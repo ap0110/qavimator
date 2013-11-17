@@ -35,7 +35,7 @@
 #define PROP_FILTER "Props (*.prp)"
 #define PRECISION   100
 
-#define SVN_ID      "$Id$"
+#define SVN_ID      "$Id: qavimator.cpp 270 2009-12-30 17:27:15Z zi_ree $"
 
 qavimator::qavimator() : QMainWindow(0)
 {
@@ -127,9 +127,10 @@ qavimator::qavimator() : QMainWindow(0)
 
   currentFrameSlider->setPageStep(1);
 
-  if(qApp->argc()>1)
+  QStringList args = QApplication::arguments();
+  if(args.size()>1)
   {
-    fileOpen(qApp->argv()[1]);
+    fileOpen(args[1]);
   }
 
   // if opening of files didn't work or no files were specified on the

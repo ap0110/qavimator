@@ -2,34 +2,34 @@
 
 CMake on unix-like systems:
 
-	- install CMake 2.4+
-	- install QT4 development package
+	- install CMake 2.8.9+
+	- install QT5 development package
 	- install glut
 	
 	mkdir _build
 	cd _build
-	cmake .. -DCMAKE_INSTALL_PREFIX=../_install
+	cmake .. -DCMAKE_INSTALL_PREFIX=../_install -DQt5Widgets_DIR=[Qt package]/lib/cmake/Qt5Widgets
 	make install
 
 OSX Bundle:
 
-	- install CMake 2.4+
+	- install CMake 2.8.9+
 	- install XCode
-	- install QT4 frameworks
+	- install QT5 frameworks
 	
 	cd other/osx
-	./make_bundle
+	./make_bundle [Qt package]/lib
 
 Windows MinGW:
 	
 	- Install MinGW
-	- Install CMake 2.4+ and make sure cmake is in system PATH
-	- Install QT4 libs and make sure qmake is in system PATH
+	- Install CMake 2.8.9+ and make sure cmake is in system PATH
+	- Install Qt5 and make sure qmake is in system PATH
 	- Download GLUT and make sure its header is in [glut package]\GL\glut.h
 	
 	mkdir _build
 	cd _build
-	cmake .. -DCMAKE_INSTALL_PREFIX=..\_install -G "MinGW Makefiles" -DGLUT_INCLUDE_PATH=[glut package] -DGLUT_LIBRARIES=[glut package]\glut32.lib
+	cmake .. -DCMAKE_INSTALL_PREFIX=..\_install -G "MinGW Makefiles" -DGLUT_INCLUDE_DIR=[glut package] -DGLUT_glut_LIBRARY=[glut package]\glut32.lib
 	mingw32-make install
 	
 	- copy [glut package]/glut32.dll into _install directory
