@@ -18,8 +18,10 @@ fi
 # get the architecture of this machine
 architecture=$(uname -m)
 
-# clean previous install
-rm -rf QAvimator.app
+# clean previous installs
+rm -rf QAvimator.app/Contents/MacOS/qavimator
+rm -rf QAvimator.app/Contents/Resources/Data
+rm -rf QAvimator.app/Contents/Frameworks/Qt*
 
 # build and install qavimator into the prepared app bundle
 mkdir _build
