@@ -4,7 +4,7 @@
 # check that we got the expected number of arguments
 if [ -z "$1" ] || [ "$2" ]
 then
-  echo "Expected only one argument"
+  echo "Expected only one argument: Qt5 lib directory"
   exit 1
 fi
 
@@ -18,10 +18,8 @@ fi
 # get the architecture of this machine
 architecture=$(uname -m)
 
-# clean previous installs
-rm -rf QAvimator.app/Contents/MacOS/qavimator
-rm -rf QAvimator.app/Contents/Resources/Data
-rm -rf QAvimator.app/Contents/Frameworks/Qt*
+# clean previous install
+rm -rf QAvimator.app
 
 # build and install qavimator into the prepared app bundle
 mkdir _build
@@ -30,6 +28,8 @@ cmake ../../.. -DINSTALL_BIN=../QAvimator.app/Contents/MacOS -DINSTALL_DATA=../Q
 make install
 
 # Fix linking and add required framework files to the project. This is optional if system Qt5 frameworks should be used
+mkdir -p ../QAvimator.app/Contents/Frameworks
+
 cp -R "$1/QtCore.framework/Versions/5/QtCore" ../QAvimator.app/Contents/Frameworks/
 install_name_tool -id @executable_path/../Frameworks/QtCore ../QAvimator.app/Contents/Frameworks/QtCore
 install_name_tool -change QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore ../QAvimator.app/Contents/MacOS/qavimator
@@ -39,15 +39,15 @@ install_name_tool -id @executable_path/../Frameworks/QtGui ../QAvimator.app/Cont
 install_name_tool -change QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore ../QAvimator.app/Contents/Frameworks/QtGui
 install_name_tool -change QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui ../QAvimator.app/Contents/MacOS/qavimator
 
-cp -R "$1/QtOpenGL.framework/Versions/5/QtOpenGL" ../QAvimator.app/Contents/Frameworks/
-install_name_tool -id @executable_path/../Frameworks/QtOpenGL ../QAvimator.app/Contents/Frameworks/QtOpenGL
-install_name_tool -change QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore ../QAvimator.app/Contents/Frameworks/QtOpenGL
-install_name_tool -change QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui ../QAvimator.app/Contents/Frameworks/QtOpenGL
-install_name_tool -change QtOpenGL.framework/Versions/5/QtOpenGL @executable_path/../Frameworks/QtOpenGL ../QAvimator.app/Contents/MacOS/qavimator
-
 cp -R "$1/QtWidgets.framework/Versions/5/QtWidgets" ../QAvimator.app/Contents/Frameworks/
 install_name_tool -id @executable_path/../Frameworks/QtWidgets ../QAvimator.app/Contents/Frameworks/QtWidgets
 install_name_tool -change QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore ../QAvimator.app/Contents/Frameworks/QtWidgets
 install_name_tool -change QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui ../QAvimator.app/Contents/Frameworks/QtWidgets
-install_name_tool -change QtOpenGL.framework/Versions/5/QtOpenGL @executable_path/../Frameworks/QtOpenGL ../QAvimator.app/Contents/Frameworks/QtWidgets
 install_name_tool -change QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets ../QAvimator.app/Contents/MacOS/qavimator
+
+cp -R "$1/QtOpenGL.framework/Versions/5/QtOpenGL" ../QAvimator.app/Contents/Frameworks/
+install_name_tool -id @executable_path/../Frameworks/QtOpenGL ../QAvimator.app/Contents/Frameworks/QtOpenGL
+install_name_tool -change QtCore.framework/Versions/5/QtCore @executable_path/../Frameworks/QtCore ../QAvimator.app/Contents/Frameworks/QtOpenGL
+install_name_tool -change QtGui.framework/Versions/5/QtGui @executable_path/../Frameworks/QtGui ../QAvimator.app/Contents/Frameworks/QtOpenGL
+install_name_tool -change QtWidgets.framework/Versions/5/QtWidgets @executable_path/../Frameworks/QtWidgets ../QAvimator.app/Contents/Frameworks/QtOpenGL
+install_name_tool -change QtOpenGL.framework/Versions/5/QtOpenGL @executable_path/../Frameworks/QtOpenGL ../QAvimator.app/Contents/MacOS/qavimator
