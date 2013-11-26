@@ -35,7 +35,7 @@
 #define PROP_FILTER "Props (*.prp)"
 #define PRECISION   100
 
-#define SVN_ID      "$Id: qavimator.cpp 270 2009-12-30 17:27:15Z zi_ree $"
+#define SVN_ID      "$Id$"
 
 qavimator::qavimator() : QMainWindow(0)
 {

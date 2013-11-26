@@ -6,7 +6,7 @@ SET (INSTALL_BIN "." CACHE PATH "Executable install path")
 SET (INSTALL_DATA "." CACHE PATH "Data install path")
 SET (INSTALL_DATA_PATH "." CACHE PATH "Where to search for data")
 
-# Initialize and search for QT5 libraries
+# Initialize and search for Qt5 libraries
 SET( QT_USE_QTOPENGL TRUE )
 FIND_PACKAGE (Qt5Widgets REQUIRED)
 #INCLUDE (${QT_USE_FILE})
