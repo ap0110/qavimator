@@ -9,7 +9,6 @@ SET (INSTALL_DATA_PATH "." CACHE PATH "Where to search for data")
 # Initialize and search for Qt5 libraries
 SET( QT_USE_QTOPENGL TRUE )
 FIND_PACKAGE (Qt5Widgets REQUIRED)
-#INCLUDE (${QT_USE_FILE})
 
 # Search for OpenGL and GLUT
 FIND_PACKAGE (OpenGL REQUIRED)
