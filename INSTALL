@@ -3,7 +3,7 @@
 CMake on unix-like systems:
 
 	- install CMake 2.8.9+
-	- install QT5 development package
+	- install Qt5 development package
 	- install glut
 	
 	mkdir _build
@@ -15,7 +15,7 @@ OSX Bundle:
 
 	- install CMake 2.8.9+
 	- install XCode
-	- install QT5 frameworks
+	- install Qt5 frameworks
 	
 	cd other/osx
 	./make_bundle [Qt package]/lib
