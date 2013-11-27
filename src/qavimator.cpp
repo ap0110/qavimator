@@ -816,8 +816,8 @@ void qavimator::easeOutChanged(int change)
 // Menu action: File / New
 void qavimator::fileNew()
 {
-  clearProps();
   if(!clearOpenFiles()) return;
+  clearProps();
 
   Animation* anim=new Animation(animationView->getBVH());
 
