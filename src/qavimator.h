@@ -154,8 +154,8 @@ class qavimator : public QMainWindow, Ui::MainWindow
     void on_currentFrameSlider_valueChanged(int newValue);
     void on_playButton_clicked();
     void on_keyframeButton_toggled(bool on);
-    void on_loopInSpinBox_valueChanged(int newValue);
-    void on_loopOutSpinBox_valueChanged(int newValue);
+    void on_loopInSpinBox_editingFinished();
+    void on_loopOutSpinBox_editingFinished();
     void on_framesSpin_valueChanged(int num);
     void on_fpsSpin_valueChanged(int num);
     // end autoconnection from designer UI

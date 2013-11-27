@@ -1711,9 +1711,7 @@ void qavimator::setLoopInPoint(int inFrame)
 
   anim->setLoopInPoint(inFrame-1);
 
-  loopInSpinBox->blockSignals(true);
   loopInSpinBox->setValue(inFrame);
-  loopInSpinBox->blockSignals(false);
 
   loopInPercentLabel->setText(QString("(%1%)").arg(inFrame*100/numOfFrames));
 }
@@ -1732,9 +1730,7 @@ void qavimator::setLoopOutPoint(int outFrame)
 
   anim->setLoopOutPoint(outFrame-1);
 
-  loopOutSpinBox->blockSignals(true);
   loopOutSpinBox->setValue(outFrame);
-  loopOutSpinBox->blockSignals(false);
 
   loopOutPercentLabel->setText(QString("(%1%)").arg(outFrame*100/numOfFrames));
 }
@@ -2118,14 +2114,14 @@ void qavimator::on_keyframeButton_toggled(bool on)
   animationView->repaint();
 }
 
-void qavimator::on_loopInSpinBox_valueChanged(int newValue)
+void qavimator::on_loopInSpinBox_editingFinished()
 {
-  setLoopInPoint(newValue);
+  setLoopInPoint(loopInSpinBox->value());
 }
 
-void qavimator::on_loopOutSpinBox_valueChanged(int newValue)
+void qavimator::on_loopOutSpinBox_editingFinished()
 {
-  setLoopOutPoint(newValue);
+  setLoopOutPoint(loopOutSpinBox->value());
 }
 
 void qavimator::on_framesSpin_valueChanged(int newValue)
