@@ -1048,7 +1048,7 @@ void qavimator::fileExportForSecondLife()
   if(currentFile!=UNTITLED_NAME)
   {
     QFileInfo fileInfo(currentFile);
-    QString exportName=fileInfo.path()+"/"+fileInfo.baseName()+".bvh";
+    QString exportName=fileInfo.path()+"/"+fileInfo.completeBaseName()+".bvh";
 
     qDebug("qavimator::fileExportForSecondLife(): exporting animation as '%s'.",exportName.toLatin1().constData());
     animationView->getAnimation()->saveBVH(exportName);
