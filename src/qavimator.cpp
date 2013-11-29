@@ -142,7 +142,6 @@ qavimator::qavimator() : QMainWindow(0)
 
 qavimator::~qavimator()
 {
-  if(timeline) delete timeline;
   fileExit();
 }
 
