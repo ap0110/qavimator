@@ -180,8 +180,8 @@ void qavimator::readSettings()
     protectFirstFrame=settings.value("/protect_first_frame").toBool();
     showTimelinePanel=settings.value("/show_timeline").toBool();
 
-    int width=settings.value("/mainwindow_width").toInt();
-    int height=settings.value("/mainwindow_height").toInt();
+    width=settings.value("/mainwindow_width").toInt();
+    height=settings.value("/mainwindow_height").toInt();
 
     lastPath=settings.value("/last_path").toString();
 
