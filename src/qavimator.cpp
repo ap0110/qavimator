@@ -910,8 +910,8 @@ void qavimator::fileOpen(const QString& name)
 
   if(!file.isEmpty())
   {
-    clearProps();
     if(!clearOpenFiles()) return;
+    clearProps();
     fileAdd(file);
   }
 
