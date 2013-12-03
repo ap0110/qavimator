@@ -201,7 +201,7 @@ void AnimationView::drawProps()
 // Adds a new animation without overriding others, and sets it current
 void AnimationView::addAnimation(Animation* anim)
 {
-  if(!inAnimList(anim))
+  if(!animList.contains(anim))
   {
     animList.append(anim);
     animation=anim; // set it as the current one
@@ -314,11 +314,6 @@ void AnimationView::clearProps()
     delete prop;
   }
   repaint();
-}
-
-bool AnimationView::inAnimList(Animation* anim)
-{
-  return animList.contains(anim);
 }
 
 void AnimationView::setProjection()
@@ -688,6 +683,11 @@ void AnimationView::mouseDoubleClickEvent(QMouseEvent* event)
 
   // no double clicks for props or drag handles
   if(selected>=OBJECT_START) return;
+
+  // FIXME: With multiple avatars, double-clicking
+  //  other avatars may require a different
+  //  animation than what getAnimation() returns
+  if (getAnimation()->getNode(selected) == 0) return;
 
   if(modifier & SHIFT)
   {

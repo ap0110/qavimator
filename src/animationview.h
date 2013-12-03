@@ -201,7 +201,6 @@ class AnimationView : public QGLWidget
     int drawMode;
     bool xSelect, ySelect, zSelect;
 
-    bool inAnimList(Animation *anim);
     void setProjection();
     void setModelView();
     void setBodyMaterial();
