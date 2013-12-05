@@ -25,15 +25,35 @@
 	@author Zi Ree <Zi Ree @ Second Life>
 */
 
+#include <QSettings>
+
 class Settings
 {
   public:
     Settings();
     ~Settings();
 
+    static void setLoop(bool value);
+    static bool loop();
+    static void setSkeleton(bool value);
+    static bool skeleton();
+    static void setJointLimits(bool value);
+    static bool jointLimits();
+    static void setProtectFirstFrame(bool value);
+    static bool protectFirstFrame();
+    static void setShowTimelinePanel(bool value);
+    static bool showTimelinePanel();
+
+    static void setMainWindowWidth(int value);
+    static int mainWindowWidth();
+    static void setMainWindowHeight(int value);
+    static int mainWindowHeight();
+
+    static void setLastPath(QString value);
+    static QString lastPath();
+
     static void setFog(bool on);
     static bool fog();
-
     static void setFloorTranslucency(int value);
     static int  floorTranslucency();
 
@@ -41,6 +61,32 @@ class Settings
     static bool easeIn();
     static void setEaseOut(bool on);
     static bool easeOut();
+
+    static void setFigure(int value);
+    static int figure();
+
+    static void readSettings();
+    static void writeSettings();
+
+private:
+    static bool m_loop;
+    static bool m_skeleton;
+    static bool m_jointLimits;
+    static bool m_protectFirstFrame;
+    static bool m_showTimelinePanel;
+
+    static int m_mainWindowWidth;
+    static int m_mainWindowHeight;
+
+    static QString m_lastPath;
+
+    static bool m_fog;
+    static int  m_floorTranslucency;
+
+    static bool m_easeIn;
+    static bool m_easeOut;
+
+    static int m_figure;
 };
 
 #endif

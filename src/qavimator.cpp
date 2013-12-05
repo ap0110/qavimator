@@ -66,7 +66,23 @@ qavimator::qavimator() : QMainWindow(0)
   // playback stopped by default
   setPlaystate(PLAYSTATE_STOPPED);
 
-  readSettings();
+  Settings::readSettings();
+
+  resize(Settings::mainWindowWidth(),Settings::mainWindowHeight());
+
+  optionsLoopAction->setChecked(Settings::loop());
+  optionsSkeletonAction->setChecked(Settings::skeleton());
+  optionsJointLimitsAction->setChecked(Settings::jointLimits());
+  optionsShowTimelineAction->setChecked(Settings::showTimelinePanel());
+
+  if(!Settings::showTimelinePanel()) timelineView->hide();
+  // prevent a signal to be sent to yet uninitialized animation view
+  optionsProtectFirstFrameAction->blockSignals(true);
+  optionsProtectFirstFrameAction->setChecked(Settings::protectFirstFrame());
+  optionsProtectFirstFrameAction->blockSignals(false);
+
+  figureCombo->setCurrentIndex(Settings::figure());
+  setAvatarShape(Settings::figure());
 
   connect(animationView,SIGNAL(partClicked(BVHNode*,
                                            Rotation,
@@ -143,80 +159,6 @@ qavimator::qavimator() : QMainWindow(0)
 qavimator::~qavimator()
 {
   fileExit();
-}
-
-// FIXME:: implement a static Settings:: class
-void qavimator::readSettings()
-{
-  QSettings settings;
-  settings.beginGroup("/qavimator");
-
-  // if no settings found, start up with defaults
-  int width=850;
-  int height=600;
-  int figureType=0;
-  bool skeleton=false;
-  bool showTimelinePanel=true;
-
-  jointLimits=true;
-  loop=true;
-  protectFirstFrame=true;
-  lastPath=QString::null;
-
-  // OpenGL presets
-  Settings::setFog(true);
-  Settings::setFloorTranslucency(33);
-
-  // defaults for ease in/ease out
-  Settings::setEaseIn(false);
-  Settings::setEaseOut(false);
-
-  bool settingsFound=settings.value("/settings").toBool();
-  if(settingsFound)
-  {
-    loop=settings.value("/loop").toBool();
-    skeleton=settings.value("/skeleton").toBool();
-    jointLimits=settings.value("/joint_limits").toBool();
-    protectFirstFrame=settings.value("/protect_first_frame").toBool();
-    showTimelinePanel=settings.value("/show_timeline").toBool();
-
-    width=settings.value("/mainwindow_width").toInt();
-    height=settings.value("/mainwindow_height").toInt();
-
-    lastPath=settings.value("/last_path").toString();
-
-    // OpenGL settings
-    Settings::setFog(settings.value("/fog").toBool());
-    Settings::setFloorTranslucency(settings.value("/floor_translucency").toInt());
-
-    // settings for ease in/ease outFrame
-    Settings::setEaseIn(settings.value("/ease_in").toBool());
-    Settings::setEaseOut(settings.value("/ease_out").toBool());
-
-    // sanity
-    if(width<50) width=50;
-    if(height<50) height=50;
-
-    figureType=settings.value("/figure").toInt();
-
-    settings.endGroup();
-  }
-
-  resize(width,height);
-
-  optionsLoopAction->setChecked(loop);
-  optionsSkeletonAction->setChecked(skeleton);
-  optionsJointLimitsAction->setChecked(jointLimits);
-  optionsShowTimelineAction->setChecked(showTimelinePanel);
-
-  if(!showTimelinePanel) timelineView->hide();
-  // prevent a signal to be sent to yet uninitialized animation view
-  optionsProtectFirstFrameAction->blockSignals(true);
-  optionsProtectFirstFrameAction->setChecked(protectFirstFrame);
-  optionsProtectFirstFrameAction->blockSignals(false);
-
-  figureCombo->setCurrentIndex(figureType);
-  setAvatarShape(figureType);
 }
 
 // slot gets called by AnimationView::mousePressEvent()
@@ -692,7 +634,7 @@ void qavimator::nextPlaystate()
     case PLAYSTATE_STOPPED:
     {
       // if we're suposed to loop and the current frame is not past loop out point
-      if(loop && anim->getFrame()<anim->getLoopOutPoint())
+      if(Settings::loop() && anim->getFrame()<anim->getLoopOutPoint())
       {
         // start looping animation
         setPlaystate(PLAYSTATE_LOOPING);
@@ -747,7 +689,7 @@ void qavimator::setFPS(int fps)
 void qavimator::frameSlider(int position)
 {
   // check if we are at the first frame and if it's protected
-  if(position==0 && protectFirstFrame) protect=true;
+  if(position==0 && Settings::protectFirstFrame()) protect=true;
   else protect=false;
 
   emit protectFrame(protect);
@@ -832,9 +774,9 @@ void qavimator::fileNew()
   // add new animation to combo box
   addToOpenFiles(UNTITLED_NAME);
 
-  anim->useRotationLimits(jointLimits);
+  anim->useRotationLimits(Settings::jointLimits());
 
-  if(protectFirstFrame)
+  if(Settings::protectFirstFrame())
   {
 //    qDebug("qavimator::fileNew(): adding loop points for protected frame 1 animation");
     // skip first frame, since it's protected anyway
@@ -876,9 +818,9 @@ QString qavimator::selectFileToOpen(const QString& caption)
 {
    //// For some unknown reason passing "this" locks up the OSX qavimator window. Possibly a QT4 bug, needs investigation
 #ifdef __APPLE__
-   QString file=QFileDialog::getOpenFileName(NULL,caption,lastPath,ANIM_FILTER);
+   QString file=QFileDialog::getOpenFileName(NULL,caption,Settings::lastPath(),ANIM_FILTER);
 #else
-   QString file=QFileDialog::getOpenFileName(this,caption,lastPath,ANIM_FILTER);
+   QString file=QFileDialog::getOpenFileName(this,caption,Settings::lastPath(),ANIM_FILTER);
 #endif
   if(!file.isEmpty())
   {
@@ -889,7 +831,7 @@ QString qavimator::selectFileToOpen(const QString& caption)
       file=QString::null;
     }
     else
-      lastPath=fileInfo.path();
+      Settings::setLastPath(fileInfo.path());
   }
 
   return file;
@@ -951,7 +893,7 @@ void qavimator::fileAdd(const QString& name)
     animationView->addAnimation(anim);
     timeline->setAnimation(anim);
     selectAnimation(anim);
-    anim->useRotationLimits(jointLimits);
+    anim->useRotationLimits(Settings::jointLimits());
 
 //    qDebug("qavimator::fileAdd(): checking for loop points");
     // no loop in point? must be a BVH or an older avm. set a sane default
@@ -961,7 +903,7 @@ void qavimator::fileAdd(const QString& name)
       // first set loop out point to avoid clamping of loop in point
       setLoopOutPoint(anim->getNumberOfFrames());
 
-      if(protectFirstFrame)
+      if(Settings::protectFirstFrame())
       {
 //        qDebug("qavimator::fileAdd(): adding loop points for protected frame 1 animation");
         anim->setFrame(1);
@@ -1029,7 +971,7 @@ void qavimator::fileSaveAs()
     if(checkFileOverwrite(fileInfo))
     {
       setCurrentFile(file);
-      lastPath=fileInfo.path();
+      Settings::setLastPath(fileInfo.path());
       animationView->getAnimation()->saveBVH(file);
       // update animation selector combo box
       selectAnimationCombo->setItemText(selectAnimationCombo->currentIndex(),fileInfo.baseName());
@@ -1060,9 +1002,9 @@ void qavimator::fileLoadProps()
 {
    //// For some unknown reason passing "this" locks up the OSX qavimator window. Possibly a QT4 bug, needs investigation
 #ifdef __APPLE__
-   QString fileName=QFileDialog::getOpenFileName(NULL,QString(),lastPath,PROP_FILTER);
+   QString fileName=QFileDialog::getOpenFileName(NULL,QString(),Settings::lastPath(),PROP_FILTER);
 #else
-   QString fileName=QFileDialog::getOpenFileName(this,QString(),lastPath,PROP_FILTER);
+   QString fileName=QFileDialog::getOpenFileName(this,QString(),Settings::lastPath(),PROP_FILTER);
 #endif
 
   if(!fileName.isEmpty())
@@ -1173,33 +1115,16 @@ void qavimator::fileExit()
   if(!clearOpenFiles())
     return;
 
-  QSettings settings;
-  settings.beginGroup("/qavimator");
+  Settings::setSkeleton(optionsSkeletonAction->isChecked());
+  Settings::setJointLimits(optionsJointLimitsAction->isChecked());
+  Settings::setProtectFirstFrame(optionsProtectFirstFrameAction->isChecked());
+  Settings::setShowTimelinePanel(optionsShowTimelineAction->isChecked());
 
-  // make sure we know next time, that there actually was a settings file
-  settings.setValue("/settings",true);
+  Settings::setFigure(figureCombo->currentIndex());
+  Settings::setMainWindowWidth(size().width());
+  Settings::setMainWindowHeight(size().height());
 
-  settings.setValue("/loop",loop);
-  settings.setValue("/skeleton",optionsSkeletonAction->isChecked());
-  settings.setValue("/joint_limits",optionsJointLimitsAction->isChecked());
-  settings.setValue("/protect_first_frame",optionsProtectFirstFrameAction->isChecked());
-  settings.setValue("/show_timeline",optionsShowTimelineAction->isChecked());
-
-  settings.setValue("/figure",figureCombo->currentIndex());
-  settings.setValue("/mainwindow_width",size().width());
-  settings.setValue("/mainwindow_height",size().height());
-
-  settings.setValue("/last_path",lastPath);
-
-  // OpenGL settings
-  settings.setValue("/fog",Settings::fog());
-  settings.setValue("/floor_translucency",Settings::floorTranslucency());
-
-  // settings for ease in/ease outFrame
-  settings.setValue("/ease_in",Settings::easeIn());
-  settings.setValue("/ease_out",Settings::easeOut());
-
-  settings.endGroup();
+  Settings::writeSettings();
 
   // remove all widgets and close the main form
   qApp->exit(0);
@@ -1252,7 +1177,7 @@ void qavimator::showSkeleton(bool on)
 // Menu Action: Options / Loop
 void qavimator::setLoop(bool on)
 {
-  loop=on;
+  Settings::setLoop(on);
 
   // update play state
   if(playstate==PLAYSTATE_LOOPING)
@@ -1265,7 +1190,7 @@ void qavimator::setLoop(bool on)
 // Menu Action: Options / Joint Limits
 void qavimator::setJointLimits(bool on)
 {
-  jointLimits=on;
+  Settings::setJointLimits(on);
   Animation* anim=animationView->getAnimation();
   if(anim)
   {
@@ -1278,7 +1203,7 @@ void qavimator::setJointLimits(bool on)
 // Menu Action: Options / Protect First Frame
 void qavimator::setProtectFirstFrame(bool on)
 {
-  protectFirstFrame=on;
+  Settings::setProtectFirstFrame(on);
   if(on && currentFrameSlider->value()==0) protect=true;
   else protect=false;
 
@@ -1493,7 +1418,7 @@ void qavimator::setCurrentFrame(int frame)
     timeline->setCurrentFrame(frame);
 //  animationView->setFrame(frame);
     // check if we are at the first frame and if it's protected
-    if(frame==0 && protectFirstFrame) protect=true;
+    if(frame==0 && Settings::protectFirstFrame()) protect=true;
     else protect=false;
     emit protectFrame(protect);
     updateInputs();
@@ -1742,7 +1667,7 @@ void qavimator::setPlaystate(PlayState state)
 
   // set play button icons according to play state
   if(state==PLAYSTATE_STOPPED)
-    playButton->setIcon(loop ? loopIcon : playIcon);
+    playButton->setIcon(Settings::loop() ? loopIcon : playIcon);
   else if(state==PLAYSTATE_LOOPING)
     playButton->setIcon(playIcon);
   else if(state==PLAYSTATE_PLAYING)

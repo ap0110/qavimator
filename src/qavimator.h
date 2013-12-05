@@ -57,7 +57,6 @@ class qavimator : public QMainWindow, Ui::MainWindow
     void protectFrame(bool state);
 
   protected slots:
-    void readSettings();
     void configChanged();
 
     void partClicked(BVHNode* node,Rotation rot,RotationLimits rotLimits,Position pos);
@@ -260,8 +259,6 @@ class qavimator : public QMainWindow, Ui::MainWindow
 
     QString currentFile;
     QStringList openFiles;
-    // last path used for open or save
-    QString lastPath;
     QTimer timer;
     // list of animation ids mapped to combo box indexes
     QList<Animation*> animationIds;
@@ -280,11 +277,7 @@ class qavimator : public QMainWindow, Ui::MainWindow
     // holds the current playing status
     PlayState playstate;
 
-    bool loop;
-    bool jointLimits;
     bool frameDataValid;
-    // if set the first frame of an animation is protected
-    bool protectFirstFrame;
     // will be true if a frame is protected
     bool protect;
 
