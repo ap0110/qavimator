@@ -53,15 +53,15 @@ Settings::~Settings()
   qWarning("Deconstructor of static class \"Settings\" was called");
 }
 
-void Settings::setLoop(bool value)               { m_loop=value; }
+void Settings::setLoop(bool on)               { m_loop=on; }
 bool Settings::loop()                            { return m_loop; }
-void Settings::setSkeleton(bool value)           { m_skeleton=value; }
+void Settings::setSkeleton(bool on)           { m_skeleton=on; }
 bool Settings::skeleton()                        { return m_skeleton; }
-void Settings::setJointLimits(bool value)        { m_jointLimits=value; }
+void Settings::setJointLimits(bool on)        { m_jointLimits=on; }
 bool Settings::jointLimits()                     { return m_jointLimits; }
-void Settings::setProtectFirstFrame(bool value)  { m_protectFirstFrame=value; }
+void Settings::setProtectFirstFrame(bool on)  { m_protectFirstFrame=on; }
 bool Settings::protectFirstFrame()               { return m_protectFirstFrame; }
-void Settings::setShowTimelinePanel(bool value)  { m_showTimelinePanel=value; }
+void Settings::setShowTimelinePanel(bool on)  { m_showTimelinePanel=on; }
 bool Settings::showTimelinePanel()               { return m_showTimelinePanel; }
 
 void Settings::setMainWindowWidth(int value)     { m_mainWindowWidth=value; }
@@ -72,14 +72,14 @@ int Settings::mainWindowHeight()                 { return m_mainWindowHeight; }
 void Settings::setLastPath(QString value)        { m_lastPath=value; }
 QString Settings::lastPath()                     { return m_lastPath; }
 
-void Settings::setFog(bool value)                { m_fog=value; }
+void Settings::setFog(bool on)                { m_fog=on; }
 bool Settings::fog()                             { return m_fog; }
-void Settings::setFloorTranslucency(int value)   { m_floorTranslucency=value; }
+void Settings::setFloorTranslucency(int on)   { m_floorTranslucency=on; }
 int  Settings::floorTranslucency()               { return m_floorTranslucency; }
 
-void Settings::setEaseIn(bool value)             { m_easeIn=value; }
+void Settings::setEaseIn(bool on)             { m_easeIn=on; }
 bool Settings::easeIn()                          { return m_easeIn; }
-void Settings::setEaseOut(bool value)            { m_easeOut=value; }
+void Settings::setEaseOut(bool on)            { m_easeOut=on; }
 bool Settings::easeOut()                         { return m_easeOut; }
 
 void Settings::setFigure(int value)              { m_figure=value; }
