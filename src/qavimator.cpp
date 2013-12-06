@@ -1169,12 +1169,9 @@ void qavimator::toolsOptimizeBVH()
 }
 
 // Menu Action: Options / Skeleton
-void qavimator::showSkeleton(bool on)
+void qavimator::setSkeleton(bool on)
 {
-  if(on)
-    animationView->showSkeleton();
-  else
-    animationView->hideSkeleton();
+  Settings::setSkeleton(on);
 }
 
 // Menu Action: Options / Loop
@@ -1782,7 +1779,7 @@ void qavimator::on_toolsMirrorAction_triggered()
 
 void qavimator::on_optionsSkeletonAction_toggled(bool on)
 {
-  showSkeleton(on);
+  setSkeleton(on);
 }
 
 void qavimator::on_optionsJointLimitsAction_toggled(bool on)

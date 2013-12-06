@@ -97,9 +97,6 @@ class AnimationView : public QGLWidget
     Animation* getAnimation() { return animation; }
     Animation* getAnimation(unsigned int index) { return animList.at(index); }
     Animation* getLastAnimation() { return animList.last(); }
-    bool isSkeletonOn() { return skeleton; }
-    void showSkeleton() { skeleton = true; }
-    void hideSkeleton() { skeleton = false; }
     void selectPart(BVHNode* node);
     void selectProp(const QString& prop);
     BVHNode* getSelectedPart();
@@ -186,7 +183,6 @@ class AnimationView : public QGLWidget
     double changeX, changeY, changeZ;
     BVHNode* joints[Animation::NUM_FIGURES];
 
-    bool skeleton;
     bool selecting;
     unsigned int selectName;
     unsigned int partHighlighted;

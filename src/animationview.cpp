@@ -61,7 +61,6 @@ AnimationView::AnimationView(QWidget* parent,const char* /* name */,Animation* a
   glutInit(&args,arg);
 
   // init
-  skeleton=false;
   selecting=false;
   partHighlighted=0;
   propDragging=0;
@@ -851,7 +850,7 @@ void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,
       selectName++;
       motion=motion->child(0);
     }
-    if(mode==MODE_SKELETON && skeleton && !selecting)
+    if(mode==MODE_SKELETON && Settings::skeleton() && !selecting)
     {
       glColor4f(0,1,1,1);
       glLineWidth(1);

@@ -183,7 +183,7 @@ class qavimator : public QMainWindow, Ui::MainWindow
     void toolsOptimizeBVH();
     void toolsMirror();
 
-    void showSkeleton(bool on);
+    void setSkeleton(bool on);
     void setJointLimits(bool on);
     void setLoop(bool on);
     void setProtectFirstFrame(bool on);
