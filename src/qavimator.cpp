@@ -74,15 +74,14 @@ qavimator::qavimator() : QMainWindow(0)
   optionsSkeletonAction->setChecked(Settings::skeleton());
   optionsJointLimitsAction->setChecked(Settings::jointLimits());
   optionsShowTimelineAction->setChecked(Settings::showTimelinePanel());
-
-  if(!Settings::showTimelinePanel()) timelineView->hide();
-  // prevent a signal to be sent to yet uninitialized animation view
-  optionsProtectFirstFrameAction->blockSignals(true);
   optionsProtectFirstFrameAction->setChecked(Settings::protectFirstFrame());
-  optionsProtectFirstFrameAction->blockSignals(false);
 
   figureCombo->setCurrentIndex(Settings::figure());
   setAvatarShape(Settings::figure());
+
+  if(!Settings::showTimelinePanel()) timelineView->hide();
+
+
 
   connect(animationView,SIGNAL(partClicked(BVHNode*,
                                            Rotation,
@@ -481,64 +480,68 @@ void qavimator::updateInputs()
   setUpdatesEnabled(false);
 
   Animation* anim=animationView->getAnimation();
-
-  if(anim && currentPart)
+  if (anim)
   {
-    Rotation rot=anim->getRotation(currentPart);
-
-    double x=rot.x;
-    double y=rot.y;
-    double z=rot.z;
-
-    RotationLimits rotLimits=anim->getRotationLimits(currentPart);
-
-    double xMin=rotLimits.xMin;
-    double yMin=rotLimits.yMin;
-    double zMin=rotLimits.zMin;
-    double xMax=rotLimits.xMax;
-    double yMax=rotLimits.yMax;
-    double zMax=rotLimits.zMax;
-
-    if(currentPart->type==BVH_ROOT)
+    if(currentPart)
     {
-      xRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
-      yRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
-      zRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
+      Rotation rot=anim->getRotation(currentPart);
+
+      double x=rot.x;
+      double y=rot.y;
+      double z=rot.z;
+
+      RotationLimits rotLimits=anim->getRotationLimits(currentPart);
+
+      double xMin=rotLimits.xMin;
+      double yMin=rotLimits.yMin;
+      double zMin=rotLimits.zMin;
+      double xMax=rotLimits.xMax;
+      double yMax=rotLimits.yMax;
+      double zMax=rotLimits.zMax;
+
+      if(currentPart->type==BVH_ROOT)
+      {
+        xRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
+        yRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
+        zRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
+      }
+      else
+      {
+        xRotationSlider->setRange((int)(xMin*PRECISION), (int)(xMax*PRECISION));
+        yRotationSlider->setRange((int)(yMin*PRECISION), (int)(yMax*PRECISION));
+        zRotationSlider->setRange((int)(zMin*PRECISION), (int)(zMax*PRECISION));
+      }
+
+      setX(x);
+      setY(y);
+      setZ(z);
     }
     else
     {
-      xRotationSlider->setRange((int)(xMin*PRECISION), (int)(xMax*PRECISION));
-      yRotationSlider->setRange((int)(yMin*PRECISION), (int)(yMax*PRECISION));
-      zRotationSlider->setRange((int)(zMin*PRECISION), (int)(zMax*PRECISION));
+      emit enableRotation(false);
     }
 
-    setX(x);
-    setY(y);
-    setZ(z);
+    emit enablePosition(!protect);
+    Position pos=anim->getPosition();
+
+    setXPos(pos.x);
+    setYPos(pos.y);
+    setZPos(pos.z);
+
+    // we do that in nextPlaystate() now
+    //  playButton->setIcon(playing ? stopIcon : playIcon);
+
+    framesSpin->setValue(anim->getNumberOfFrames());
+    currentFrameSlider->setMaximum(anim->getNumberOfFrames()-1);
+    fpsSpin->setValue(anim->fps());
+
+    // prevent feedback loop
+    scaleSpin->blockSignals(true);
+    scaleSpin->setValue(anim->getAvatarScale()*100.0+0.1);  // +0.1 to overcome rounding errors
+    scaleSpin->blockSignals(false);
+
+    updateKeyBtn();
   }
-  else
-    emit enableRotation(false);
-
-  emit enablePosition(!protect);
-  Position pos=anim->getPosition();
-
-  setXPos(pos.x);
-  setYPos(pos.y);
-  setZPos(pos.z);
-
-// we do that in nextPlaystate() now
-//  playButton->setIcon(playing ? stopIcon : playIcon);
-
-  framesSpin->setValue(anim->getNumberOfFrames());
-  currentFrameSlider->setMaximum(anim->getNumberOfFrames()-1);
-  fpsSpin->setValue(anim->fps());
-
-  // prevent feedback loop
-  scaleSpin->blockSignals(true);
-  scaleSpin->setValue(anim->getAvatarScale()*100.0+0.1);  // +0.1 to overcome rounding errors
-  scaleSpin->blockSignals(false);
-
-  updateKeyBtn();
 
   if(playstate==PLAYSTATE_STOPPED)
     emit enableInputs(true);
