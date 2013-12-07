@@ -104,7 +104,6 @@ class Animation : public QObject
 
     bool dirty() const;
     void setDirty(bool state);
-    void setLoop(bool loop);
 
     void nextPlaystate();
     void setPlaystate(PlayState state);
@@ -179,7 +178,7 @@ class Animation : public QObject
 
     // for playback
     double currentPlayTime;
-    int playstate;
+    PlayState playstate;
 
     bool loop;            // should we loop when using stepForward()?
     int loopInPoint;
@@ -204,7 +203,9 @@ class Animation : public QObject
     void solveIK();
 
     QString dataPath;
-    QTimer timer;
+    // FIXME: Timer disabled since playbackTimeout() is unused.
+    //  Either remove it or start using it.
+    //QTimer timer;
 };
 
 #endif

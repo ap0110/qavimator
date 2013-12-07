@@ -78,13 +78,14 @@ Animation::Animation(BVH* newBVH,const QString& bvhFile) :
   setIK(IK_LFOOT, false);
   setIK(IK_RFOOT, false);
 
-  setLoop(false);
   setDirty(false);
 
   currentPlayTime=0.0;
   setPlaystate(PLAYSTATE_STOPPED);
 
-  connect(&timer,SIGNAL(timeout()),this,SLOT(playbackTimeout()));
+  // FIXME: playbackTimeout() was not being used
+  //  so either remove it or find a way to use it.
+  //connect(&timer,SIGNAL(timeout()),this,SLOT(playbackTimeout()));
 }
 
 Animation::~Animation()
@@ -200,7 +201,7 @@ int Animation::stepForward()
   {
     int nextFrame=(frame+1) % totalFrames;
 
-    if(loop)
+    if(playstate == PLAYSTATE_LOOPING)
     {
       if(!nextFrame || nextFrame>loopOutPoint) nextFrame=loopInPoint;
     }
@@ -1042,11 +1043,6 @@ void Animation::setDirty(bool state)
   emit animationDirty(state);
 }
 
-void Animation::setLoop(bool on)
-{
-  loop=on;
-}
-
 float Animation::getAvatarScale()
 {
   return avatarScale;
@@ -1079,10 +1075,10 @@ void Animation::setPlaystate(PlayState state)
   {
     case PLAYSTATE_LOOPING:
     case PLAYSTATE_PLAYING:
-      timer.start(PLAYBACK_RESOLUTION);
+      //timer.start(PLAYBACK_RESOLUTION);
       break;
     case PLAYSTATE_STOPPED:
-      timer.stop();
+      //timer.stop();
       break;
     default:
       break;

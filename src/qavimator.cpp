@@ -641,13 +641,13 @@ void qavimator::nextPlaystate()
       {
         // start looping animation
         setPlaystate(PLAYSTATE_LOOPING);
-        anim->setLoop(true);
+        anim->setPlaystate(PLAYSTATE_LOOPING);
       }
       else
       {
         // start one-shot animation
         setPlaystate(PLAYSTATE_PLAYING);
-        anim->setLoop(false);
+        anim->setPlaystate(PLAYSTATE_PLAYING);
       }
 
       timer.start((int)(1.0/anim->fps()*1000.0));
@@ -656,7 +656,7 @@ void qavimator::nextPlaystate()
     case PLAYSTATE_LOOPING:
     {
       setPlaystate(PLAYSTATE_PLAYING);
-      anim->setLoop(false);
+      anim->setPlaystate(PLAYSTATE_PLAYING);
       break;
     }
     case PLAYSTATE_PLAYING:
@@ -664,6 +664,7 @@ void qavimator::nextPlaystate()
       // take care of locks, key frames ...
       frameSlider(currentFrameSlider->value());
       setPlaystate(PLAYSTATE_STOPPED);
+      anim->setPlaystate(PLAYSTATE_STOPPED);
 
       break;
     }
