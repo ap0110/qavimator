@@ -39,8 +39,6 @@ int  Settings::m_floorTranslucency=33;
 bool Settings::m_easeIn=false;
 bool Settings::m_easeOut=false;
 
-int Settings::m_figure=0;
-
 Settings::Settings()
 {
   // should never be accessed
@@ -82,9 +80,6 @@ bool Settings::easeIn()                          { return m_easeIn; }
 void Settings::setEaseOut(bool on)            { m_easeOut=on; }
 bool Settings::easeOut()                         { return m_easeOut; }
 
-void Settings::setFigure(int value)              { m_figure=value; }
-int Settings::figure()                           { return m_figure; }
-
 void Settings::readSettings()
 {
   QSettings settings;
@@ -111,8 +106,6 @@ void Settings::readSettings()
     // settings for ease in/ease outFrame
     Settings::setEaseIn(settings.value("/ease_in").toBool());
     Settings::setEaseOut(settings.value("/ease_out").toBool());
-
-    Settings::setFigure(settings.value("/figure").toInt());
   }
   settings.endGroup();
 }
@@ -131,7 +124,6 @@ void Settings::writeSettings()
   settings.setValue("/protect_first_frame",Settings::protectFirstFrame());
   settings.setValue("/show_timeline",Settings::showTimelinePanel());
 
-  settings.setValue("/figure",Settings::figure());
   settings.setValue("/mainwindow_width",Settings::mainWindowWidth());
   settings.setValue("/mainwindow_height",Settings::mainWindowHeight());
 

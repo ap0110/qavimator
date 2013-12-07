@@ -62,9 +62,6 @@ class Settings
     static void setEaseOut(bool on);
     static bool easeOut();
 
-    static void setFigure(int value);
-    static int figure();
-
     static void readSettings();
     static void writeSettings();
 
@@ -85,8 +82,6 @@ private:
 
     static bool m_easeIn;
     static bool m_easeOut;
-
-    static int m_figure;
 };
 
 #endif

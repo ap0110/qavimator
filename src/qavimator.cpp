@@ -76,9 +76,6 @@ qavimator::qavimator() : QMainWindow(0)
   optionsShowTimelineAction->setChecked(Settings::showTimelinePanel());
   optionsProtectFirstFrameAction->setChecked(Settings::protectFirstFrame());
 
-  figureCombo->setCurrentIndex(Settings::figure());
-  setAvatarShape(Settings::figure());
-
   if(!Settings::showTimelinePanel()) timelineView->hide();
 
 
@@ -1121,7 +1118,6 @@ void qavimator::fileExit()
   Settings::setProtectFirstFrame(optionsProtectFirstFrameAction->isChecked());
   Settings::setShowTimelinePanel(optionsShowTimelineAction->isChecked());
 
-  Settings::setFigure(figureCombo->currentIndex());
   Settings::setMainWindowWidth(size().width());
   Settings::setMainWindowHeight(size().height());
 
