@@ -180,7 +180,6 @@ class Animation : public QObject
     double currentPlayTime;
     PlayState playstate;
 
-    bool loop;            // should we loop when using stepForward()?
     int loopInPoint;
     int loopOutPoint;
 
