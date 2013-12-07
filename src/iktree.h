@@ -57,14 +57,12 @@ class IKTree
     void set(BVHNode *root);
     void setGoal(int frame, const QString& name);
     void solve(int frame);
-    void setJointLimits(bool flag) { jointLimits = flag; }
 
   protected:
     enum {AXIS_X, AXIS_Y, AXIS_Z};
 
     int numBones;
     IKBone bone[MAX_BONES];
-    bool jointLimits;
 
     void reset(int frame);
     void addJoint(BVHNode *node);

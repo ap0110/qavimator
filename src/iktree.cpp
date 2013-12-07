@@ -26,6 +26,7 @@
 
 #include "MT_Transform.h"
 #include "iktree.h"
+#include "settings.h"
 
 int display = 0;
 
@@ -35,8 +36,7 @@ static const MT_Vector3 yAxis(0,1,0);
 static const MT_Vector3 zAxis(0,0,1);
 static const MT_Quaternion identity(0,0,0,1);
 
-IKTree::IKTree(BVHNode *root) :
-  jointLimits(true)
+IKTree::IKTree(BVHNode *root)
 {
   set(root);
 }
@@ -257,7 +257,7 @@ void IKTree::solveJoint(int frame, int i, IKEffectorList &effList)
     MT_Quaternion targetRot = 0.9 * totalPosRot + 0.1 * totalDirRot;
     targetRot = targetRot * bone[i].lRot;
     toEuler(targetRot, n->channelOrder, x, y, z);
-    if (jointLimits) {
+    if (Settings::jointLimits()) {
       bone[i].lRot = identity;
       for (int k=0; k<n->numChannels; k++) {  // clamp each axis in order
         switch (n->channelType[k]) {

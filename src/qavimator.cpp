@@ -777,8 +777,6 @@ void qavimator::fileNew()
   // add new animation to combo box
   addToOpenFiles(UNTITLED_NAME);
 
-  anim->useRotationLimits(Settings::jointLimits());
-
   if(Settings::protectFirstFrame())
   {
 //    qDebug("qavimator::fileNew(): adding loop points for protected frame 1 animation");
@@ -896,7 +894,6 @@ void qavimator::fileAdd(const QString& name)
     animationView->addAnimation(anim);
     timeline->setAnimation(anim);
     selectAnimation(anim);
-    anim->useRotationLimits(Settings::jointLimits());
 
 //    qDebug("qavimator::fileAdd(): checking for loop points");
     // no loop in point? must be a BVH or an older avm. set a sane default
@@ -1194,7 +1191,6 @@ void qavimator::setJointLimits(bool on)
   Animation* anim=animationView->getAnimation();
   if(anim)
   {
-    anim->useRotationLimits(on);
     animationView->repaint();
     updateInputs();
   }

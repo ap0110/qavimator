@@ -63,7 +63,6 @@ Animation::Animation(BVH* newBVH,const QString& bvhFile) :
 
   loadBVH(fileName);
   calcPartMirrors();
-  useRotationLimits(true);
   setNumberOfFrames(bvh->lastLoadedNumberOfFrames);
   setAvatarScale(bvh->lastLoadedAvatarScale);
   setFigureType(bvh->lastLoadedFigureType);
@@ -475,7 +474,6 @@ void Animation::solveIK()
   if(ikOn[IK_LHAND]) getEndSite("lHand")->ikOn=true;
   if(ikOn[IK_RHAND]) getEndSite("rHand")->ikOn=true;
 
-//  ikTree.setJointLimits(true);
   ikTree.solve(frame);
 }
 
@@ -541,12 +539,6 @@ Rotation Animation::getRotation(BVHNode* node)
   return Rotation();
 }
 
-void Animation::useRotationLimits(bool flag)
-{
-  limits=flag;
-  ikTree.setJointLimits(flag);
-}
-
 RotationLimits Animation::getRotationLimits(BVHNode* node)
 {
   if(node)
@@ -557,7 +549,7 @@ RotationLimits Animation::getRotationLimits(BVHNode* node)
     {
       xMin=yMin=zMin=xMax=yMax=zMax=0;
     }
-    else if(limits)
+    else if(Settings::jointLimits())
     {
       bvh->bvhGetChannelLimits(node,BVH_XROT,&xMin,&xMax);
       bvh->bvhGetChannelLimits(node,BVH_YROT,&yMin,&yMax);

@@ -113,7 +113,6 @@ class Animation : public QObject
 
     void setRotation(BVHNode* node,double x,double y,double z);
     Rotation getRotation(BVHNode* node);
-    void useRotationLimits(bool flag);
     RotationLimits getRotationLimits(BVHNode* node);
     void setPosition(double x,double y,double z);
     Position getPosition();
@@ -187,7 +186,6 @@ class Animation : public QObject
     int loopOutPoint;
 
     bool mirrored;
-    bool limits;
     bool ikOn[NUM_IK];
     IKTree ikTree;
 
