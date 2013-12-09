@@ -25,10 +25,12 @@
   @author Zi Ree
 */
 
-#include <QString>
+#include <QObject>
 
-class Prop
+class Prop : public QObject
 {
+  Q_OBJECT
+
   public:
     typedef enum
     {
