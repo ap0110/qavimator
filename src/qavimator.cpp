@@ -1618,6 +1618,12 @@ void qavimator::selectAnimation(Animation* animation)
 void qavimator::setLoopInPoint(int inFrame)
 {
   Animation* anim=animationView->getAnimation();
+
+  // FIXME: Temporary fix for a seg fault caused
+  //  by adding then deleting a prop immediately
+  //  before closing the QAvimator window
+  if (!anim) return;
+
   int numOfFrames=anim->getNumberOfFrames();
   int outFrame=anim->getLoopOutPoint();
   qDebug("qavimator::setLoopInPoint(%d) (%d frames)",inFrame,numOfFrames);
