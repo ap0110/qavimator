@@ -142,31 +142,3 @@ unsigned int Prop::isAttached() const
 {
   return attachmentPoint;
 }
-
-// ------------------- Class Vertex ----------------------
-
-Vertex::Vertex(double xc,double yc,double zc)
-{
-  xp=xc;
-  yp=yc;
-  zp=zc;
-}
-
-Vertex::~Vertex()
-{
-}
-
-double Vertex::x()
-{
-  return xp;
-}
-
-double Vertex::y()
-{
-  return yp;
-}
-
-double Vertex::z()
-{
-  return zp;
-}

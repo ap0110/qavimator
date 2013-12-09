@@ -27,22 +27,6 @@
 
 #include <QString>
 
-class Vertex
-{
-  public:
-    Vertex(double x,double y,double z);
-    ~Vertex();
-
-    double x();
-    double y();
-    double z();
-
-  protected:
-    double xp;
-    double yp;
-    double zp;
-};
-
 class Prop
 {
   public:
