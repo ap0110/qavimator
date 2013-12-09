@@ -23,13 +23,42 @@
 
 #include <QObject>
 
+#include "prop.h"
+
+#define OBJECT_START      8000
+
 class Props : public QObject
 {
   Q_OBJECT
 
-public:
-  Props();
-  ~Props();
+  public:
+    Props(QObject* parent = 0);
+    ~Props();
+
+    unsigned int getSelectedPropId();
+    const QString getSelectedPropName() const;
+    Prop* getPropByName(const QString& lookName);
+    Prop* getPropById(unsigned int id);
+
+    Prop* at(int i) const;
+    int count() const;
+
+    Prop* addProp(Prop::PropType type,
+                        double x, double y, double z,
+                        double xs, double ys, double zs,
+                        double xr, double yr, double zr,
+                        int attach);
+    void deleteProp(Prop* prop);
+    void clearProps();
+
+    void selectProp(unsigned int id = 0);
+
+  private:
+    unsigned int nextPropId;
+
+    QList<Prop*> propList;
+
+    unsigned int propSelected;
 };
 
 #endif

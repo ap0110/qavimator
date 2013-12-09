@@ -61,6 +61,7 @@
 #define ROTATE_HANDLE_Z   DRAG_HANDLE_START+8
 
 class QMouseEvent;
+class Props;
 
 class AnimationView : public QGLWidget
 {
@@ -169,9 +170,8 @@ class AnimationView : public QGLWidget
     bool leftMouseButton;
     bool frameProtected;
     char modifier;
-    unsigned int nextPropId;
 
-    QList<Prop*> propList;
+    Props* props;
     QPoint clickPos;           // holds the mouse click position for dragging
     QPoint returnPos;          // holds the mouse position to return to after dragging
 
@@ -188,8 +188,7 @@ class AnimationView : public QGLWidget
     unsigned int partHighlighted;
     unsigned int partSelected;
     unsigned int mirrorSelected;
-    unsigned int propSelected;  // needs an own variable, because we will drag the handle, not the prop
-    unsigned int propDragging;  // holds the actual drag handle id
+    unsigned int propDragging;  // holds the drag handle id
 
     int dragX, dragY;           // holds the last mouse drag offset
     int oldDragX, oldDragY;     // holds the mouse position before the last drag
