@@ -69,7 +69,7 @@ class Prop : public QObject
 
     PropType type;
 
-  protected:
+  private:
     QString propName;
 
     unsigned int attachmentPoint;

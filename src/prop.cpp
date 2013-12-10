@@ -40,6 +40,42 @@ Prop::~Prop()
 {
 }
 
+void Prop::setType(PropType newType)
+{
+  type=newType;
+}
+
+const QString& Prop::name() const
+{
+  return propName;
+}
+
+unsigned int Prop::isAttached() const
+{
+  return attachmentPoint;
+}
+
+void Prop::setPosition(double xp,double yp,double zp)
+{
+  x=xp;
+  y=yp;
+  z=zp;
+}
+
+void Prop::setScale(double scx,double scy,double scz)
+{
+  xs=scx;
+  ys=scy;
+  zs=scz;
+}
+
+void Prop::setRotation(double rx,double ry,double rz)
+{
+  xr=rx;
+  yr=ry;
+  zr=rz;
+}
+
 void Prop::draw(State state) const
 {
   glEnable(GL_DEPTH_TEST);
@@ -94,37 +130,6 @@ void Prop::draw(State state) const
   glPopMatrix();
 }
 
-void Prop::setPosition(double xp,double yp,double zp)
-{
-  x=xp;
-  y=yp;
-  z=zp;
-}
-
-void Prop::setScale(double scx,double scy,double scz)
-{
-  xs=scx;
-  ys=scy;
-  zs=scz;
-}
-
-void Prop::setRotation(double rx,double ry,double rz)
-{
-  xr=rx;
-  yr=ry;
-  zr=rz;
-}
-
-void Prop::setType(PropType newType)
-{
-  type=newType;
-}
-
-const QString& Prop::name() const
-{
-  return propName;
-}
-
 void Prop::attach(unsigned int where)
 {
   attachmentPoint=where;
@@ -136,9 +141,4 @@ void Prop::attach(unsigned int where)
   {
     setPosition(10,40,10);
   }
-}
-
-unsigned int Prop::isAttached() const
-{
-  return attachmentPoint;
 }
