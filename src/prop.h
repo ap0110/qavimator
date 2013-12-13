@@ -62,6 +62,10 @@ class Prop : public QObject
     float yScale() const;
     float zScale() const;
 
+    float xRotation() const;
+    float yRotation() const;
+    float zRotation() const;
+
     void setPosition(double xp,double yp,double zp);
     void setScale(double scx,double scy,double scz);
     void setRotation(double rx,double ry,double rz);
@@ -71,8 +75,6 @@ class Prop : public QObject
     void attach(unsigned int where);
 
     unsigned int id;
-    double xs,ys,zs;
-    double xr,yr,zr;
 
     PropType type;
 
@@ -81,6 +83,7 @@ class Prop : public QObject
 
     QScopedPointer<QVector3D> m_position;
     QScopedPointer<QVector3D> m_scale;
+    QScopedPointer<QVector3D> m_rotation;
 
     unsigned int attachmentPoint;
 };

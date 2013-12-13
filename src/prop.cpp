@@ -38,6 +38,7 @@ Prop::Prop(unsigned int propId,PropType newType,const QString& newName)
 
   m_position.reset(new QVector3D());
   m_scale.reset(new QVector3D());
+  m_rotation.reset(new QVector3D());
 
   attachmentPoint=0;
 }
@@ -91,6 +92,21 @@ float Prop::zScale() const
   return m_scale->z();
 }
 
+float Prop::xRotation() const
+{
+  return m_rotation->x();
+}
+
+float Prop::yRotation() const
+{
+  return m_rotation->y();
+}
+
+float Prop::zRotation() const
+{
+  return m_rotation->z();
+}
+
 void Prop::setPosition(double xp,double yp,double zp)
 {
   m_position->setX(xp);
@@ -107,9 +123,9 @@ void Prop::setScale(double scx,double scy,double scz)
 
 void Prop::setRotation(double rx,double ry,double rz)
 {
-  xr=rx;
-  yr=ry;
-  zr=rz;
+  m_rotation->setX(rx);
+  m_rotation->setY(ry);
+  m_rotation->setZ(rz);
 }
 
 void Prop::draw(State state) const
@@ -126,9 +142,9 @@ void Prop::draw(State state) const
 
   glTranslatef(m_position->x(), m_position->y(), m_position->z());
 
-  glRotatef(xr, 1, 0, 0);
-  glRotatef(yr, 0, 1, 0);
-  glRotatef(zr, 0, 0, 1);
+  glRotatef(m_rotation->x(), 1, 0, 0);
+  glRotatef(m_rotation->y(), 0, 1, 0);
+  glRotatef(m_rotation->z(), 0, 0, 1);
 
   // load prop's id, so we can pick it later
   glLoadName(id);

@@ -304,9 +304,10 @@ void qavimator::propScaled(Prop* prop,double x,double y,double z)
 // slot gets called by AnimationView::mouseMoveEvent()
 void qavimator::propRotated(Prop* prop,double x,double y,double z)
 {
-  prop->xr+=x;
-  prop->yr+=y;
-  prop->zr+=z;
+  double newX = prop->xRotation() + x;
+  double newY = prop->yRotation() + y;
+  double newZ = prop->zRotation() + z;
+  prop->setRotation(newX, newY, newZ);
   updatePropSpins(prop);
 }
 
@@ -1098,9 +1099,9 @@ void qavimator::fileSaveProps()
         properties.append(QString::number(prop->xScale()));
         properties.append(QString::number(prop->yScale()));
         properties.append(QString::number(prop->zScale()));
-        properties.append(QString::number(prop->xr));
-        properties.append(QString::number(prop->yr));
-        properties.append(QString::number(prop->zr));
+        properties.append(QString::number(prop->xRotation()));
+        properties.append(QString::number(prop->yRotation()));
+        properties.append(QString::number(prop->zRotation()));
         properties.append(QString::number(prop->isAttached()));
         QString line=properties.join(" ")+"\n";
         file.write(line.toLatin1().constData(),line.length());
@@ -1487,9 +1488,9 @@ void qavimator::updatePropSpins(const Prop* prop)
   propYRotSpin->blockSignals(true);
   propZRotSpin->blockSignals(true);
 
-  propXRotSpin->setValue((int)(360+prop->xr) % 360);
-  propYRotSpin->setValue((int)(360+prop->yr) % 360);
-  propZRotSpin->setValue((int)(360+prop->zr) % 360);
+  propXRotSpin->setValue((int)(360+prop->xRotation()) % 360);
+  propYRotSpin->setValue((int)(360+prop->yRotation()) % 360);
+  propZRotSpin->setValue((int)(360+prop->zRotation()) % 360);
 
   propXRotSpin->blockSignals(false);
   propYRotSpin->blockSignals(false);

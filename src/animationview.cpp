@@ -962,9 +962,9 @@ void AnimationView::drawDragHandles(const Prop* prop) const
     // now draw the scale cubes with proper depth sorting
     glEnable(GL_DEPTH_TEST);
 
-    glRotatef(prop->xr,1,0,0);
-    glRotatef(prop->yr,0,1,0);
-    glRotatef(prop->zr,0,0,1);
+    glRotatef(prop->xRotation(),1,0,0);
+    glRotatef(prop->yRotation(),0,1,0);
+    glRotatef(prop->zRotation(),0,0,1);
 
     glLoadName(SCALE_HANDLE_X);
     glColor4f(xRGB.redF(),xRGB.greenF(),xRGB.blueF(),1);
