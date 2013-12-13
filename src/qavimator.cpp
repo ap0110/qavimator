@@ -294,9 +294,10 @@ void qavimator::propDragged(Prop* prop,double x,double y,double z)
 // slot gets called by AnimationView::mouseMoveEvent()
 void qavimator::propScaled(Prop* prop,double x,double y,double z)
 {
-  prop->xs+=x;
-  prop->ys+=y;
-  prop->zs+=z;
+  double newX = prop->xScale() + x;
+  double newY = prop->yScale() + y;
+  double newZ = prop->zScale() + z;
+  prop->setScale(newX, newY, newZ);
   updatePropSpins(prop);
 }
 
@@ -1094,9 +1095,9 @@ void qavimator::fileSaveProps()
         properties.append(QString::number(prop->xPosition()));
         properties.append(QString::number(prop->yPosition()));
         properties.append(QString::number(prop->zPosition()));
-        properties.append(QString::number(prop->xs));
-        properties.append(QString::number(prop->ys));
-        properties.append(QString::number(prop->zs));
+        properties.append(QString::number(prop->xScale()));
+        properties.append(QString::number(prop->yScale()));
+        properties.append(QString::number(prop->zScale()));
         properties.append(QString::number(prop->xr));
         properties.append(QString::number(prop->yr));
         properties.append(QString::number(prop->zr));
@@ -1498,9 +1499,9 @@ void qavimator::updatePropSpins(const Prop* prop)
   propYScaleSpin->blockSignals(true);
   propZScaleSpin->blockSignals(true);
 
-  propXScaleSpin->setValue((int)(prop->xs));
-  propYScaleSpin->setValue((int)(prop->ys));
-  propZScaleSpin->setValue((int)(prop->zs));
+  propXScaleSpin->setValue((int)(prop->xScale()));
+  propYScaleSpin->setValue((int)(prop->yScale()));
+  propZScaleSpin->setValue((int)(prop->zScale()));
 
   propXScaleSpin->blockSignals(false);
   propYScaleSpin->blockSignals(false);

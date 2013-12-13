@@ -37,6 +37,7 @@ Prop::Prop(unsigned int propId,PropType newType,const QString& newName)
   propName=newName;
 
   m_position.reset(new QVector3D());
+  m_scale.reset(new QVector3D());
 
   attachmentPoint=0;
 }
@@ -75,6 +76,21 @@ float Prop::zPosition() const
   return m_position->z();
 }
 
+float Prop::xScale() const
+{
+  return m_scale->x();
+}
+
+float Prop::yScale() const
+{
+  return m_scale->y();
+}
+
+float Prop::zScale() const
+{
+  return m_scale->z();
+}
+
 void Prop::setPosition(double xp,double yp,double zp)
 {
   m_position->setX(xp);
@@ -84,9 +100,9 @@ void Prop::setPosition(double xp,double yp,double zp)
 
 void Prop::setScale(double scx,double scy,double scz)
 {
-  xs=scx;
-  ys=scy;
-  zs=scz;
+  m_scale->setX(scx);
+  m_scale->setY(scy);
+  m_scale->setZ(scz);
 }
 
 void Prop::setRotation(double rx,double ry,double rz)
@@ -127,23 +143,23 @@ void Prop::draw(State state) const
   // each prop type has its own base sizes and positions
   if(type==Box)
   {
-    glScalef(xs,ys,zs);
+    glScalef(m_scale->x(), m_scale->y(), m_scale->z());
     glutSolidCube(1);
   }
   else if(type==Sphere)
   {
-    glScalef(xs/2,ys/2,zs/2);
+    glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
     glutSolidSphere(1,16,16);
   }
   else if(type==Cone)
   {
     glTranslatef(0,0,-5);
-    glScalef(xs/2,ys/2,zs/2);
+    glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
     glutSolidCone(1,2,16,16);
   }
   else if(type==Torus)
   {
-    glScalef(xs/4,ys/4,zs/2);
+    glScalef(m_scale->x() / 4, m_scale->y() / 4, m_scale->z() / 2);
     glutSolidTorus(1,1,16,16);
   }
 

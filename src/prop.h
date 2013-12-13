@@ -58,6 +58,10 @@ class Prop : public QObject
     float yPosition() const;
     float zPosition() const;
 
+    float xScale() const;
+    float yScale() const;
+    float zScale() const;
+
     void setPosition(double xp,double yp,double zp);
     void setScale(double scx,double scy,double scz);
     void setRotation(double rx,double ry,double rz);
@@ -76,6 +80,7 @@ class Prop : public QObject
     QString propName;
 
     QScopedPointer<QVector3D> m_position;
+    QScopedPointer<QVector3D> m_scale;
 
     unsigned int attachmentPoint;
 };

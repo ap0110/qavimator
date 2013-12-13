@@ -916,9 +916,9 @@ void AnimationView::drawDragHandles(const Prop* prop) const
   double y=prop->yPosition();
   double z=prop->zPosition();
  // get prop's scale
-  double xs=prop->xs/2.0;
-  double ys=prop->ys/2.0;
-  double zs=prop->zs/2.0;
+  double xs=prop->xScale() / 2.0;
+  double ys=prop->yScale() / 2.0;
+  double zs=prop->zScale() / 2.0;
 
   QColor xRGB("#ff0000");
   QColor yRGB("#00ff00");
