@@ -912,9 +912,9 @@ void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,
 void AnimationView::drawDragHandles(const Prop* prop) const
 {
   // get prop's position
-  double x=prop->x;
-  double y=prop->y;
-  double z=prop->z;
+  double x=prop->xPosition();
+  double y=prop->yPosition();
+  double z=prop->zPosition();
  // get prop's scale
   double xs=prop->xs/2.0;
   double ys=prop->ys/2.0;

@@ -26,13 +26,18 @@
 #include <GL/glut.h>
 #endif
 
+#include <QVector3D>
+
 #include "prop.h"
 
 Prop::Prop(unsigned int propId,PropType newType,const QString& newName)
 {
+  id=propId;
   setType(newType);
   propName=newName;
-  id=propId;
+
+  m_position.reset(new QVector3D());
+
   attachmentPoint=0;
 }
 
@@ -55,11 +60,26 @@ unsigned int Prop::isAttached() const
   return attachmentPoint;
 }
 
+float Prop::xPosition() const
+{
+  return m_position->x();
+}
+
+float Prop::yPosition() const
+{
+  return m_position->y();
+}
+
+float Prop::zPosition() const
+{
+  return m_position->z();
+}
+
 void Prop::setPosition(double xp,double yp,double zp)
 {
-  x=xp;
-  y=yp;
-  z=zp;
+  m_position->setX(xp);
+  m_position->setY(yp);
+  m_position->setZ(zp);
 }
 
 void Prop::setScale(double scx,double scy,double scz)
@@ -88,7 +108,7 @@ void Prop::draw(State state) const
 
   glPushMatrix();
 
-  glTranslatef(x,y,z);
+  glTranslatef(m_position->x(), m_position->y(), m_position->z());
 
   glRotatef(xr, 1, 0, 0);
   glRotatef(yr, 0, 1, 0);

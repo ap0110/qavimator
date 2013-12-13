@@ -284,9 +284,10 @@ void qavimator::propClicked(Prop* prop)
 // slot gets called by AnimationView::mouseMoveEvent()
 void qavimator::propDragged(Prop* prop,double x,double y,double z)
 {
-  prop->x+=x;
-  prop->y+=y;
-  prop->z+=z;
+  double newX = prop->xPosition() + x;
+  double newY = prop->yPosition() + y;
+  double newZ = prop->zPosition() + z;
+  prop->setPosition(newX, newY, newZ);
   updatePropSpins(prop);
 }
 
@@ -1090,9 +1091,9 @@ void qavimator::fileSaveProps()
         Prop* prop=animationView->getPropByName(propNameCombo->itemText(index));
         QStringList properties;
         properties.append(QString::number(prop->type));
-        properties.append(QString::number(prop->x));
-        properties.append(QString::number(prop->y));
-        properties.append(QString::number(prop->z));
+        properties.append(QString::number(prop->xPosition()));
+        properties.append(QString::number(prop->yPosition()));
+        properties.append(QString::number(prop->zPosition()));
         properties.append(QString::number(prop->xs));
         properties.append(QString::number(prop->ys));
         properties.append(QString::number(prop->zs));
@@ -1473,9 +1474,9 @@ void qavimator::updatePropSpins(const Prop* prop)
   propYPosSpin->blockSignals(true);
   propZPosSpin->blockSignals(true);
 
-  propXPosSpin->setValue((int)(prop->x));
-  propYPosSpin->setValue((int)(prop->y));
-  propZPosSpin->setValue((int)(prop->z));
+  propXPosSpin->setValue((int)(prop->xPosition()));
+  propYPosSpin->setValue((int)(prop->yPosition()));
+  propZPosSpin->setValue((int)(prop->zPosition()));
 
   propXPosSpin->blockSignals(false);
   propYPosSpin->blockSignals(false);

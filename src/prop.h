@@ -54,6 +54,10 @@ class Prop : public QObject
     const QString& name() const;
     unsigned int isAttached() const;
 
+    float xPosition() const;
+    float yPosition() const;
+    float zPosition() const;
+
     void setPosition(double xp,double yp,double zp);
     void setScale(double scx,double scy,double scz);
     void setRotation(double rx,double ry,double rz);
@@ -63,7 +67,6 @@ class Prop : public QObject
     void attach(unsigned int where);
 
     unsigned int id;
-    double x,y,z;
     double xs,ys,zs;
     double xr,yr,zr;
 
@@ -71,6 +74,8 @@ class Prop : public QObject
 
   private:
     QString propName;
+
+    QScopedPointer<QVector3D> m_position;
 
     unsigned int attachmentPoint;
 };
