@@ -1092,7 +1092,7 @@ void qavimator::fileSaveProps()
       {
         Prop* prop=animationView->getPropByName(propNameCombo->itemText(index));
         QStringList properties;
-        properties.append(QString::number(prop->type));
+        properties.append(QString::number(prop->type()));
         properties.append(QString::number(prop->xPosition()));
         properties.append(QString::number(prop->yPosition()));
         properties.append(QString::number(prop->zPosition()));

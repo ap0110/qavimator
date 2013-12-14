@@ -50,6 +50,7 @@ class Prop : public QObject
     Prop(unsigned int propId,PropType type,const QString& name);
     ~Prop();
 
+    PropType type() const;
     void setType(PropType type);
 
     unsigned int id() const;
@@ -76,18 +77,17 @@ class Prop : public QObject
 
     void attach(unsigned int where);
 
-    PropType type;
-
   private:
+    PropType m_type;
     unsigned int m_id;
 
-    QString propName;
+    QString m_name;
 
     QScopedPointer<QVector3D> m_position;
     QScopedPointer<QVector3D> m_scale;
     QScopedPointer<QVector3D> m_rotation;
 
-    unsigned int attachmentPoint;
+    unsigned int m_attachmentPoint;
 };
 
 #endif

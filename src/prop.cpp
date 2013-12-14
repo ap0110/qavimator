@@ -34,22 +34,27 @@ Prop::Prop(unsigned int propId,PropType newType,const QString& newName)
 {
   m_id = propId;
   setType(newType);
-  propName=newName;
+  m_name = newName;
 
   m_position.reset(new QVector3D());
   m_scale.reset(new QVector3D());
   m_rotation.reset(new QVector3D());
 
-  attachmentPoint=0;
+  m_attachmentPoint = 0;
 }
 
 Prop::~Prop()
 {
 }
 
+Prop::PropType Prop::type() const
+{
+  return m_type;
+}
+
 void Prop::setType(PropType newType)
 {
-  type=newType;
+  m_type = newType;
 }
 
 unsigned int Prop::id() const
@@ -59,12 +64,12 @@ unsigned int Prop::id() const
 
 const QString& Prop::name() const
 {
-  return propName;
+  return m_name;
 }
 
 unsigned int Prop::isAttached() const
 {
-  return attachmentPoint;
+  return m_attachmentPoint;
 }
 
 float Prop::xPosition() const
@@ -162,23 +167,23 @@ void Prop::draw(State state) const
     glColor4f(0.6, 0.3, 0.3, 1);
 
   // each prop type has its own base sizes and positions
-  if(type==Box)
+  if(m_type == Box)
   {
     glScalef(m_scale->x(), m_scale->y(), m_scale->z());
     glutSolidCube(1);
   }
-  else if(type==Sphere)
+  else if(m_type == Sphere)
   {
     glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
     glutSolidSphere(1,16,16);
   }
-  else if(type==Cone)
+  else if(m_type == Cone)
   {
     glTranslatef(0,0,-5);
     glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
     glutSolidCone(1,2,16,16);
   }
-  else if(type==Torus)
+  else if(m_type == Torus)
   {
     glScalef(m_scale->x() / 4, m_scale->y() / 4, m_scale->z() / 2);
     glutSolidTorus(1,1,16,16);
@@ -189,7 +194,7 @@ void Prop::draw(State state) const
 
 void Prop::attach(unsigned int where)
 {
-  attachmentPoint=where;
+  m_attachmentPoint = where;
   if(where)
   {
     setPosition(0,0,0);
