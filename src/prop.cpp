@@ -32,7 +32,7 @@
 
 Prop::Prop(unsigned int propId,PropType newType,const QString& newName)
 {
-  id=propId;
+  m_id = propId;
   setType(newType);
   propName=newName;
 
@@ -50,6 +50,11 @@ Prop::~Prop()
 void Prop::setType(PropType newType)
 {
   type=newType;
+}
+
+unsigned int Prop::id() const
+{
+  return m_id;
 }
 
 const QString& Prop::name() const
@@ -147,7 +152,7 @@ void Prop::draw(State state) const
   glRotatef(m_rotation->z(), 0, 0, 1);
 
   // load prop's id, so we can pick it later
-  glLoadName(id);
+  glLoadName(m_id);
 
   if(state==Normal)
     glColor4f(0.3,0.4,1.0, 1);

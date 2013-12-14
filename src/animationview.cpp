@@ -181,11 +181,11 @@ void AnimationView::drawFloor()
 void AnimationView::drawProp(const Prop* prop) const
 {
   Prop::State state=Prop::Normal;
-  if(props->getSelectedPropId() == prop->id)
+  if(props->getSelectedPropId() == prop->id())
     state=Prop::Selected;
-  else if(partHighlighted==prop->id) state=Prop::Highlighted;
+  else if(partHighlighted==prop->id()) state=Prop::Highlighted;
   prop->draw(state);
-  if(props->getSelectedPropId() == prop->id)
+  if(props->getSelectedPropId() == prop->id())
     drawDragHandles(prop);
 }
 
@@ -1191,7 +1191,7 @@ void AnimationView::selectProp(const QString& propName)
   partSelected=0;
   mirrorSelected=0;
   Prop* prop=getPropByName(propName);
-  if(prop) props->selectProp(prop->id);
+  if(prop) props->selectProp(prop->id());
   repaint();
 }
 

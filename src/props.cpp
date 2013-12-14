@@ -40,7 +40,10 @@ unsigned int Props::getSelectedPropId()
 const QString Props::getSelectedPropName() const
 {
   for(unsigned int index=0;index< (unsigned int) propList.count();index++)
-    if(propList.at(index)->id==propSelected) return propList.at(index)->name();
+  {
+    if(propList.at(index)->id() == propSelected)
+      return propList.at(index)->name();
+  }
   return QString();
 }
 
@@ -60,7 +63,8 @@ Prop* Props::getPropById(unsigned int id)
   for(unsigned int index=0;index< (unsigned int) propList.count();index++)
   {
     Prop* prop=propList.at(index);
-    if(prop->id==id) return prop;
+    if(prop->id() == id)
+      return prop;
   }
 
   return 0;
