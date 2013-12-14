@@ -12,6 +12,7 @@ SET (QAVI_SRC	animation.cpp
                         props.cpp
 			qavimator.cpp
 			rotation.cpp
+                        scene.cpp
 			settings.cpp
 			settingsdialog.cpp
 			slpartsfemale.cpp
@@ -33,6 +34,7 @@ SET (QAVI_MOC_HDR 	animation.h
                         props.h
 			qavimator.h
 			rotation.h
+                        scene.h
 			settings.h
 			settingsdialog.h
 			slparts.h

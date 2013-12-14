@@ -48,7 +48,7 @@ qavimator::qavimator() : QMainWindow(0)
 
   QCoreApplication::setOrganizationName("DeZiRee");
   QCoreApplication::setOrganizationDomain("qavimator.org");
-  QCoreApplication::setApplicationName("QAvinmator");
+  QCoreApplication::setApplicationName("QAvimator");
 
   setupUi(this);
 
