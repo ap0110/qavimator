@@ -32,7 +32,6 @@
 #define NOKEY_IMAGE "data/nokey.png"
 
 #include "ui_mainapplicationform.h"
-#include "rotation.h"
 #include "playstate.h"
 
 class Animation;
@@ -59,7 +58,7 @@ class qavimator : public QMainWindow, Ui::MainWindow
   protected slots:
     void configChanged();
 
-    void partClicked(BVHNode* node, Rotation rot, RotationLimits rotLimits, QVector3D position);
+    void partClicked(BVHNode* node, QVector3D rotation, RotationLimits rotLimits, QVector3D position);
     void partDragged(BVHNode* node,double changeX,double changeY,double changeZ);
     void propClicked(Prop* prop);
     void propDragged(Prop* prop,double x,double y,double z);

@@ -38,9 +38,9 @@ BVHNode::BVHNode(const QString& name)
 
   numChannels=0;
 
-  ikRot.x=0;
-  ikRot.y=0;
-  ikRot.z=0;
+  ikRotation.setX(0);
+  ikRotation.setY(0);
+  ikRotation.setZ(0);
 
   ikGoalPos[0]=0;
   ikGoalPos[1]=0;
@@ -94,10 +94,10 @@ void BVHNode::removeChild(BVHNode* child)
   children.removeAll(child);
 }
 
-void BVHNode::addKeyframe(int frame, QVector3D position, Rotation rot)
+void BVHNode::addKeyframe(int frame, QVector3D position, QVector3D rotation)
 {
 //  qDebug(QString("addKeyframe(%1)").arg(frame));
-  keyframes[frame]=FrameData(frame, position, rot);
+  keyframes[frame] = FrameData(frame, position, rotation);
 //  if(frame==0 && name()=="hip") qDebug(QString("BVHNode::addKeyframe(%1,<%2,%3,%4>,<%5,%6,%7>) %8").arg(frame).arg(pos.x).arg(pos.y).arg(pos.z).arg(rot.x).arg(rot.y).arg(rot.z).arg(pos.bodyPart));
 }
 
@@ -112,14 +112,14 @@ void BVHNode::setKeyframePosition(int frame, const QVector3D& position)
   }
 }
 
-void BVHNode::setKeyframeRotation(int frame,const Rotation& rot)
+void BVHNode::setKeyframeRotation(int frame, const QVector3D& rotation)
 {
 //  qDebug(QString("setKeyframeRotation(%1)").arg(frame));
   if(!isKeyframe(frame)) qDebug("setKeyframeRotation(%d): not a keyframe!",frame);
   else
   {
     FrameData& key=keyframes[frame];
-    key.setRotation(rot);
+    key.setRotation(rotation);
   }
 }
 
@@ -246,17 +246,17 @@ const FrameData BVHNode::frameData(int frame) const
   // we return the last keyframe data
   if(frameBefore==frameAfter) return before;
 
-  Rotation rotBefore=before.rotation();
-  Rotation rotAfter=after.rotation();
+  QVector3D rotationBefore = before.rotation();
+  QVector3D rotationAfter = after.rotation();
   QVector3D positionBefore = before.position();
   QVector3D positionAfter = after.position();
 
-  Rotation iRot;
+  QVector3D iRotation;
   QVector3D iPosition;
 
-  iRot.x=interpolate(rotBefore.x,rotAfter.x,frameAfter-frameBefore,frame-frameBefore,before.easeOut(),after.easeIn());
-  iRot.y=interpolate(rotBefore.y,rotAfter.y,frameAfter-frameBefore,frame-frameBefore,before.easeOut(),after.easeIn());
-  iRot.z=interpolate(rotBefore.z,rotAfter.z,frameAfter-frameBefore,frame-frameBefore,before.easeOut(),after.easeIn());
+  iRotation.setX(interpolate(rotationBefore.x(), rotationAfter.x(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
+  iRotation.setY(interpolate(rotationBefore.y(), rotationAfter.y(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
+  iRotation.setZ(interpolate(rotationBefore.z(), rotationAfter.z(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
 
   iPosition.setX(interpolate(positionBefore.x(), positionAfter.x(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
   iPosition.setY(interpolate(positionBefore.y(), positionAfter.y(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
@@ -265,7 +265,7 @@ const FrameData BVHNode::frameData(int frame) const
 // qDebug(QString("iRot.x %1 frame %2: %3").arg(rotBefore.bodyPart).arg(before.frameNumber()).arg(iRot.x));
 
   // return interpolated frame data here
-  return FrameData(frame, iPosition, iRot);
+  return FrameData(frame, iPosition, iRotation);
 }
 
 const FrameData BVHNode::getKeyframeBefore(int frame) const
@@ -338,7 +338,7 @@ int BVHNode::numKeyframes() const
   return keyframes.count();
 }
 
-const Rotation* BVHNode::getCachedRotation(int frame)
+const QVector3D* BVHNode::getCachedRotation(int frame)
 {
   return rotations.at(frame);
 }
@@ -348,7 +348,7 @@ const QVector3D* BVHNode::getCachedPosition(int frame)
   return positions.at(frame);
 }
 
-void BVHNode::cacheRotation(Rotation* rot)
+void BVHNode::cacheRotation(QVector3D* rot)
 {
   rotations.append(rot);
 }
@@ -373,10 +373,10 @@ void BVHNode::dumpKeyframes()
   QList<int> keys=keyframeList();
   for(unsigned int index=0;index< (unsigned int) keyframes.count();index++)
   {
-    Rotation rot=frameData(keys[index]).rotation();
+    QVector3D rotation = frameData(keys[index]).rotation();
     QVector3D position = frameData(keys[index]).position();
 
-    qDebug(QString("%1: %2 - Pos: <%3,%4,%5> Rot: <%6,%7,%8>").arg(name()).arg(keys[index]).arg(position.x()).arg(position.y()).arg(position.z()).arg(rot.x).arg(rot.y).arg(rot.z).toLatin1().constData());
+    qDebug(QString("%1: %2 - Pos: <%3,%4,%5> Rot: <%6,%7,%8>").arg(name()).arg(keys[index]).arg(position.x()).arg(position.y()).arg(position.z()).arg(rotation.x()).arg(rotation.y()).arg(rotation.z()).toLatin1().constData());
   }
 }
 
@@ -421,12 +421,12 @@ bool BVHNode::compareFrames(int key1,int key2) const
   }
   else
   {
-    const Rotation rot1=frameData(key1).rotation();
-    const Rotation rot2=frameData(key2).rotation();
+    const QVector3D rotation1 = frameData(key1).rotation();
+    const QVector3D rotation2 = frameData(key2).rotation();
 
-    if(rot1.x!=rot2.x) return false;
-    if(rot1.y!=rot2.y) return false;
-    if(rot1.z!=rot2.z) return false;
+    if(rotation1.x() != rotation2.x()) return false;
+    if(rotation1.y() != rotation2.y()) return false;
+    if(rotation1.z() != rotation2.z()) return false;
   }
 
   return true;
@@ -460,7 +460,7 @@ void BVHNode::optimize()
 
   // PASS 2 - remove keyframes that are superfluous due to linear interpolation
 
-  Rotation oldRDifference;
+  QVector3D oldRotationDifference;
   QVector3D oldPositionDifference;
 
   // get first frame to compare - we even compare frame 1 here because we need
@@ -504,21 +504,19 @@ void BVHNode::optimize()
     // otherwise optimize rotations
     else
     {
-      Rotation rDifference=Rotation::difference((*itBefore).rotation(),(*itCurrent).rotation());
+      QVector3D rotationDifference = (*itCurrent).rotation() - (*itBefore).rotation();
 
-      rDifference.x/=distance;
-      rDifference.y/=distance;
-      rDifference.z/=distance;
+      rotationDifference /= distance;
 
-      if(fabs(rDifference.x-oldRDifference.x)<tolerance &&
-        fabs(rDifference.y-oldRDifference.y)<tolerance &&
-        fabs(rDifference.z-oldRDifference.z)<tolerance)
+      if(fabs(rotationDifference.x() - oldRotationDifference.x()) < tolerance &&
+         fabs(rotationDifference.y() - oldRotationDifference.y()) < tolerance &&
+         fabs(rotationDifference.z() - oldRotationDifference.z()) < tolerance)
       {
           // never delete the key in the first frame
           if(itBefore.key()!=0) keyframes.remove(itBefore.key());
       }
 
-      oldRDifference=rDifference;
+      oldRotationDifference = rotationDifference;
     }
 
     itBefore=itCurrent;
@@ -556,10 +554,10 @@ void BVHNode::mirrorKeys()
     }
     else
     {
-      Rotation rot=frameData(frame).rotation();
-      rot.y=-rot.y;
-      rot.z=-rot.z;
-      setKeyframeRotation(frame,rot);
+      QVector3D rotation = frameData(frame).rotation();
+      rotation.setY(-rotation.y());
+      rotation.setZ(-rotation.z());
+      setKeyframeRotation(frame, rotation);
     }
   }
 }
@@ -590,12 +588,12 @@ FrameData::FrameData()
   m_easeOut=false;
 }
 
-FrameData::FrameData(int num, QVector3D pos, Rotation rot)
+FrameData::FrameData(int num, QVector3D position, QVector3D rotation)
 {
 //  qDebug(QString("FrameData(%1): frame %2  pos %3,%4,%5 rot %6,%7,%8").arg((unsigned long) this).arg(frame).arg(pos.x).arg(pos.y).arg(pos.z).arg(rot.x).arg(rot.y).arg(rot.z));
   m_frameNumber=num;
-  m_rotation=rot;
-  m_position=pos;
+  m_rotation = rotation;
+  m_position = position;
   m_easeIn=false;
   m_easeOut=false;
 }
@@ -615,7 +613,7 @@ QVector3D FrameData::position() const
   return m_position;
 }
 
-Rotation FrameData::rotation() const
+QVector3D FrameData::rotation() const
 {
   return m_rotation;
 }
@@ -642,16 +640,14 @@ bool FrameData::easeOut() const
 
 void FrameData::setPosition(const QVector3D& position)
 {
-  m_position=position;
+  m_position = position;
 }
 
-void FrameData::setRotation(const Rotation& rot)
+void FrameData::setRotation(const QVector3D& rotation)
 {
 //  qDebug(QString("FrameData::setRotation(<%1,%2,%3>)").arg(m_rotation.x).arg(m_rotation.y).arg(m_rotation.z));
 //  qDebug(QString("FrameData::setRotation(<%1,%2,%3>)").arg(rot.x).arg(rot.y).arg(rot.z));
-  m_rotation.x=rot.x;
-  m_rotation.y=rot.y;
-  m_rotation.z=rot.z;
+  m_rotation = rotation;
 //  qDebug(QString("FrameData::setRotation(<%1,%2,%3>)").arg(m_rotation.x).arg(m_rotation.y).arg(m_rotation.z));
 //  m_rotation=rot;
 }
@@ -661,7 +657,7 @@ void FrameData::dump() const
 {
   qDebug("FrameData::dump()");
   qDebug("Frame Number: %d",m_frameNumber);
-  qDebug("Rotation: %lf, %lf, %lf",m_rotation.x,m_rotation.y,m_rotation.z);
+  qDebug("Rotation: %lf, %lf, %lf",m_rotation.x() ,m_rotation.y() ,m_rotation.z());
   qDebug("Position: %lf, %lf, %lf",m_position.x(), m_position.y(), m_position.z());
   qDebug("Ease in/out: %d / %d",m_easeIn,m_easeOut);
 }

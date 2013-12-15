@@ -10,8 +10,7 @@ SET (QAVI_SRC	animation.cpp
 			math3d.cpp
 			prop.cpp
                         props.cpp
-			qavimator.cpp
-			rotation.cpp
+                        qavimator.cpp
                         scene.cpp
 			settings.cpp
 			settingsdialog.cpp
@@ -32,8 +31,7 @@ SET (QAVI_MOC_HDR 	animation.h
 			playstate.h
 			prop.h
                         props.h
-			qavimator.h
-			rotation.h
+                        qavimator.h
                         scene.h
 			settings.h
 			settingsdialog.h

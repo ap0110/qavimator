@@ -29,7 +29,6 @@
 // #include "main.h"
 
 #include "animation.h"
-#include "rotation.h"
 #include "bvh.h"
 #include "settings.h"
 
@@ -311,19 +310,17 @@ void Animation::applyIK(const QString& name)
 {
   BVHNode* node=bvh->bvhFindNode(frames,name);
 
-  Rotation rot=node->frameData(frame).rotation();
+  QVector3D rotation = node->frameData(frame).rotation();
 
   if(node)
   {
 //    for (int i=0; i<3; i++) {
-    rot.x+=node->ikRot.x;
-    rot.y+=node->ikRot.y;
-    rot.z+=node->ikRot.z;
+    rotation += node->ikRotation;
 
 
-    node->ikRot.x=0;
-    node->ikRot.y=0;
-    node->ikRot.z=0;
+    node->ikRotation.setX(0);
+    node->ikRotation.setY(0);
+    node->ikRotation.setZ(0);
 /*
       node->frame[frame][i] += node->ikRot[i];
       node->ikRot[i] = 0;
@@ -332,7 +329,7 @@ void Animation::applyIK(const QString& name)
 
     setDirty(true);
     addKeyFrame(node);
-    node->setKeyframeRotation(frame,rot);
+    node->setKeyframeRotation(frame, rotation);
     emit redrawTrack(getPartIndex(node));
 //    }
   }
@@ -494,10 +491,10 @@ void Animation::setRotation(BVHNode* node,double x,double y,double z)
     }
 
     if(node->isKeyframe(frame))
-      node->setKeyframeRotation(frame,Rotation(x,y,z));
+      node->setKeyframeRotation(frame, QVector3D(x, y, z));
     else
     {
-      node->addKeyframe(frame,node->frameData(frame).position(),Rotation(x,y,z));
+      node->addKeyframe(frame,node->frameData(frame).position(), QVector3D(x, y, z));
       setEaseIn(node,frame,Settings::easeIn());
       setEaseOut(node,frame,Settings::easeOut());
     }
@@ -508,10 +505,10 @@ void Animation::setRotation(BVHNode* node,double x,double y,double z)
     {
       // new keyframe system
       if(mirrorNode->isKeyframe(frame))
-        mirrorNode->setKeyframeRotation(frame,Rotation(x,-y,-z));
+        mirrorNode->setKeyframeRotation(frame, QVector3D(x, -y, -z));
       else
       {
-        mirrorNode->addKeyframe(frame,node->frameData(frame).position(),Rotation(x,-y,-z));
+        mirrorNode->addKeyframe(frame,node->frameData(frame).position(), QVector3D(x, -y, -z));
         setEaseIn(mirrorNode,frame,Settings::easeIn());
         setEaseOut(mirrorNode,frame,Settings::easeOut());
       }
@@ -530,14 +527,14 @@ void Animation::setRotation(BVHNode* node,double x,double y,double z)
   }
 }
 
-Rotation Animation::getRotation(BVHNode* node)
+QVector3D Animation::getRotation(BVHNode* node)
 {
   if(node)
   {
     return node->frameData(frame).rotation();
   }
   qDebug("Animation::getRotation(): node==0!");
-  return Rotation();
+  return QVector3D();
 }
 
 RotationLimits Animation::getRotationLimits(BVHNode* node)
@@ -596,7 +593,7 @@ void Animation::setPosition(double x,double y,double z)
     positionNode->setKeyframePosition(frame, QVector3D(x, y, z));
   else
   {
-    positionNode->addKeyframe(frame, QVector3D(x, y, z), Rotation());
+    positionNode->addKeyframe(frame, QVector3D(x, y, z), QVector3D());
     setEaseIn(positionNode,frame,Settings::easeIn());
     setEaseOut(positionNode,frame,Settings::easeOut());
   }
@@ -889,8 +886,8 @@ void Animation::moveKeyFrame(int jointNumber,int from,int to,bool copy)
   }
   else
   {
-    Rotation rot=frameData.rotation();
-    setRotation(joint,rot.x,rot.y,rot.z);
+    QVector3D rotation = frameData.rotation();
+    setRotation(joint, rotation.x(), rotation.y(), rotation.z());
   }
   // only now set ease in/out, because setRotation/setPosition sets to default when the
   // target position has no keyframe yet

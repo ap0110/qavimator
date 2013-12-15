@@ -25,7 +25,6 @@
 #include <QtCore>
 #include <QTextStream>
 
-#include "rotation.h"
 #include "bvhnode.h"
 #include "animation.h"
 
@@ -86,7 +85,7 @@ class BVH
 
     int nodeCount;
 
-    QList<Rotation> rotationCopyBuffer;
+    QList<QVector3D> rotationCopyBuffer;
     QVector3D positionCopyBuffer;
 
   protected:

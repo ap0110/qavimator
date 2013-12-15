@@ -591,7 +591,7 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
       dragX = dragY = 0;
 
       emit partClicked(part,
-                       Rotation(getAnimation()->getRotation(part)),
+                       QVector3D(getAnimation()->getRotation(part)),
                        getAnimation()->getRotationLimits(part),
                        QVector3D(getAnimation()->getPosition())
                       );
@@ -833,7 +833,7 @@ void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,
       }
     }
 
-    Rotation rot=motion->frameData(frame).rotation();
+    QVector3D rotation = motion->frameData(frame).rotation();
     for(int i=0;i<motion->numChannels;i++)
     {
 /*
@@ -850,15 +850,15 @@ void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,
         default: break;
       } */
 
-      Rotation ikRot;
-      if(motion->ikOn) ikRot=motion->ikRot;
+      QVector3D ikRotation;
+      if(motion->ikOn) ikRotation = motion->ikRotation;
 
       // need to do rotations in the right order
       switch(motion->channelType[i])
       {
-        case BVH_XROT: glRotatef(rot.x+ikRot.x,1,0,0); break;
-        case BVH_YROT: glRotatef(rot.y+ikRot.y,0,1,0); break;
-        case BVH_ZROT: glRotatef(rot.z+ikRot.z,0,0,1); break;
+        case BVH_XROT: glRotatef(rotation.x() + ikRotation.x(), 1, 0, 0); break;
+        case BVH_YROT: glRotatef(rotation.y() + ikRotation.y(), 0, 1, 0); break;
+        case BVH_ZROT: glRotatef(rotation.z() + ikRotation.z(), 0, 0, 1); break;
         default: break;
       }
 
@@ -1178,7 +1178,7 @@ void AnimationView::selectPart(BVHNode* node)
   //        the increment for each animation so they don't get confused
   partSelected=getAnimation()->getPartIndex(node)+ANIMATION_INCREMENT*animationIndex;
   emit partClicked(node,
-                   Rotation(getAnimation()->getRotation(node)),
+                   QVector3D(getAnimation()->getRotation(node)),
                    getAnimation()->getRotationLimits(node),
                    QVector3D(getAnimation()->getPosition())
                   );

@@ -190,7 +190,7 @@ void BVH::assignChannels(BVHNode* node,int frame)
 //  qDebug("BVH::assignChannels()");
 
   // create new rotation and position objects
-  Rotation* rot=new Rotation();
+  QVector3D* rotation = new QVector3D();
   QVector3D* position = new QVector3D();
 
   for(int i=0;i<node->numChannels;i++)
@@ -200,14 +200,14 @@ void BVH::assignChannels(BVHNode* node,int frame)
     if     (type==BVH_XPOS) position->setX(value);
     else if(type==BVH_YPOS) position->setY(value);
     else if(type==BVH_ZPOS) position->setZ(value);
-    else if(type==BVH_XROT) rot->x=value;
-    else if(type==BVH_YROT) rot->y=value;
-    else if(type==BVH_ZROT) rot->z=value;
+    else if(type==BVH_XROT) rotation->setX(value);
+    else if(type==BVH_YROT) rotation->setY(value);
+    else if(type==BVH_ZROT) rotation->setZ(value);
     else qDebug("BVH::assignChannels(): unknown channel type %d",(int) type);
   }
 
   // put rotation and position into the node's cache for later keyframe referencing
-  node->cacheRotation(rot);
+  node->cacheRotation(rotation);
   node->cachePosition(position);
 
   for(int i=0;i<node->numChildren();i++)
@@ -288,11 +288,11 @@ void BVH::setAllKeyFramesHelper(BVHNode* node,int numberOfFrames) const
 
   for(int i=0;i<numberOfFrames;i++)
   {
-    const Rotation* rot=node->getCachedRotation(i);
+    const QVector3D* rotation = node->getCachedRotation(i);
     const QVector3D* position = node->getCachedPosition(i);
 
     if(node->type!=BVH_END)
-      node->addKeyframe(i, QVector3D(position->x(), position->y(), position->z()), Rotation(rot->x, rot->y, rot->z));
+      node->addKeyframe(i, QVector3D(position->x(), position->y(), position->z()), QVector3D(rotation->x(), rotation->y(), rotation->z()));
   }
 
   for(int i=0;i<node->numChildren();i++)
@@ -350,11 +350,11 @@ void BVH::avmReadKeyFrame(BVHNode* root)
 {
   // NOTE: new system needs frame 0 as key frame
   // FIXME: find a better way without code duplication
-  const Rotation* rot=root->getCachedRotation(0);
+  const QVector3D* rotation = root->getCachedRotation(0);
   const QVector3D* position = root->getCachedPosition(0);
-  root->addKeyframe(0, QVector3D(position->x(), position->y(), position->z()), Rotation(rot->x, rot->y, rot->z));
+  root->addKeyframe(0, QVector3D(position->x(), position->y(), position->z()), QVector3D(rotation->x(), rotation->y(), rotation->z()));
   if(root->type==BVH_ROOT)
-    lastLoadedPositionNode->addKeyframe(0, QVector3D(position->x(), position->y(), position->z()), Rotation(rot->x, rot->y, rot->z));
+    lastLoadedPositionNode->addKeyframe(0, QVector3D(position->x(), position->y(), position->z()), QVector3D(rotation->x(), rotation->y(), rotation->z()));
 
   int numKeyFrames=token().toInt();
   for(int i=0;i<numKeyFrames;i++)
@@ -363,9 +363,9 @@ void BVH::avmReadKeyFrame(BVHNode* root)
 
     if(key<lastLoadedNumberOfFrames)
     {
-      const Rotation* rot=root->getCachedRotation(key);
+      const QVector3D* rotation = root->getCachedRotation(key);
       const QVector3D* position = root->getCachedPosition(key);
-      root->addKeyframe(key, QVector3D(position->x(), position->y(), position->z()), Rotation(rot->x, rot->y, rot->z));
+      root->addKeyframe(key, QVector3D(position->x(), position->y(), position->z()), QVector3D(rotation->x(), rotation->y(), rotation->z()));
     }
   }
 
@@ -494,7 +494,7 @@ BVHNode* BVH::avmRead(const QString& file)
             int key=token().toInt();
             qDebug("Reading position frame %d",key);
             const FrameData& frameData=root->frameData(key);
-            lastLoadedPositionNode->addKeyframe(key,frameData.position(),Rotation());
+            lastLoadedPositionNode->addKeyframe(key, frameData.position(), QVector3D());
           } // for
         }
         else if(propertyName=="PositionsEase:")
@@ -560,7 +560,7 @@ BVHNode* BVH::animRead(const QString& file,const QString& limFile)
     {
       const FrameData& frameData=root->keyframeDataByIndex(index);
       int frameNum=frameData.frameNumber();
-      lastLoadedPositionNode->addKeyframe(frameNum,frameData.position(),Rotation());
+      lastLoadedPositionNode->addKeyframe(frameNum, frameData.position(), QVector3D());
       lastLoadedPositionNode->setEaseIn(frameNum,frameData.easeIn());
       lastLoadedPositionNode->setEaseOut(frameNum,frameData.easeOut());
     }
@@ -604,7 +604,7 @@ void BVH::bvhWriteNode(BVHNode* node,QTextStream& out,int depth)
 
 void BVH::bvhWriteFrame(BVHNode* node,QTextStream& out,int frame)
 {
-  Rotation rot=node->frameData(frame).rotation();
+  QVector3D rotation = node->frameData(frame).rotation();
   QVector3D position = positionNode->frameData(frame).position();
 
   // preserve channel order while writing
@@ -617,9 +617,9 @@ void BVH::bvhWriteFrame(BVHNode* node,QTextStream& out,int frame)
     else if(type==BVH_YPOS) value = position.y();
     else if(type==BVH_ZPOS) value = position.z();
 
-    else if(type==BVH_XROT) value=rot.x;
-    else if(type==BVH_YROT) value=rot.y;
-    else if(type==BVH_ZROT) value=rot.z;
+    else if(type==BVH_XROT) value = rotation.x();
+    else if(type==BVH_YROT) value = rotation.y();
+    else if(type==BVH_ZROT) value = rotation.z();
 
     out << value << " ";
   }
@@ -918,7 +918,7 @@ void BVH::bvhSetFrameData(BVHNode* node,int frame)
 
   // reset paste buffer counter
   pasteIndex=0;
-  lastLoadedPositionNode->addKeyframe(frame,positionCopyBuffer,Rotation());
+  lastLoadedPositionNode->addKeyframe(frame, positionCopyBuffer, QVector3D());
   // paste all keyframes for all joints
   bvhSetFrameDataHelper(node,frame);
 }

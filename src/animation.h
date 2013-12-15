@@ -27,7 +27,6 @@
 
 #include "iktree.h"
 #include "playstate.h"
-#include "rotation.h"
 
 #define DEFAULT_POSE "data/TPose.avm"
 // #define DEFAULT_POSE "data/Relaxed.bvh"
@@ -118,7 +117,7 @@ class Animation : public QObject
     const FrameData keyframeDataByIndex(int jointNumber,int index);
 
     void setRotation(BVHNode* node,double x,double y,double z);
-    Rotation getRotation(BVHNode* node);
+    QVector3D getRotation(BVHNode* node);
     RotationLimits getRotationLimits(BVHNode* node);
     void setPosition(double x,double y,double z);
     QVector3D getPosition();

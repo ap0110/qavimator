@@ -36,7 +36,6 @@
 
 #include "animation.h"
 #include "camera.h"
-#include "rotation.h"
 #include "prop.h"
 #include "bvh.h"
 
@@ -112,7 +111,7 @@ class AnimationView : public QGLWidget
     Prop* getPropById(unsigned int id);
 
   signals:
-    void partClicked(BVHNode* node, Rotation rot, RotationLimits rotLimit, QVector3D position);
+    void partClicked(BVHNode* node, QVector3D rotation, RotationLimits rotLimit, QVector3D position);
     void partClicked(int part);
     void propClicked(Prop* prop);
 

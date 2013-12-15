@@ -24,7 +24,6 @@
 
 #include "qavimator.h"
 #include "animationview.h"
-#include "rotation.h"
 #include "prop.h"
 #include "timeline.h"
 #include "timelineview.h"
@@ -81,11 +80,11 @@ qavimator::qavimator() : QMainWindow(0)
 
 
   connect(animationView,SIGNAL(partClicked(BVHNode*,
-                                           Rotation,
+                                           QVector3D,
                                            RotationLimits,
                                            QVector3D)),
                      this,SLOT(partClicked(BVHNode*,
-                                           Rotation,
+                                           QVector3D,
                                            RotationLimits,
                                            QVector3D)));
 
@@ -158,7 +157,7 @@ qavimator::~qavimator()
 }
 
 // slot gets called by AnimationView::mousePressEvent()
-void qavimator::partClicked(BVHNode* node, Rotation rot, RotationLimits limits, QVector3D position)
+void qavimator::partClicked(BVHNode* node, QVector3D rotation, RotationLimits limits, QVector3D position)
 {
   avatarPropsTab->setCurrentIndex(0);
   emit enableProps(false);
@@ -202,9 +201,9 @@ void qavimator::partClicked(BVHNode* node, Rotation rot, RotationLimits limits, 
     yRotationSlider->blockSignals(false);
     zRotationSlider->blockSignals(false);
 
-    setX(rot.x);
-    setY(rot.y);
-    setZ(rot.z);
+    setX(rotation.x());
+    setY(rotation.y());
+    setZ(rotation.z());
 
 //    emit enablePosition(!protect);
     if(node->type==BVH_POS)
@@ -232,14 +231,14 @@ void qavimator::partDragged(BVHNode* node,double x,double y,double z)
       // get animation object
       Animation* anim=animationView->getAnimation();
       // get rotation values for selected part
-      Rotation rot=anim->getRotation(node);
+      QVector3D rotation = anim->getRotation(node);
       // get rotation limits for part
       RotationLimits rotLimits=anim->getRotationLimits(node);
 
       // calculate new rotation (x, y, z are the modifiers)
-      double newX=rot.x+x;
-      double newY=rot.y+y;
-      double newZ=rot.z+z;
+      double newX = rotation.x() + x;
+      double newY = rotation.y() + y;
+      double newZ = rotation.z() + z;
 
       double xMin=rotLimits.minimum.x();
       double yMin=rotLimits.minimum.y();
@@ -341,11 +340,11 @@ void qavimator::partChoice()
 void qavimator::rotationSlider(const QObject* slider)
 {
   Animation* anim=animationView->getAnimation();
-  Rotation rot=anim->getRotation(currentPart);
+  QVector3D rotation = anim->getRotation(currentPart);
 
-  double x=rot.x;
-  double y=rot.y;
-  double z=rot.z;
+  double x = rotation.x();
+  double y = rotation.y();
+  double z = rotation.z();
 
   if(slider==xRotationSlider)
   {
@@ -484,11 +483,11 @@ void qavimator::updateInputs()
   {
     if(currentPart)
     {
-      Rotation rot=anim->getRotation(currentPart);
+      QVector3D rotation = anim->getRotation(currentPart);
 
-      double x=rot.x;
-      double y=rot.y;
-      double z=rot.z;
+      double x = rotation.x();
+      double y = rotation.y();
+      double z = rotation.z();
 
       RotationLimits rotLimits=anim->getRotationLimits(currentPart);
 

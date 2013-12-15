@@ -26,8 +26,6 @@
 #include <qstring.h>
 #include <QVector3D>
 
-#include "rotation.h"
-
 #define MAX_FRAMES 1800
 
 typedef enum { BVH_POS, BVH_ROOT, BVH_JOINT, BVH_END, BVH_NO_SL } BVHNodeType;
@@ -38,16 +36,16 @@ class FrameData
 {
   public:
     FrameData();
-    FrameData(int frame, QVector3D position, Rotation rot);
+    FrameData(int frame, QVector3D position, QVector3D rotation);
     ~FrameData();
 
     int frameNumber() const;
     void setFrameNumber(int frame);
 
     QVector3D position() const;
-    Rotation rotation() const;
+    QVector3D rotation() const;
     void setPosition(const QVector3D& position);
-    void setRotation(const Rotation& rot);
+    void setRotation(const QVector3D& rotation);
 
     bool easeIn() const;
     bool easeOut() const;
@@ -60,7 +58,7 @@ class FrameData
   protected:
     unsigned int m_frameNumber;
 
-    Rotation m_rotation;
+    QVector3D m_rotation;
     QVector3D m_position;
 
     bool m_easeIn;
@@ -84,10 +82,10 @@ class BVHNode
     const FrameData keyframeDataByIndex(int index) const;
     const QList<int> keyframeList() const;
 
-    void addKeyframe(int frame, QVector3D position, Rotation rot);
+    void addKeyframe(int frame, QVector3D position, QVector3D rotation);
     void deleteKeyframe(int frame);
     void setKeyframePosition(int frame, const QVector3D& position);
-    void setKeyframeRotation(int frame,const Rotation& rot);
+    void setKeyframeRotation(int frame, const QVector3D& rotation);
     void insertFrame(int frame); // moves all key frames starting at "frame" one frame further
     void deleteFrame(int frame); // removes frame at position and moves all further frames one down
     bool isKeyframe(int frame) const;
@@ -101,9 +99,9 @@ class BVHNode
     bool easeIn(int frame);
     bool easeOut(int frame);
 
-    const Rotation* getCachedRotation(int frame);
+    const QVector3D* getCachedRotation(int frame);
     const QVector3D* getCachedPosition(int frame);
-    void cacheRotation(Rotation* rot);
+    void cacheRotation(QVector3D* rotation);
     void cachePosition(QVector3D* position);
     void flushFrameCache();
 
@@ -129,7 +127,7 @@ class BVHNode
     double channelMax[6];
 
     bool ikOn;
-    Rotation ikRot;
+    QVector3D ikRotation;
     double ikGoalPos[3];
     double ikGoalDir[3];
     double ikWeight;
@@ -154,7 +152,7 @@ class BVHNode
     QMap<int,FrameData> keyframes;
 
     // rotation/position cache on load, will be cleared once the animation is loaded
-    QList<Rotation*> rotations;
+    QList<QVector3D*> rotations;
     QList<QVector3D*> positions;
 };
 
