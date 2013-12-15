@@ -59,7 +59,7 @@ class qavimator : public QMainWindow, Ui::MainWindow
   protected slots:
     void configChanged();
 
-    void partClicked(BVHNode* node,Rotation rot,RotationLimits rotLimits,Position pos);
+    void partClicked(BVHNode* node, Rotation rot, RotationLimits rotLimits, QVector3D position);
     void partDragged(BVHNode* node,double changeX,double changeY,double changeZ);
     void propClicked(Prop* prop);
     void propDragged(Prop* prop,double x,double y,double z);

@@ -41,18 +41,4 @@ class Rotation
     double z;
 };
 
-class Position
-{
-  public:
-    Position();
-    Position(double x,double y,double z);
-    ~Position();
-
-    static Position difference(const Position& rot1,const Position& rot2);
-
-    double x;
-    double y;
-    double z;
-};
-
 #endif

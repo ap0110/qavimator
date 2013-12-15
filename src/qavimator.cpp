@@ -83,11 +83,11 @@ qavimator::qavimator() : QMainWindow(0)
   connect(animationView,SIGNAL(partClicked(BVHNode*,
                                            Rotation,
                                            RotationLimits,
-                                           Position)),
+                                           QVector3D)),
                      this,SLOT(partClicked(BVHNode*,
                                            Rotation,
                                            RotationLimits,
-                                           Position)));
+                                           QVector3D)));
 
   connect(animationView,SIGNAL(partDragged(BVHNode*,double,double,double)),
                      this,SLOT(partDragged(BVHNode*,double,double,double)));
@@ -158,7 +158,7 @@ qavimator::~qavimator()
 }
 
 // slot gets called by AnimationView::mousePressEvent()
-void qavimator::partClicked(BVHNode* node,Rotation rot,RotationLimits limits,Position pos)
+void qavimator::partClicked(BVHNode* node, Rotation rot, RotationLimits limits, QVector3D position)
 {
   avatarPropsTab->setCurrentIndex(0);
   emit enableProps(false);
@@ -212,9 +212,9 @@ void qavimator::partClicked(BVHNode* node,Rotation rot,RotationLimits limits,Pos
     else
       emit enableRotation(!protect);
 
-    setXPos(pos.x);
-    setYPos(pos.y);
-    setZPos(pos.z);
+    setXPos(position.x());
+    setYPos(position.y());
+    setZPos(position.z());
 
     // show the user if this part has a key frame here
     updateKeyBtn();
@@ -412,11 +412,11 @@ void qavimator::rotationValue()
 void qavimator::positionSlider(const QObject* slider)
 {
   Animation* anim=animationView->getAnimation();
-  Position pos=anim->getPosition();
+  QVector3D position = anim->getPosition();
 
-  double x=pos.x;
-  double y=pos.y;
-  double z=pos.z;
+  double x = position.x();
+  double y = position.y();
+  double z = position.z();
 
   if(slider==xPositionSlider)
   {
@@ -522,11 +522,11 @@ void qavimator::updateInputs()
     }
 
     emit enablePosition(!protect);
-    Position pos=anim->getPosition();
+    QVector3D position = anim->getPosition();
 
-    setXPos(pos.x);
-    setYPos(pos.y);
-    setZPos(pos.z);
+    setXPos(position.x());
+    setYPos(position.y());
+    setZPos(position.z());
 
     // we do that in nextPlaystate() now
     //  playButton->setIcon(playing ? stopIcon : playIcon);

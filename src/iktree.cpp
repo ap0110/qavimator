@@ -77,7 +77,7 @@ void IKTree::reset(int frame)
     bone[i].gRot = identity;
     n = bone[i].node;
     Rotation rot=n->frameData(frame).rotation();
-    Position pos=n->frameData(frame).position();
+    QVector3D position = n->frameData(frame).position();
 
     for (int k=0; k<n->numChannels; k++) {  // rotate each axis in order
       q = identity;
@@ -91,9 +91,9 @@ void IKTree::reset(int frame)
       case BVH_ZROT:
         q.setRotation(zAxis, rot.z * M_PI / 180);
       break;
-      case BVH_XPOS: bone[i].pos[0] = pos.x; break;
-      case BVH_YPOS: bone[i].pos[1] = pos.y; break;
-      case BVH_ZPOS: bone[i].pos[2] = pos.z; break;
+        case BVH_XPOS: bone[i].pos[0] = position.x(); break;
+        case BVH_YPOS: bone[i].pos[1] = position.y(); break;
+        case BVH_ZPOS: bone[i].pos[2] = position.z(); break;
       }
       bone[i].lRot = q * bone[i].lRot;
     }

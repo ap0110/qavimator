@@ -94,21 +94,21 @@ void BVHNode::removeChild(BVHNode* child)
   children.removeAll(child);
 }
 
-void BVHNode::addKeyframe(int frame,Position pos,Rotation rot)
+void BVHNode::addKeyframe(int frame, QVector3D position, Rotation rot)
 {
 //  qDebug(QString("addKeyframe(%1)").arg(frame));
-  keyframes[frame]=FrameData(frame,pos,rot);
+  keyframes[frame]=FrameData(frame, position, rot);
 //  if(frame==0 && name()=="hip") qDebug(QString("BVHNode::addKeyframe(%1,<%2,%3,%4>,<%5,%6,%7>) %8").arg(frame).arg(pos.x).arg(pos.y).arg(pos.z).arg(rot.x).arg(rot.y).arg(rot.z).arg(pos.bodyPart));
 }
 
-void BVHNode::setKeyframePosition(int frame,const Position& pos)
+void BVHNode::setKeyframePosition(int frame, const QVector3D& position)
 {
 //  qDebug(QString("setKeyframePosition(%1)").arg(frame));
   if(!isKeyframe(frame)) qDebug("setKeyframePosition(%d): not a keyframe!",frame);
   else
   {
     FrameData& key=keyframes[frame];
-    key.setPosition(pos);
+    key.setPosition(position);
   }
 }
 
@@ -248,24 +248,24 @@ const FrameData BVHNode::frameData(int frame) const
 
   Rotation rotBefore=before.rotation();
   Rotation rotAfter=after.rotation();
-  Position posBefore=before.position();
-  Position posAfter=after.position();
+  QVector3D positionBefore = before.position();
+  QVector3D positionAfter = after.position();
 
   Rotation iRot;
-  Position iPos;
+  QVector3D iPosition;
 
   iRot.x=interpolate(rotBefore.x,rotAfter.x,frameAfter-frameBefore,frame-frameBefore,before.easeOut(),after.easeIn());
   iRot.y=interpolate(rotBefore.y,rotAfter.y,frameAfter-frameBefore,frame-frameBefore,before.easeOut(),after.easeIn());
   iRot.z=interpolate(rotBefore.z,rotAfter.z,frameAfter-frameBefore,frame-frameBefore,before.easeOut(),after.easeIn());
 
-  iPos.x=interpolate(posBefore.x,posAfter.x,frameAfter-frameBefore,frame-frameBefore,before.easeOut(),after.easeIn());
-  iPos.y=interpolate(posBefore.y,posAfter.y,frameAfter-frameBefore,frame-frameBefore,before.easeOut(),after.easeIn());
-  iPos.z=interpolate(posBefore.z,posAfter.z,frameAfter-frameBefore,frame-frameBefore,before.easeOut(),after.easeIn());
+  iPosition.setX(interpolate(positionBefore.x(), positionAfter.x(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
+  iPosition.setY(interpolate(positionBefore.y(), positionAfter.y(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
+  iPosition.setX(interpolate(positionBefore.z(), positionAfter.z(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
 
 // qDebug(QString("iRot.x %1 frame %2: %3").arg(rotBefore.bodyPart).arg(before.frameNumber()).arg(iRot.x));
 
   // return interpolated frame data here
-  return FrameData(frame,iPos,iRot);
+  return FrameData(frame, iPosition, iRot);
 }
 
 const FrameData BVHNode::getKeyframeBefore(int frame) const
@@ -343,7 +343,7 @@ const Rotation* BVHNode::getCachedRotation(int frame)
   return rotations.at(frame);
 }
 
-const Position* BVHNode::getCachedPosition(int frame)
+const QVector3D* BVHNode::getCachedPosition(int frame)
 {
   return positions.at(frame);
 }
@@ -353,7 +353,7 @@ void BVHNode::cacheRotation(Rotation* rot)
   rotations.append(rot);
 }
 
-void BVHNode::cachePosition(Position* pos)
+void BVHNode::cachePosition(QVector3D* pos)
 {
   positions.append(pos);
 }
@@ -374,9 +374,9 @@ void BVHNode::dumpKeyframes()
   for(unsigned int index=0;index< (unsigned int) keyframes.count();index++)
   {
     Rotation rot=frameData(keys[index]).rotation();
-    Position pos=frameData(keys[index]).position();
+    QVector3D position = frameData(keys[index]).position();
 
-    qDebug(QString("%1: %2 - Pos: <%3,%4,%5> Rot: <%6,%7,%8>").arg(name()).arg(keys[index]).arg(pos.x).arg(pos.y).arg(pos.z).arg(rot.x).arg(rot.y).arg(rot.z).toLatin1().constData());
+    qDebug(QString("%1: %2 - Pos: <%3,%4,%5> Rot: <%6,%7,%8>").arg(name()).arg(keys[index]).arg(position.x()).arg(position.y()).arg(position.z()).arg(rot.x).arg(rot.y).arg(rot.z).toLatin1().constData());
   }
 }
 
@@ -412,12 +412,12 @@ bool BVHNode::compareFrames(int key1,int key2) const
 {
   if(type==BVH_POS)
   {
-    const Position pos1=frameData(key1).position();
-    const Position pos2=frameData(key2).position();
+    const QVector3D position1 = frameData(key1).position();
+    const QVector3D position2 = frameData(key2).position();
 
-    if(pos1.x!=pos2.x) return false;
-    if(pos1.y!=pos2.y) return false;
-    if(pos1.z!=pos2.z) return false;
+    if(position1.x() != position2.x()) return false;
+    if(position1.y() != position2.y()) return false;
+    if(position1.z() != position2.z()) return false;
   }
   else
   {
@@ -461,7 +461,7 @@ void BVHNode::optimize()
   // PASS 2 - remove keyframes that are superfluous due to linear interpolation
 
   Rotation oldRDifference;
-  Position oldPDifference;
+  QVector3D oldPositionDifference;
 
   // get first frame to compare - we even compare frame 1 here because we need
   // the initial "distance" and "difference" values. The first keyframe will
@@ -487,21 +487,19 @@ void BVHNode::optimize()
     // optimize positions if this is the position node
     if(type==BVH_POS)
     {
-      Position pDifference=Position::difference((*itBefore).position(),(*itCurrent).position());
+      QVector3D positionDifference = (*itCurrent).position() - (*itBefore).position();
 
-      pDifference.x/=distance;
-      pDifference.y/=distance;
-      pDifference.z/=distance;
+      positionDifference /= distance;
 
-      if(fabs(pDifference.x-oldPDifference.x)<tolerance &&
-         fabs(pDifference.y-oldPDifference.y)<tolerance &&
-         fabs(pDifference.z-oldPDifference.z)<tolerance)
+      if(fabs(positionDifference.x() - oldPositionDifference.x()) < tolerance &&
+         fabs(positionDifference.y() - oldPositionDifference.y()) < tolerance &&
+         fabs(positionDifference.z() - oldPositionDifference.z()) < tolerance)
       {
         // never delete the key in the first frame
         if(itBefore.key()!=0) keyframes.remove(itBefore.key());
       }
 
-      oldPDifference=pDifference;
+      oldPositionDifference = positionDifference;
     }
     // otherwise optimize rotations
     else
@@ -552,9 +550,9 @@ void BVHNode::mirrorKeys()
     int frame=keys[index];
     if(type==BVH_POS)
     {
-      Position pos=frameData(frame).position();
-      pos.x=-pos.x;
-      setKeyframePosition(frame,pos);
+      QVector3D position = frameData(frame).position();
+      position.setX(-position.x());
+      setKeyframePosition(frame, position);
     }
     else
     {
@@ -592,7 +590,7 @@ FrameData::FrameData()
   m_easeOut=false;
 }
 
-FrameData::FrameData(int num,Position pos,Rotation rot)
+FrameData::FrameData(int num, QVector3D pos, Rotation rot)
 {
 //  qDebug(QString("FrameData(%1): frame %2  pos %3,%4,%5 rot %6,%7,%8").arg((unsigned long) this).arg(frame).arg(pos.x).arg(pos.y).arg(pos.z).arg(rot.x).arg(rot.y).arg(rot.z));
   m_frameNumber=num;
@@ -612,7 +610,7 @@ void FrameData::setFrameNumber(int frame)
   m_frameNumber=frame;
 }
 
-Position FrameData::position() const
+QVector3D FrameData::position() const
 {
   return m_position;
 }
@@ -642,9 +640,9 @@ bool FrameData::easeOut() const
   return m_easeOut;
 }
 
-void FrameData::setPosition(const Position& pos)
+void FrameData::setPosition(const QVector3D& position)
 {
-  m_position=pos;
+  m_position=position;
 }
 
 void FrameData::setRotation(const Rotation& rot)
@@ -664,7 +662,7 @@ void FrameData::dump() const
   qDebug("FrameData::dump()");
   qDebug("Frame Number: %d",m_frameNumber);
   qDebug("Rotation: %lf, %lf, %lf",m_rotation.x,m_rotation.y,m_rotation.z);
-  qDebug("Position: %lf, %lf, %lf",m_position.x,m_position.y,m_position.z);
+  qDebug("Position: %lf, %lf, %lf",m_position.x(), m_position.y(), m_position.z());
   qDebug("Ease in/out: %d / %d",m_easeIn,m_easeOut);
 }
 

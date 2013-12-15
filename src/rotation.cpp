@@ -42,26 +42,3 @@ Rotation Rotation::difference(const Rotation& rot1,const Rotation& rot2)
 Rotation::~Rotation()
 {
 }
-
-Position::Position()
-{
-  x=0;
-  y=0;
-  z=0;
-}
-
-Position::Position(double px,double py, double pz)
-{
-  x=px;
-  y=py;
-  z=pz;
-}
-
-Position::~Position()
-{
-}
-
-Position Position::difference(const Position& pos1,const Position& pos2)
-{
-  return Position(pos2.x-pos1.x,pos2.y-pos1.y,pos2.z-pos1.z);
-}

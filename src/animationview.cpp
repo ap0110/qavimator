@@ -593,7 +593,7 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
       emit partClicked(part,
                        Rotation(getAnimation()->getRotation(part)),
                        getAnimation()->getRotationLimits(part),
-                       Position(getAnimation()->getPosition())
+                       QVector3D(getAnimation()->getPosition())
                       );
       emit partClicked(partSelected % ANIMATION_INCREMENT);
     }
@@ -769,8 +769,8 @@ void AnimationView::drawFigure(Animation* anim,unsigned int index)
     float scale=anim->getAvatarScale();
     glScalef(scale,scale,scale);
 
-    Position pos=anim->getPosition();
-    glTranslatef(pos.x,pos.y,pos.z);
+    QVector3D position = anim->getPosition();
+    glTranslatef(position.x(), position.y(), position.z());
 
     // visual compensation
     glTranslatef(0, 2, 0);
@@ -1180,7 +1180,7 @@ void AnimationView::selectPart(BVHNode* node)
   emit partClicked(node,
                    Rotation(getAnimation()->getRotation(node)),
                    getAnimation()->getRotationLimits(node),
-                   Position(getAnimation()->getPosition())
+                   QVector3D(getAnimation()->getPosition())
                   );
   repaint();
 }

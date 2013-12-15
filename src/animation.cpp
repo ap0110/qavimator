@@ -593,10 +593,10 @@ void Animation::setPosition(double x,double y,double z)
   }
   // new keyframe system
   if(positionNode->isKeyframe(frame))
-    positionNode->setKeyframePosition(frame,Position(x,y,z));
+    positionNode->setKeyframePosition(frame, QVector3D(x, y, z));
   else
   {
-    positionNode->addKeyframe(frame,Position(x,y,z),Rotation());
+    positionNode->addKeyframe(frame, QVector3D(x, y, z), Rotation());
     setEaseIn(positionNode,frame,Settings::easeIn());
     setEaseOut(positionNode,frame,Settings::easeOut());
   }
@@ -606,7 +606,7 @@ void Animation::setPosition(double x,double y,double z)
   emit frameChanged();
 }
 
-Position Animation::getPosition()
+QVector3D Animation::getPosition()
 {
   return positionNode->frameData(frame).position();
 }
@@ -884,8 +884,8 @@ void Animation::moveKeyFrame(int jointNumber,int from,int to,bool copy)
   // move rotation or position of the body part
   if(joint->type==BVH_POS)
   {
-    Position pos=frameData.position();
-    setPosition(pos.x,pos.y,pos.z);
+    QVector3D position = frameData.position();
+    setPosition(position.x(), position.y(), position.z());
   }
   else
   {

@@ -87,7 +87,7 @@ class BVH
     int nodeCount;
 
     QList<Rotation> rotationCopyBuffer;
-    Position positionCopyBuffer;
+    QVector3D positionCopyBuffer;
 
   protected:
     QString inputFile;

@@ -121,7 +121,7 @@ class Animation : public QObject
     Rotation getRotation(BVHNode* node);
     RotationLimits getRotationLimits(BVHNode* node);
     void setPosition(double x,double y,double z);
-    Position getPosition();
+    QVector3D getPosition();
     int getRotationOrder(const QString& jointName);
     void addKeyFrameAllJoints();
     void addKeyFrame(BVHNode* joint);

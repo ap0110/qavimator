@@ -112,7 +112,7 @@ class AnimationView : public QGLWidget
     Prop* getPropById(unsigned int id);
 
   signals:
-    void partClicked(BVHNode* node,Rotation rot,RotationLimits rotLimit,Position pos);
+    void partClicked(BVHNode* node, Rotation rot, RotationLimits rotLimit, QVector3D position);
     void partClicked(int part);
     void propClicked(Prop* prop);
 

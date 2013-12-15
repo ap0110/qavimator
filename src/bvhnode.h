@@ -24,6 +24,7 @@
 #include <QtCore>
 
 #include <qstring.h>
+#include <QVector3D>
 
 #include "rotation.h"
 
@@ -37,15 +38,15 @@ class FrameData
 {
   public:
     FrameData();
-    FrameData(int frame,Position pos,Rotation rot);
+    FrameData(int frame, QVector3D position, Rotation rot);
     ~FrameData();
 
     int frameNumber() const;
     void setFrameNumber(int frame);
 
-    Position position() const;
+    QVector3D position() const;
     Rotation rotation() const;
-    void setPosition(const Position& pos);
+    void setPosition(const QVector3D& position);
     void setRotation(const Rotation& rot);
 
     bool easeIn() const;
@@ -60,7 +61,7 @@ class FrameData
     unsigned int m_frameNumber;
 
     Rotation m_rotation;
-    Position m_position;
+    QVector3D m_position;
 
     bool m_easeIn;
     bool m_easeOut;
@@ -83,9 +84,9 @@ class BVHNode
     const FrameData keyframeDataByIndex(int index) const;
     const QList<int> keyframeList() const;
 
-    void addKeyframe(int frame,Position pos,Rotation rot);
+    void addKeyframe(int frame, QVector3D position, Rotation rot);
     void deleteKeyframe(int frame);
-    void setKeyframePosition(int frame,const Position& pos);
+    void setKeyframePosition(int frame, const QVector3D& position);
     void setKeyframeRotation(int frame,const Rotation& rot);
     void insertFrame(int frame); // moves all key frames starting at "frame" one frame further
     void deleteFrame(int frame); // removes frame at position and moves all further frames one down
@@ -101,9 +102,9 @@ class BVHNode
     bool easeOut(int frame);
 
     const Rotation* getCachedRotation(int frame);
-    const Position* getCachedPosition(int frame);
+    const QVector3D* getCachedPosition(int frame);
     void cacheRotation(Rotation* rot);
-    void cachePosition(Position* pos);
+    void cachePosition(QVector3D* position);
     void flushFrameCache();
 
     bool compareFrames(int key1,int key2) const;
@@ -154,7 +155,7 @@ class BVHNode
 
     // rotation/position cache on load, will be cleared once the animation is loaded
     QList<Rotation*> rotations;
-    QList<Position*> positions;
+    QList<QVector3D*> positions;
 };
 
 #endif
