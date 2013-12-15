@@ -192,9 +192,9 @@ void qavimator::partClicked(BVHNode* node,Rotation rot,RotationLimits limits,Pos
     }
     else
     {
-      xRotationSlider->setRange((int)(limits.xMin*PRECISION),(int)(limits.xMax*PRECISION));
-      yRotationSlider->setRange((int)(limits.yMin*PRECISION),(int)(limits.yMax*PRECISION));
-      zRotationSlider->setRange((int)(limits.zMin*PRECISION),(int)(limits.zMax*PRECISION));
+      xRotationSlider->setRange((int)(limits.minimum.x()*PRECISION),(int)(limits.maximum.x()*PRECISION));
+      yRotationSlider->setRange((int)(limits.minimum.y()*PRECISION),(int)(limits.maximum.y()*PRECISION));
+      zRotationSlider->setRange((int)(limits.minimum.z()*PRECISION),(int)(limits.maximum.z()*PRECISION));
     }
 
     // re-enable signals
@@ -241,12 +241,12 @@ void qavimator::partDragged(BVHNode* node,double x,double y,double z)
       double newY=rot.y+y;
       double newZ=rot.z+z;
 
-      double xMin=rotLimits.xMin;
-      double yMin=rotLimits.yMin;
-      double zMin=rotLimits.zMin;
-      double xMax=rotLimits.xMax;
-      double yMax=rotLimits.yMax;
-      double zMax=rotLimits.zMax;
+      double xMin=rotLimits.minimum.x();
+      double yMin=rotLimits.minimum.y();
+      double zMin=rotLimits.minimum.z();
+      double xMax=rotLimits.maximum.x();
+      double yMax=rotLimits.maximum.y();
+      double zMax=rotLimits.maximum.z();
 
       if(newX<xMin) newX=xMin;
       if(newX>xMax) newX=xMax;
@@ -492,12 +492,12 @@ void qavimator::updateInputs()
 
       RotationLimits rotLimits=anim->getRotationLimits(currentPart);
 
-      double xMin=rotLimits.xMin;
-      double yMin=rotLimits.yMin;
-      double zMin=rotLimits.zMin;
-      double xMax=rotLimits.xMax;
-      double yMax=rotLimits.yMax;
-      double zMax=rotLimits.zMax;
+      double xMin=rotLimits.minimum.x();
+      double yMin=rotLimits.minimum.y();
+      double zMin=rotLimits.minimum.z();
+      double xMax=rotLimits.maximum.x();
+      double yMax=rotLimits.maximum.y();
+      double zMax=rotLimits.maximum.z();
 
       if(currentPart->type==BVH_ROOT)
       {

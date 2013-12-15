@@ -41,23 +41,6 @@ class Rotation
     double z;
 };
 
-class RotationLimits
-{
-  public:
-    RotationLimits(const QString& jointName,double xMin,double xMax,
-                                            double yMin,double yMax,
-                                            double zMin,double zMax);
-    ~RotationLimits();
-
-    QString jointName;
-    double xMin;
-    double yMin;
-    double zMin;
-    double xMax;
-    double yMax;
-    double zMax;
-};
-
 class Position
 {
   public:

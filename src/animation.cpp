@@ -562,11 +562,13 @@ RotationLimits Animation::getRotationLimits(BVHNode* node)
       xMax=yMax=zMax=180;
     }
 
-    RotationLimits rotLimit(node->name(),xMin,xMax,yMin,yMax,zMin,zMax);
+    RotationLimits rotLimit;
+    rotLimit.minimum = QVector3D(xMin, yMin, zMin);
+    rotLimit.maximum = QVector3D(xMax, yMax, zMax);
     return rotLimit;
   }
   qDebug("Animation::getRotationLimits(): node==0!");
-  return RotationLimits(QString::null,0,0,0,0,0,0);
+  return RotationLimits();
 }
 
 int Animation::getRotationOrder(const QString& jointName)

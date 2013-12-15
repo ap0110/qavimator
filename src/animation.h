@@ -23,6 +23,7 @@
 #define ANIMATION_H
 
 #include <QTimer>
+#include <QVector3D>
 
 #include "iktree.h"
 #include "playstate.h"
@@ -37,6 +38,12 @@
 #define PLAYBACK_RESOLUTION     20.0
 
 class BVH;
+
+struct RotationLimits
+{
+    QVector3D minimum;
+    QVector3D maximum;
+};
 
 class Animation : public QObject
 {

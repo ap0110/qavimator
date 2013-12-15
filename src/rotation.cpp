@@ -43,24 +43,6 @@ Rotation::~Rotation()
 {
 }
 
-RotationLimits::RotationLimits(const QString& joint,double rxMin,double rxMax,
-                                                    double ryMin,double ryMax,
-                                                    double rzMin,double rzMax)
-{
-  jointName=joint;
-
-  xMin=rxMin;
-  yMin=ryMin;
-  zMin=rzMin;
-  xMax=rxMax;
-  yMax=ryMax;
-  zMax=rzMax;
-}
-
-RotationLimits::~RotationLimits()
-{
-}
-
 Position::Position()
 {
   x=0;
