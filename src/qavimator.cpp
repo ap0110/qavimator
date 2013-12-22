@@ -22,13 +22,15 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include "qavimator.h"
 #include "animationview.h"
 #include "prop.h"
-#include "timeline.h"
-#include "timelineview.h"
+#include "scene.h"
 #include "settings.h"
 #include "settingsdialog.h"
+#include "timeline.h"
+#include "timelineview.h"
+
+#include "qavimator.h"
 
 #define ANIM_FILTER "Animation Files (*.avm *.bvh)"
 #define PROP_FILTER "Props (*.prp)"
@@ -56,6 +58,8 @@ qavimator::qavimator() : QMainWindow(0)
   frameDataValid=false;
   currentPart=0;
   longestRunningTime=0.0;
+  scene = new Scene(this);
+  animationView->setScene(scene);
 
   // prepare play button icons
   stopIcon=QIcon(":/icons/icons/stop.png");
@@ -77,7 +81,8 @@ qavimator::qavimator() : QMainWindow(0)
 
   if(!Settings::showTimelinePanel()) timelineView->hide();
 
-
+  connect(scene, SIGNAL(repaint()), animationView, SLOT(repaint()));
+  connect(scene, SIGNAL(animationSelected(Animation*)), this, SLOT(selectAnimation(Animation*)));
 
   connect(animationView,SIGNAL(partClicked(BVHNode*,
                                            QVector3D,
@@ -229,7 +234,7 @@ void qavimator::partDragged(BVHNode* node,double x,double y,double z)
     if(!protect)
     {
       // get animation object
-      Animation* anim=animationView->getAnimation();
+      Animation* anim=scene->getAnimation();
       // get rotation values for selected part
       QVector3D rotation = anim->getRotation(node);
       // get rotation limits for part
@@ -258,7 +263,7 @@ void qavimator::partDragged(BVHNode* node,double x,double y,double z)
       setY(newY);
       setZ(newZ);
 
-      animationView->getAnimation()->setRotation(node,newX,newY,newZ);
+      scene->getAnimation()->setRotation(node,newX,newY,newZ);
       animationView->repaint();
 
       updateKeyBtn();
@@ -339,7 +344,7 @@ void qavimator::partChoice()
 // gets called whenever a body part rotation slider is moved
 void qavimator::rotationSlider(const QObject* slider)
 {
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   QVector3D rotation = anim->getRotation(currentPart);
 
   double x = rotation.x();
@@ -398,7 +403,7 @@ void qavimator::rotationValue()
   setY(y);
   setZ(z);
 
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   if(animationView->getSelectedPart())
   {
     anim->setRotation(animationView->getSelectedPart(), x, y, z);
@@ -410,7 +415,7 @@ void qavimator::rotationValue()
 
 void qavimator::positionSlider(const QObject* slider)
 {
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   QVector3D position = anim->getPosition();
 
   double x = position.x();
@@ -433,7 +438,7 @@ void qavimator::positionSlider(const QObject* slider)
     setZPos(z);
   }
 
-  animationView->getAnimation()->setPosition(x,y,z);
+  scene->getAnimation()->setPosition(x,y,z);
   animationView->repaint();
 
   updateKeyBtn();
@@ -467,7 +472,7 @@ void qavimator::positionValue()
   setYPos(y);
   setZPos(z);
 
-  animationView->getAnimation()->setPosition(x,y,z);
+  scene->getAnimation()->setPosition(x,y,z);
   animationView->repaint();
 
   updateKeyBtn();
@@ -478,7 +483,7 @@ void qavimator::updateInputs()
   // deactivate redraw to reduce interface "jitter" during updating
   setUpdatesEnabled(false);
 
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   if (anim)
   {
     if(currentPart)
@@ -563,7 +568,7 @@ void qavimator::updateInputs()
 
 void qavimator::updateKeyBtn()
 {
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   qDebug("qavimator::updateKeyBtn(): anim=%lx",(unsigned long) anim);
 
   // make sure we don't send a toggle signal on display update
@@ -605,13 +610,13 @@ void qavimator::frameTimeout()
   // only if we are still playing
   if(playstate!=PLAYSTATE_STOPPED)
   {
-    Animation* anim=animationView->getAnimation();
+    Animation* anim=scene->getAnimation();
     if(anim)
     {
       // don't show protected frames color on playback to avoid flicker
       emit protectFrame(false);
       // cycle through frames, restart at looping point
-      animationView->stepForward();
+      scene->stepForward();
 
       if(anim->getFrame()==(anim->getNumberOfFrames()-1) && playstate==PLAYSTATE_PLAYING)
       {
@@ -629,7 +634,7 @@ void qavimator::nextPlaystate()
 {
 //  qDebug("qavimator::nextPlaystate(): current playstate %d",(int) playstate);
 
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
 
   switch(playstate)
   {
@@ -678,7 +683,7 @@ void qavimator::setFPS(int fps)
 {
   qDebug("qavimator::setFPS(%d)",fps);
 
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   if(!anim) return;
 
   // sanity check
@@ -697,14 +702,14 @@ void qavimator::frameSlider(int position)
 
   emit protectFrame(protect);
   setPlaystate(PLAYSTATE_STOPPED);
-  animationView->setFrame(position);
+  scene->setFrame(position);
 
   updateInputs();
 }
 
 void qavimator::setAvatarShape(int shape)
 {
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   if(!anim) return;
 
   if(shape==0)
@@ -716,14 +721,14 @@ void qavimator::setAvatarShape(int shape)
 
 void qavimator::setAvatarScale(int percent)
 {
-  animationView->getAnimation()->setAvatarScale(percent/100.0);
+  scene->getAnimation()->setAvatarScale(percent/100.0);
   animationView->repaint();
 }
 
 void qavimator::numFramesChanged(int num)
 {
   if(num<1) num=1;
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   anim->setNumberOfFrames(num);
   calculateLongestRunningTime();
 
@@ -742,7 +747,7 @@ void qavimator::easeInChanged(int change)
   bool ease=false;
   if(change==Qt::Checked) ease=true;
 
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   anim->setEaseIn(currentPart,anim->getFrame(),ease);
 }
 
@@ -751,7 +756,7 @@ void qavimator::easeOutChanged(int change)
   bool ease=false;
   if(change==Qt::Checked) ease=true;
 
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   anim->setEaseOut(currentPart,anim->getFrame(),ease);
 }
 
@@ -768,7 +773,7 @@ void qavimator::fileNew()
   // set timeline animation first, because ...
   timeline->setAnimation(anim);
   // ... setting animation here will delete all old animations
-  animationView->setAnimation(anim);
+  scene->setAnimation(anim);
   selectAnimation(anim);
 
   // add new animation to internal list
@@ -891,7 +896,7 @@ void qavimator::fileAdd(const QString& name)
 
     setCurrentFile(file);
 
-    animationView->addAnimation(anim);
+    scene->addAnimation(anim);
     timeline->setAnimation(anim);
     selectAnimation(anim);
 
@@ -945,7 +950,7 @@ void qavimator::fileSave()
   if(currentFile==UNTITLED_NAME)
     fileSaveAs();
   else
-    animationView->getAnimation()->saveBVH(currentFile);
+    scene->getAnimation()->saveBVH(currentFile);
 }
 
 // Menu Action: File / Save As...
@@ -972,7 +977,7 @@ void qavimator::fileSaveAs()
     {
       setCurrentFile(file);
       Settings::setLastPath(fileInfo.path());
-      animationView->getAnimation()->saveBVH(file);
+      scene->getAnimation()->saveBVH(file);
       // update animation selector combo box
       selectAnimationCombo->setItemText(selectAnimationCombo->currentIndex(),fileInfo.baseName());
       openFiles[selectAnimationCombo->currentIndex()]=file;
@@ -992,7 +997,7 @@ void qavimator::fileExportForSecondLife()
     QString exportName=fileInfo.path()+"/"+fileInfo.completeBaseName()+".bvh";
 
     qDebug("qavimator::fileExportForSecondLife(): exporting animation as '%s'.",exportName.toLatin1().constData());
-    animationView->getAnimation()->saveBVH(exportName);
+    scene->getAnimation()->saveBVH(exportName);
     QMessageBox::information(this,QObject::tr("Export for Second Life"),QObject::tr("Animation was exported for Second Life as:\n%1").arg(exportName));
   }
 }
@@ -1133,7 +1138,7 @@ void qavimator::fileExit()
 void qavimator::editCut()
 {
 //  qDebug("qavimator::editCut()");
-  animationView->getAnimation()->cutFrame();
+  scene->getAnimation()->cutFrame();
   frameDataValid=true;
   updateInputs();
 }
@@ -1141,7 +1146,7 @@ void qavimator::editCut()
 // Menu Action: Edit / Copy
 void qavimator::editCopy()
 {
-  animationView->getAnimation()->copyFrame();
+  scene->getAnimation()->copyFrame();
   frameDataValid=true;
   updateInputs();
 }
@@ -1151,7 +1156,7 @@ void qavimator::editPaste()
 {
   if(frameDataValid)
   {
-    animationView->getAnimation()->pasteFrame();
+    scene->getAnimation()->pasteFrame();
     animationView->repaint();
     updateInputs();
   }
@@ -1160,7 +1165,7 @@ void qavimator::editPaste()
 // Menu Action: Edit / Paste
 void qavimator::toolsOptimizeBVH()
 {
-  animationView->getAnimation()->optimize();
+  scene->getAnimation()->optimize();
   updateInputs();
 }
 
@@ -1187,7 +1192,7 @@ void qavimator::setLoop(bool on)
 void qavimator::setJointLimits(bool on)
 {
   Settings::setJointLimits(on);
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   if(anim)
   {
     animationView->repaint();
@@ -1330,7 +1335,7 @@ void qavimator::setSliderValue(QSlider* slider,QLineEdit* edit,float value)
 
 void qavimator::updateFps()
 {
-  int fps=animationView->getAnimation()->fps();
+  int fps=scene->getAnimation()->fps();
 
   // guard against division by zero
   if(fps)
@@ -1380,7 +1385,7 @@ bool qavimator::clearOpenFiles()
   }
 
   timeline->setAnimation(0);
-  animationView->clear();
+  scene->clear();
   openFiles.clear();
   selectAnimationCombo->clear();
   animationIds.clear();
@@ -1592,14 +1597,16 @@ void qavimator::selectAnimation(Animation* animation)
     {
       // prevent signal looping
       animationView->blockSignals(true);
+      scene->blockSignals(true);
       // update animation combo box
       selectAnimationCombo->setCurrentIndex(index);
       // update window title
       setCurrentFile(openFiles.at(index));
       // update animation view (might already be active, depending on how this function was called)
-      animationView->selectAnimation(index);
+      scene->selectAnimation(index);
       // re-enable signals
       animationView->blockSignals(false);
+      scene->blockSignals(false);
     }
   } // for
 
@@ -1619,7 +1626,7 @@ void qavimator::selectAnimation(Animation* animation)
 // set loop in point (user view, so always +1)
 void qavimator::setLoopInPoint(int inFrame)
 {
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
 
   // FIXME: Temporary fix for a seg fault caused
   //  by adding then deleting a prop immediately
@@ -1644,7 +1651,7 @@ void qavimator::setLoopInPoint(int inFrame)
 // set loop out point (user view, so always +1)
 void qavimator::setLoopOutPoint(int outFrame)
 {
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   int numOfFrames=anim->getNumberOfFrames();
   int inFrame=anim->getLoopInPoint();
   qDebug("qavimator::setLoopOutPoint(%d) (%d frames)",outFrame,numOfFrames);
@@ -1773,7 +1780,7 @@ void qavimator::on_toolsOptimizeBVHAction_triggered()
 
 void qavimator::on_toolsMirrorAction_triggered()
 {
-  Animation* anim=animationView->getAnimation();
+  Animation* anim=scene->getAnimation();
   anim->mirror(currentPart);
   updateInputs();
 }
@@ -2035,7 +2042,7 @@ void qavimator::on_playButton_clicked()
 void qavimator::on_keyframeButton_toggled(bool on)
 {
   qDebug("on_keyframeButton_toggled(%d)",(int) on);
-  animationView->getAnimation()->toggleKeyFrame(currentPart); // (animationView->getSelectedPart());
+  scene->getAnimation()->toggleKeyFrame(currentPart); // (animationView->getSelectedPart());
   animationView->repaint();
 }
 

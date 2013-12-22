@@ -34,10 +34,12 @@
 #include "ui_mainapplicationform.h"
 #include "playstate.h"
 
+class QCloseEvent;
+
 class Animation;
 class Prop;
+class Scene;
 class Timeline;
-class QCloseEvent;
 
 class qavimator : public QMainWindow, Ui::MainWindow
 {
@@ -282,6 +284,9 @@ class qavimator : public QMainWindow, Ui::MainWindow
 
     // holds the longest running time of all currently opened animations
     double longestRunningTime;
+
+  private:
+    Scene* scene;
 };
 
 #endif

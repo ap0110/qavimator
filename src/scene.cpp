@@ -18,13 +18,93 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "animation.h"
+
 #include "scene.h"
 
 Scene::Scene(QObject* parent)
   : QObject(parent)
 {
+  selectedAnimation = NULL;
 }
 
 Scene::~Scene()
 {
+  clear();
+}
+
+void Scene::selectAnimation(int index)
+{
+  if (index < animationList.count())
+  {
+    selectedAnimation = animationList.at(index);
+    emit animationSelected(getAnimation());
+    emit repaint();
+  }
+}
+
+void Scene::setAnimation(Animation* animation)
+{
+  clear();
+
+  selectedAnimation = animation;
+  animationList.append(animation);
+  connect(animation, SIGNAL(frameChanged()), this, SIGNAL(repaint()));
+  emit repaint();
+}
+
+// Adds a new animation without overriding others, and sets it current
+void Scene::addAnimation(Animation* animation)
+{
+  if (!animationList.contains(animation))
+  {
+    animationList.append(animation);
+    selectedAnimation = animation; // set it as the current one
+    if (!animationList.isEmpty() && animation != animationList.first())
+      animation->setFrame(animationList.first()->getFrame());
+
+    connect(animation, SIGNAL(frameChanged()), this, SIGNAL(repaint()));
+    emit repaint();
+  }
+}
+
+void Scene::clear()
+{
+  qDeleteAll(animationList);
+  animationList.clear();
+  selectedAnimation = NULL;
+}
+
+void Scene::setFrame(int frame)
+{
+  for (int i = 0; i < animationList.count(); i++)
+  {
+    animationList.at(i)->setFrame(frame);
+  }
+}
+
+void Scene::stepForward()
+{
+  for (int i = 0; i < animationList.count(); i++)
+  {
+    animationList.at(i)->stepForward();
+  }
+}
+
+void Scene::setFPS(int fps)
+{
+  for (int i = 0; i < animationList.count(); i++)
+  {
+    animationList.at(i)->setFPS(fps);
+  }
+}
+
+int Scene::getIndexOfAnimation(Animation* animation)
+{
+  return animationList.indexOf(animation);
+}
+
+int Scene::getCountOfAnimations()
+{
+  return animationList.count();
 }

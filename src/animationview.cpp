@@ -29,10 +29,12 @@
 
 #include <QMouseEvent>
 
+#include "animation.h"
 #include "animationview.h"
 #include "bvh.h"
 #include "slparts.h"
 #include "props.h"
+#include "scene.h"
 
 #include "settings.h"
 
@@ -51,8 +53,6 @@ AnimationView::AnimationView(QWidget* parent,const char* /* name */,Animation* a
     qDebug("AnimationView::AnimationView(): BVH initialisation failed.");
     return;
   }
-
-  animation=0;
 
   // fake glut initialization
   int args=1;
@@ -100,7 +100,7 @@ AnimationView::AnimationView(QWidget* parent,const char* /* name */,Animation* a
   leftMouseButton=false;
   frameProtected=false;
   modifier=0;
-  if(anim) setAnimation(anim);
+  if(anim) m_scene->setAnimation(anim);
   setMouseTracking(true);
   setFocusPolicy(Qt::StrongFocus);
 
@@ -110,37 +110,16 @@ AnimationView::AnimationView(QWidget* parent,const char* /* name */,Animation* a
 
 AnimationView::~AnimationView()
 {
-  clear();
+}
 
-  // call delete on all animations in the list
-  qDeleteAll(animList);
-  // clear all now invalid references from the list
-  animList.clear();
+void AnimationView::setScene(Scene* scene)
+{
+  m_scene = scene;
 }
 
 BVH* AnimationView::getBVH() const
 {
   return bvh;
-}
-
-void AnimationView::selectAnimation(unsigned int index)
-{
-  if(index< (unsigned int) animList.count())
-  {
-    animation=animList.at(index);
-    emit animationSelected(getAnimation());
-    repaint();
-  }
-}
-
-void AnimationView::setAnimation(Animation* anim)
-{
-    clear();
-
-    animation=anim;
-    animList.append(anim);
-    connect(anim,SIGNAL(frameChanged()),this,SLOT(repaint()));
-    repaint();
 }
 
 void AnimationView::drawFloor()
@@ -196,52 +175,6 @@ void AnimationView::drawProps()
     Prop* prop=props->at(index);
     if(!prop->isAttached()) drawProp(prop);
   }
-}
-
-// Adds a new animation without overriding others, and sets it current
-void AnimationView::addAnimation(Animation* anim)
-{
-  if(!animList.contains(anim))
-  {
-    animList.append(anim);
-    animation=anim; // set it as the current one
-    if(animList.count() && anim!=animList.first())
-      anim->setFrame(animList.first()->getFrame());
-
-    connect(anim,SIGNAL(frameChanged()),this,SLOT(repaint()));
-    repaint();
-  }
-}
-
-void AnimationView::clear()
-{
-  animList.clear();
-  animation=NULL;
-}
-
-void AnimationView::setFrame(int frame)
-{
-//  qDebug(QString("animationview->frame now %1").arg(frame));
-  for(unsigned int i=0;i< (unsigned int) animList.count();i++)
-  {
-    animList.at(i)->setFrame(frame);
-  } // for
-}
-
-void AnimationView::stepForward()
-{
-  for(unsigned int i=0;i< (unsigned int) animList.count();i++)
-  {
-    animList.at(i)->stepForward();
-  } // for
-}
-
-void AnimationView::setFPS(int fps)
-{
-  for(unsigned int i=0;i< (unsigned int) animList.count();i++)
-  {
-    animList.at(i)->setFPS(fps);
-  } // for
 }
 
 const Prop* AnimationView::addProp(Prop::PropType type,double x,double y,double z,double xs,double ys,double zs,double xr,double yr,double zr,int attach)
@@ -367,7 +300,7 @@ void AnimationView::draw()
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
   camera.setModelView();
-  if(!animList.isEmpty()) drawAnimations();
+  drawAnimations();
   drawFloor();
   drawProps();
   glFlush();
@@ -375,15 +308,15 @@ void AnimationView::draw()
 
 void AnimationView::drawAnimations()
 {
-  for(unsigned int index=0;index< (unsigned int) animList.count();index++)
+  for(unsigned int index=0;index< (unsigned int) m_scene->getCountOfAnimations();index++)
   {
-    drawFigure(animList.at(index),index);
+    drawFigure(m_scene->getAnimation(index),index);
   }
 }
 
 int AnimationView::pickPart(int x, int y)
 {
-  int bufSize=((Animation::MAX_PARTS+10)*animList.count()+props->count())*4;
+  int bufSize=((Animation::MAX_PARTS+10)*m_scene->getCountOfAnimations()+props->count())*4;
 
   GLuint* selectBuf=(GLuint*) malloc(bufSize);
 
@@ -567,7 +500,7 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
     unsigned int selected=pickPart(event->x(),event->y());
 
     // if another part than the current one has been clicked, switch off mirror mode
-    if(selected!=partSelected) getAnimation()->setMirrored(false);
+    if(selected!=partSelected) m_scene->getAnimation()->setMirrored(false);
 
     // background clicked, reset all
     if(!selected)
@@ -582,7 +515,7 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
     else if(selected<OBJECT_START)
     {
       partSelected=selected;
-      selectAnimation(selected/ANIMATION_INCREMENT);
+      m_scene->selectAnimation(selected/ANIMATION_INCREMENT);
       props->selectProp(0);
       propDragging=0;
 
@@ -591,9 +524,9 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
       dragX = dragY = 0;
 
       emit partClicked(part,
-                       QVector3D(getAnimation()->getRotation(part)),
-                       getAnimation()->getRotationLimits(part),
-                       QVector3D(getAnimation()->getPosition())
+                       QVector3D(m_scene->getAnimation()->getRotation(part)),
+                       m_scene->getAnimation()->getRotationLimits(part),
+                       QVector3D(m_scene->getAnimation()->getPosition())
                       );
       emit partClicked(partSelected % ANIMATION_INCREMENT);
     }
@@ -645,17 +578,17 @@ void AnimationView::mouseDoubleClickEvent(QMouseEvent* event)
   // FIXME: With multiple avatars, double-clicking
   //  other avatars may require a different
   //  animation than what getAnimation() returns
-  if (getAnimation()->getNode(selected) == 0) return;
+  if (m_scene->getAnimation()->getNode(selected) == 0) return;
 
   if(modifier & SHIFT)
   {
     mirrorSelected=getSelectedPart()->getMirrorIndex()+(selected/ANIMATION_INCREMENT)*ANIMATION_INCREMENT;
     if(mirrorSelected)
-      getAnimation()->setMirrored(true);
+      m_scene->getAnimation()->setMirrored(true);
   }
   else if(selected && selected < OBJECT_START)
-    getAnimation()->setIK(getAnimation()->getNode(selected),
-                     !getAnimation()->getIK(getAnimation()->getNode(selected)));
+    m_scene->getAnimation()->setIK(m_scene->getAnimation()->getNode(selected),
+                     !m_scene->getAnimation()->getIK(m_scene->getAnimation()->getNode(selected)));
   repaint();
 }
 
@@ -1114,7 +1047,7 @@ void AnimationView::drawCircle(int axis,float radius,int width)
 
 BVHNode* AnimationView::getSelectedPart()
 {
-  return getAnimation()->getNode(partSelected % ANIMATION_INCREMENT);
+  return m_scene->getAnimation()->getNode(partSelected % ANIMATION_INCREMENT);
 }
 
 unsigned int AnimationView::getSelectedPartIndex()
@@ -1136,7 +1069,7 @@ const QString AnimationView::getSelectedPropName()
 
 void AnimationView::selectPart(int partNum)
 {
-  BVHNode* node=getAnimation()->getNode(partNum);
+  BVHNode* node=m_scene->getAnimation()->getNode(partNum);
   qDebug("AnimationView::selectPart(%d)",partNum);
 
   if(!node)
@@ -1171,16 +1104,16 @@ void AnimationView::selectPart(BVHNode* node)
   propDragging=0;
 
   // find out the index count of the animation we're working with currently
-  int animationIndex=animList.indexOf(getAnimation());
+  int animationIndex=m_scene->getIndexOfAnimation(m_scene->getAnimation());
 
   // get the part index to be selected, including the proper animation increment
   // FIXME: when we are adding support for removing animations we need to remember
   //        the increment for each animation so they don't get confused
-  partSelected=getAnimation()->getPartIndex(node)+ANIMATION_INCREMENT*animationIndex;
+  partSelected=m_scene->getAnimation()->getPartIndex(node)+ANIMATION_INCREMENT*animationIndex;
   emit partClicked(node,
-                   QVector3D(getAnimation()->getRotation(node)),
-                   getAnimation()->getRotationLimits(node),
-                   QVector3D(getAnimation()->getPosition())
+                   QVector3D(m_scene->getAnimation()->getRotation(node)),
+                   m_scene->getAnimation()->getRotationLimits(node),
+                   QVector3D(m_scene->getAnimation()->getPosition())
                   );
   repaint();
 }

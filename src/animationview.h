@@ -34,7 +34,6 @@
 
 #include <QtOpenGL/QGLWidget>
 
-#include "animation.h"
 #include "camera.h"
 #include "prop.h"
 #include "bvh.h"
@@ -60,7 +59,9 @@
 #define ROTATE_HANDLE_Z   DRAG_HANDLE_START+8
 
 class QMouseEvent;
+class Animation;
 class Props;
+class Scene;
 
 class AnimationView : public QGLWidget
 {
@@ -70,33 +71,12 @@ class AnimationView : public QGLWidget
     AnimationView(QWidget* parent=0,const char* name=0,Animation* anim=0);
     ~AnimationView();
 
+    // TODO Temporary method while logic is moving around
+    void setScene(Scene* scene);
+
     // exports the BVH class handler (ugly, need to find a better way)
     BVH* getBVH() const;
 
-    // Sets an animation "active"
-    void selectAnimation(unsigned int index);
-
-    // this is for setting a single-pose animation.  It will clear all other
-    // current animations, and become the only active one
-    void setAnimation(Animation *anim);
-
-    // this is for adding subsequent animations after the first call to
-    // setAnimation
-    void addAnimation(Animation *anim);
-
-    // This function clears the animations
-    void clear();
-
-    // These functions are re-implemented here so that every animation's
-    // frame data can be changed at once
-    void setFrame(int frame);
-    void stepForward();
-    void setFPS(int fps);
-
-    // getAnimation returns the *current* animation
-    Animation* getAnimation() { return animation; }
-    Animation* getAnimation(unsigned int index) { return animList.at(index); }
-    Animation* getLastAnimation() { return animList.last(); }
     void selectPart(BVHNode* node);
     void selectProp(const QString& prop);
     BVHNode* getSelectedPart();
@@ -176,8 +156,6 @@ class AnimationView : public QGLWidget
 
     QStringList figureFiles;   // holds the names of the BVH files for male/female skeleton models
 
-    QList<Animation*> animList;
-    Animation* animation; // this is the "currently selected" animation
     Camera camera;
     double changeX, changeY, changeZ;
     BVHNode* joints[Animation::NUM_FIGURES];
@@ -201,6 +179,10 @@ class AnimationView : public QGLWidget
     void clearSelected();
     int pickPart(int x, int y);
     void drawCircle(int axis, float radius, int width);
+
+  private:
+    // TODO Temporary pointer to scene while logic is being moved around
+    Scene* m_scene;
 };
 
 #endif
