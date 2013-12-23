@@ -83,6 +83,7 @@ qavimator::qavimator() : QMainWindow(0)
 
   connect(scene, SIGNAL(repaint()), animationView, SLOT(repaint()));
   connect(scene, SIGNAL(animationSelected(Animation*)), this, SLOT(selectAnimation(Animation*)));
+  connect(this, SIGNAL(protectFrame(bool)), scene, SLOT(protectFrame(bool)));
 
   connect(animationView,SIGNAL(partClicked(BVHNode*,
                                            QVector3D,
@@ -125,7 +126,6 @@ qavimator::qavimator() : QMainWindow(0)
   connect(&timer,SIGNAL(timeout()),this,SLOT(frameTimeout()));
 
   connect(this,SIGNAL(resetCamera()),animationView,SLOT(resetCamera()));
-  connect(this,SIGNAL(protectFrame(bool)),animationView,SLOT(protectFrame(bool)));
 
   connect(animationView,SIGNAL(partClicked(int)),timelineView,SLOT(selectTrack(int)));
   connect(animationView,SIGNAL(backgroundClicked()),timelineView,SLOT(backgroundClicked()));

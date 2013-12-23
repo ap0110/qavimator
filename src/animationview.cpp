@@ -98,7 +98,6 @@ AnimationView::AnimationView(QWidget* parent,const char* /* name */,Animation* a
 // FIXME:    mode(FL_DOUBLE | FL_MULTISAMPLE | FL_ALPHA | FL_DEPTH);
 
   leftMouseButton=false;
-  frameProtected=false;
   modifier=0;
   if(anim) m_scene->setAnimation(anim);
   setMouseTracking(true);
@@ -120,41 +119,6 @@ void AnimationView::setScene(Scene* scene)
 BVH* AnimationView::getBVH() const
 {
   return bvh;
-}
-
-void AnimationView::drawFloor()
-{
-  float alpha=(100-Settings::floorTranslucency())/100.0;
-
-  glEnable(GL_DEPTH_TEST);
-  glBegin(GL_QUADS);
-  for(int i=-10;i<10;i++)
-  {
-    for(int j=-10;j<10;j++)
-    {
-      if((i+j) % 2)
-      {
-        if(frameProtected)
-          glColor4f(0.3,0.0,0.0,alpha);
-        else
-          glColor4f(0.1,0.1,0.1,alpha);
-      }
-      else
-      {
-        if(frameProtected)
-          glColor4f(0.8,0.0,0.0,alpha);
-        else
-          glColor4f(0.6,0.6,0.6,alpha);
-      }
-
-      glVertex3f(i*40,0,j*40);
-      glVertex3f(i*40,0,(j+1)*40);
-      glVertex3f((i+1)*40,0,(j+1)*40);
-      glVertex3f((i+1)*40,0,j*40);
-    }
-  }
-
-  glEnd();
 }
 
 void AnimationView::drawProp(const Prop* prop) const
@@ -301,7 +265,7 @@ void AnimationView::draw()
 
   camera.setModelView();
   drawAnimations();
-  drawFloor();
+  m_scene->drawFloor();
   drawProps();
   glFlush();
 }
@@ -1152,15 +1116,4 @@ void AnimationView::resizeEvent(QResizeEvent* newSize)
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-}
-
-// set the current frame's visual protection status
-void AnimationView::protectFrame(bool on)
-{
-  // only redraw if we need to
-  if(frameProtected!=on)
-  {
-    frameProtected=on;
-    repaint();
-  }
 }

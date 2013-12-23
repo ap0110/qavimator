@@ -109,7 +109,6 @@ class AnimationView : public QGLWidget
 
   public slots:
     void resetCamera();
-    void protectFrame(bool on);
     void selectPart(int part);
 
   protected slots:
@@ -135,7 +134,6 @@ class AnimationView : public QGLWidget
     virtual void keyReleaseEvent(QKeyEvent* event);
     virtual void resizeEvent(QResizeEvent* newSize);
 
-    void drawFloor();
     void drawAnimations();
     void drawFigure(Animation* anim, unsigned int index);
     void drawPart(Animation* anim, unsigned int index, int frame, BVHNode *motion,
@@ -147,7 +145,6 @@ class AnimationView : public QGLWidget
     BVH* bvh;
 
     bool leftMouseButton;
-    bool frameProtected;
     char modifier;
 
     Props* props;

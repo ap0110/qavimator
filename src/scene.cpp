@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "animation.h"
+#include "floor.h"
 
 #include "scene.h"
 
@@ -26,6 +27,7 @@ Scene::Scene(QObject* parent)
   : QObject(parent)
 {
   selectedAnimation = NULL;
+  floor = new Floor(this);
 }
 
 Scene::~Scene()
@@ -107,4 +109,14 @@ int Scene::getIndexOfAnimation(Animation* animation)
 int Scene::getCountOfAnimations()
 {
   return animationList.count();
+}
+
+void Scene::drawFloor()
+{
+  floor->draw();
+}
+
+void Scene::protectFrame(bool on)
+{
+  floor->protectFrame(on);
 }
