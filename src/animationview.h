@@ -82,13 +82,6 @@ class AnimationView : public QGLWidget
     BVHNode* getSelectedPart();
     unsigned int getSelectedPartIndex();
     // const QString getPartName(int index);
-    const QString getSelectedPropName();
-
-    const Prop* addProp(Prop::PropType type,double x,double y,double z,double xs,double ys,double zs,double xr,double yr,double zr,int attach);
-    void deleteProp(Prop* prop);
-    void clearProps();
-    Prop* getPropByName(const QString& name);
-    Prop* getPropById(unsigned int id);
 
   signals:
     void partClicked(BVHNode* node, QVector3D rotation, RotationLimits rotLimit, QVector3D position);
@@ -147,7 +140,6 @@ class AnimationView : public QGLWidget
     bool leftMouseButton;
     char modifier;
 
-    Props* props;
     QPoint clickPos;           // holds the mouse click position for dragging
     QPoint returnPos;          // holds the mouse position to return to after dragging
 
@@ -178,6 +170,9 @@ class AnimationView : public QGLWidget
     void drawCircle(int axis, float radius, int width);
 
   private:
+    // TODO Temporary method while logic is moved around
+    Props* props() const;
+
     // TODO Temporary pointer to scene while logic is being moved around
     Scene* m_scene;
 };

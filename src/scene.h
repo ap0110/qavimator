@@ -23,8 +23,11 @@
 
 #include <QObject>
 
+#include "prop.h"
+
 class Animation;
 class Floor;
+class Props;
 
 class Scene : public QObject
 {
@@ -62,6 +65,19 @@ class Scene : public QObject
 
     void drawFloor();
 
+    // TODO Temporary method while logic is moved around
+    Props* props();
+
+    const Prop* addProp(Prop::PropType type,
+                        double x, double y, double z,
+                        double xs, double ys, double zs,
+                        double xr, double yr, double zr,
+                        int attach);
+    Prop* getPropByName(const QString& lookName);
+    Prop* getPropById(unsigned int id);
+    void deleteProp(Prop* prop);
+    void clearProps();
+
   signals:
     void repaint();
     void animationSelected(Animation* animation);
@@ -74,6 +90,7 @@ class Scene : public QObject
     Animation* selectedAnimation; // this is the "currently selected" animation
 
     Floor* floor;
+    Props* m_props;
 };
 
 #endif

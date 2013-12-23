@@ -1044,7 +1044,7 @@ void qavimator::fileLoadProps()
             while(props.count()<11) props.append("0");
           }
 
-          const Prop* prop=animationView->addProp((Prop::PropType) props[0].toInt(),
+          const Prop* prop=scene->addProp((Prop::PropType) props[0].toInt(),
                                             props[1].toDouble(),
                                             props[2].toDouble(),
                                             props[3].toDouble(),
@@ -1094,7 +1094,7 @@ void qavimator::fileSaveProps()
     {
       for(int index=0;index<propNameCombo->count();index++)
       {
-        Prop* prop=animationView->getPropByName(propNameCombo->itemText(index));
+        Prop* prop=scene->getPropByName(propNameCombo->itemText(index));
         QStringList properties;
         properties.append(QString::number(prop->type()));
         properties.append(QString::number(prop->xPosition()));
@@ -1429,7 +1429,7 @@ void qavimator::setCurrentFrame(int frame)
 // this slot gets called when someone clicks one of the "New Prop" buttons
 void qavimator::newProp(Prop::PropType type)
 {
-  const Prop* prop=animationView->addProp(type,10,40,10, 10,10,10, 0,0,0, 0);
+  const Prop* prop=scene->addProp(type,10,40,10, 10,10,10, 0,0,0, 0);
 
   if(prop)
   {
@@ -1442,7 +1442,7 @@ void qavimator::newProp(Prop::PropType type)
 
 void qavimator::selectProp(const QString& propName)
 {
-  const Prop* prop=animationView->getPropByName(propName);
+  const Prop* prop=scene->getPropByName(propName);
   if(prop)
   {
     emit enableProps(true);
@@ -1468,7 +1468,7 @@ void qavimator::attachProp(int attachmentPoint)
   // FIXME: find better solution for filtering endpoint for joints
   if(attachToComboBox->currentText()=="-") attachmentPoint=0;
   QString propName=propNameCombo->currentText();
-  Prop* prop=animationView->getPropByName(propName);
+  Prop* prop=scene->getPropByName(propName);
   prop->attach(attachmentPoint);
   updatePropSpins(prop);
   animationView->repaint();
@@ -1517,7 +1517,7 @@ void qavimator::updatePropSpins(const Prop* prop)
 void qavimator::propPositionChanged()
 {
   QString propName=propNameCombo->currentText();
-  Prop* prop=animationView->getPropByName(propName);
+  Prop* prop=scene->getPropByName(propName);
   if(prop)
   {
     prop->setPosition(propXPosSpin->value(),propYPosSpin->value(),propZPosSpin->value());
@@ -1529,7 +1529,7 @@ void qavimator::propPositionChanged()
 void qavimator::propScaleChanged()
 {
   QString propName=propNameCombo->currentText();
-  Prop* prop=animationView->getPropByName(propName);
+  Prop* prop=scene->getPropByName(propName);
   if(prop)
   {
     prop->setScale(propXScaleSpin->value(),propYScaleSpin->value(),propZScaleSpin->value());
@@ -1541,7 +1541,7 @@ void qavimator::propScaleChanged()
 void qavimator::propRotationChanged()
 {
   QString propName=propNameCombo->currentText();
-  Prop* prop=animationView->getPropByName(propName);
+  Prop* prop=scene->getPropByName(propName);
   if(prop)
   {
     prop->setRotation(propXRotSpin->value(),propYRotSpin->value(),propZRotSpin->value());
@@ -1552,10 +1552,10 @@ void qavimator::propRotationChanged()
 void qavimator::deleteProp()
 {
   QString propName=propNameCombo->currentText();
-  Prop* prop=animationView->getPropByName(propName);
+  Prop* prop=scene->getPropByName(propName);
   if(prop)
   {
-    animationView->deleteProp(prop);
+    scene->deleteProp(prop);
     for(int index=0;index<propNameCombo->count();index++)
       if(propNameCombo->itemText(index)==propName)
     {
@@ -1567,7 +1567,7 @@ void qavimator::deleteProp()
 
 void qavimator::clearProps()
 {
-  animationView->clearProps();
+  scene->clearProps();
   propNameCombo->clear();
   selectProp(QString::null);
 }

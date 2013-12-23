@@ -75,7 +75,6 @@ AnimationView::AnimationView(QWidget* parent,const char* /* name */,Animation* a
   xSelect=false;
   ySelect=false;
   zSelect=false;
-  props = new Props(this);
 
 #ifdef __APPLE__
   QString dataPath=QApplication::applicationDirPath() + "/../Resources";
@@ -124,51 +123,21 @@ BVH* AnimationView::getBVH() const
 void AnimationView::drawProp(const Prop* prop) const
 {
   Prop::State state=Prop::Normal;
-  if(props->getSelectedPropId() == prop->id())
+  if(props()->getSelectedPropId() == prop->id())
     state=Prop::Selected;
   else if(partHighlighted==prop->id()) state=Prop::Highlighted;
   prop->draw(state);
-  if(props->getSelectedPropId() == prop->id())
+  if(props()->getSelectedPropId() == prop->id())
     drawDragHandles(prop);
 }
 
 void AnimationView::drawProps()
 {
-  for(unsigned int index=0;index<(unsigned int) props->count();index++)
+  for(unsigned int index=0;index<(unsigned int) props()->count();index++)
   {
-    Prop* prop=props->at(index);
+    Prop* prop=props()->at(index);
     if(!prop->isAttached()) drawProp(prop);
   }
-}
-
-const Prop* AnimationView::addProp(Prop::PropType type,double x,double y,double z,double xs,double ys,double zs,double xr,double yr,double zr,int attach)
-{
-  Prop* newProp = props->addProp(type, x, y, z, xs, ys, zs, xr, yr, zr, attach);
-  repaint();
-
-  return newProp;
-}
-
-Prop* AnimationView::getPropByName(const QString& lookName)
-{
-  props->getPropByName(lookName);
-}
-
-Prop* AnimationView::getPropById(unsigned int id)
-{
-  props->getPropById(id);
-}
-
-void AnimationView::deleteProp(Prop* prop)
-{
-  props->deleteProp(prop);
-  repaint();
-}
-
-void AnimationView::clearProps()
-{
-  props->clearProps();
-  repaint();
 }
 
 void AnimationView::setProjection()
@@ -280,7 +249,7 @@ void AnimationView::drawAnimations()
 
 int AnimationView::pickPart(int x, int y)
 {
-  int bufSize=((Animation::MAX_PARTS+10)*m_scene->getCountOfAnimations()+props->count())*4;
+  int bufSize=((Animation::MAX_PARTS+10)*m_scene->getCountOfAnimations()+props()->count())*4;
 
   GLuint* selectBuf=(GLuint*) malloc(bufSize);
 
@@ -373,7 +342,7 @@ void AnimationView::mouseMoveEvent(QMouseEvent* event)
     else if(propDragging)
     {
       float rot=camera.yRotation();
-      Prop* prop=getPropById(props->getSelectedPropId());
+      Prop* prop=m_scene->getPropById(props()->getSelectedPropId());
 
       if(propDragging==DRAG_HANDLE_X)
       {
@@ -471,7 +440,7 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
     {
       partSelected=0;
       mirrorSelected=0;
-      props->selectProp(0);
+      props()->selectProp(0);
       propDragging=0;
       emit backgroundClicked();
     }
@@ -480,7 +449,7 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
     {
       partSelected=selected;
       m_scene->selectAnimation(selected/ANIMATION_INCREMENT);
-      props->selectProp(0);
+      props()->selectProp(0);
       propDragging=0;
 
       BVHNode* part=getSelectedPart();
@@ -511,8 +480,8 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
     }
     else
     {
-      emit propClicked(getPropById(selected));
-      props->selectProp(selected);
+      emit propClicked(m_scene->getPropById(selected));
+      props()->selectProp(selected);
     }
     repaint();
   }
@@ -792,9 +761,9 @@ void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,
       }
       anim->getFigureType()==Animation::FIGURE_MALE ? drawSLMalePart(motion->name()):drawSLFemalePart(motion->name());
 
-      for(unsigned int index=0;index< (unsigned int) props->count();index++)
+      for(unsigned int index=0;index< (unsigned int) props()->count();index++)
       {
-        Prop* prop=props->at(index);
+        Prop* prop=props()->at(index);
         if(prop->isAttached()==selectName) drawProp(prop);
       } // for
     }
@@ -1009,6 +978,11 @@ void AnimationView::drawCircle(int axis,float radius,int width)
 
 }
 
+Props* AnimationView::props() const
+{
+  return m_scene->props();
+}
+
 BVHNode* AnimationView::getSelectedPart()
 {
   return m_scene->getAnimation()->getNode(partSelected % ANIMATION_INCREMENT);
@@ -1025,11 +999,6 @@ const QString AnimationView::getPartName(int index)
   return getAnimation()->getPartName(index % ANIMATION_INCREMENT);
 }
 */
-// returns the selected prop name or an empty string if none selected
-const QString AnimationView::getSelectedPropName()
-{
-  return props->getSelectedPropName();
-}
 
 void AnimationView::selectPart(int partNum)
 {
@@ -1046,7 +1015,7 @@ void AnimationView::selectPart(int partNum)
   {
     partSelected=0;
     mirrorSelected=0;
-    props->selectProp(0);
+    props()->selectProp(0);
     propDragging=0;
     emit backgroundClicked();
     repaint();
@@ -1064,7 +1033,7 @@ void AnimationView::selectPart(BVHNode* node)
 
   qDebug("AnimationView::selectPart(node): %s",node->name().toLatin1().constData());
   // make sure no prop is selected anymore
-  props->selectProp(0);
+  props()->selectProp(0);
   propDragging=0;
 
   // find out the index count of the animation we're working with currently
@@ -1087,8 +1056,8 @@ void AnimationView::selectProp(const QString& propName)
   // make sure no part is selected anymore
   partSelected=0;
   mirrorSelected=0;
-  Prop* prop=getPropByName(propName);
-  if(prop) props->selectProp(prop->id());
+  Prop* prop=m_scene->getPropByName(propName);
+  if(prop) props()->selectProp(prop->id());
   repaint();
 }
 

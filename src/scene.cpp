@@ -20,6 +20,7 @@
 
 #include "animation.h"
 #include "floor.h"
+#include "props.h"
 
 #include "scene.h"
 
@@ -28,6 +29,7 @@ Scene::Scene(QObject* parent)
 {
   selectedAnimation = NULL;
   floor = new Floor(this);
+  m_props = new Props(this);
 }
 
 Scene::~Scene()
@@ -114,6 +116,41 @@ int Scene::getCountOfAnimations()
 void Scene::drawFloor()
 {
   floor->draw();
+}
+
+Props* Scene::props()
+{
+  return m_props;
+}
+
+const Prop* Scene::addProp(Prop::PropType type, double x, double y, double z, double xs, double ys, double zs, double xr, double yr, double zr, int attach)
+{
+  Prop* newProp = m_props->addProp(type, x, y, z, xs, ys, zs, xr, yr, zr, attach);
+  emit repaint();
+
+  return newProp;
+}
+
+Prop* Scene::getPropByName(const QString& lookName)
+{
+  return m_props->getPropByName(lookName);
+}
+
+Prop* Scene::getPropById(unsigned int id)
+{
+  return m_props->getPropById(id);
+}
+
+void Scene::deleteProp(Prop* prop)
+{
+  m_props->deleteProp(prop);
+  emit repaint();
+}
+
+void Scene::clearProps()
+{
+  m_props->clearProps();
+  emit repaint();
 }
 
 void Scene::protectFrame(bool on)

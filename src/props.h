@@ -36,7 +36,6 @@ class Props : public QObject
     ~Props();
 
     unsigned int getSelectedPropId();
-    const QString getSelectedPropName() const;
     Prop* getPropByName(const QString& lookName);
     Prop* getPropById(unsigned int id);
 
