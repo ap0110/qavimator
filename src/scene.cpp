@@ -21,7 +21,7 @@
 #include "animation.h"
 #include "camera.h"
 #include "floor.h"
-#include "props.h"
+#include "propmanager.h"
 
 #include "scene.h"
 
@@ -31,7 +31,7 @@ Scene::Scene(QObject* parent)
   selectedAnimation = NULL;
   m_camera = new Camera(this);
   m_floor = new Floor(this);
-  m_props = new Props(this);
+  m_propManager = new PropManager(this);
 }
 
 Scene::~Scene()
@@ -125,14 +125,14 @@ Camera* Scene::camera()
   return m_camera;
 }
 
-Props* Scene::props()
+PropManager* Scene::propManager()
 {
-  return m_props;
+  return m_propManager;
 }
 
 const Prop* Scene::addProp(Prop::PropType type, double x, double y, double z, double xs, double ys, double zs, double xr, double yr, double zr, int attach)
 {
-  Prop* newProp = m_props->addProp(type, x, y, z, xs, ys, zs, xr, yr, zr, attach);
+  Prop* newProp = m_propManager->addProp(type, x, y, z, xs, ys, zs, xr, yr, zr, attach);
   emit repaint();
 
   return newProp;
@@ -140,23 +140,23 @@ const Prop* Scene::addProp(Prop::PropType type, double x, double y, double z, do
 
 Prop* Scene::getPropByName(const QString& lookName)
 {
-  return m_props->getPropByName(lookName);
+  return m_propManager->getPropByName(lookName);
 }
 
 Prop* Scene::getPropById(unsigned int id)
 {
-  return m_props->getPropById(id);
+  return m_propManager->getPropById(id);
 }
 
 void Scene::deleteProp(Prop* prop)
 {
-  m_props->deleteProp(prop);
+  m_propManager->deleteProp(prop);
   emit repaint();
 }
 
 void Scene::clearProps()
 {
-  m_props->clearProps();
+  m_propManager->clearProps();
   emit repaint();
 }
 

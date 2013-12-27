@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef PROPS_H
-#define PROPS_H
+#ifndef PROPMANAGER_H
+#define PROPMANAGER_H
 
 #include <QObject>
 
@@ -27,13 +27,13 @@
 
 #define OBJECT_START      8000
 
-class Props : public QObject
+class PropManager : public QObject
 {
   Q_OBJECT
 
   public:
-    Props(QObject* parent = 0);
-    ~Props();
+    PropManager(QObject* parent = 0);
+    ~PropManager();
 
     unsigned int getSelectedPropId();
     Prop* getPropByName(const QString& lookName);

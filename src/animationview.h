@@ -60,7 +60,7 @@
 
 class QMouseEvent;
 class Animation;
-class Props;
+class PropManager;
 class Scene;
 
 class AnimationView : public QGLWidget
@@ -170,7 +170,7 @@ class AnimationView : public QGLWidget
 
   private:
     // TODO Temporary methods while logic is moved around
-    Props* props() const;
+    PropManager* propManager() const;
     Camera* camera() const;
 
     // TODO Temporary pointer to scene while logic is being moved around

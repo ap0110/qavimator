@@ -33,7 +33,7 @@
 #include "animationview.h"
 #include "bvh.h"
 #include "slparts.h"
-#include "props.h"
+#include "propmanager.h"
 #include "scene.h"
 
 #include "settings.h"
@@ -120,19 +120,19 @@ BVH* AnimationView::getBVH() const
 void AnimationView::drawProp(const Prop* prop) const
 {
   Prop::State state=Prop::Normal;
-  if(props()->getSelectedPropId() == prop->id())
+  if(propManager()->getSelectedPropId() == prop->id())
     state=Prop::Selected;
   else if(partHighlighted==prop->id()) state=Prop::Highlighted;
   prop->draw(state);
-  if(props()->getSelectedPropId() == prop->id())
+  if(propManager()->getSelectedPropId() == prop->id())
     drawDragHandles(prop);
 }
 
 void AnimationView::drawProps()
 {
-  for(unsigned int index=0;index<(unsigned int) props()->count();index++)
+  for(unsigned int index=0;index<(unsigned int) propManager()->count();index++)
   {
-    Prop* prop=props()->at(index);
+    Prop* prop=propManager()->at(index);
     if(!prop->isAttached()) drawProp(prop);
   }
 }
@@ -246,7 +246,7 @@ void AnimationView::drawAnimations()
 
 int AnimationView::pickPart(int x, int y)
 {
-  int bufSize=((Animation::MAX_PARTS+10)*m_scene->getCountOfAnimations()+props()->count())*4;
+  int bufSize=((Animation::MAX_PARTS+10)*m_scene->getCountOfAnimations()+propManager()->count())*4;
 
   GLuint* selectBuf=(GLuint*) malloc(bufSize);
 
@@ -339,7 +339,7 @@ void AnimationView::mouseMoveEvent(QMouseEvent* event)
     else if(propDragging)
     {
       float rot=camera()->yRotation();
-      Prop* prop=m_scene->getPropById(props()->getSelectedPropId());
+      Prop* prop=m_scene->getPropById(propManager()->getSelectedPropId());
 
       if(propDragging==DRAG_HANDLE_X)
       {
@@ -437,7 +437,7 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
     {
       partSelected=0;
       mirrorSelected=0;
-      props()->selectProp(0);
+      propManager()->selectProp(0);
       propDragging=0;
       emit backgroundClicked();
     }
@@ -446,7 +446,7 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
     {
       partSelected=selected;
       m_scene->selectAnimation(selected/ANIMATION_INCREMENT);
-      props()->selectProp(0);
+      propManager()->selectProp(0);
       propDragging=0;
 
       BVHNode* part=getSelectedPart();
@@ -478,7 +478,7 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
     else
     {
       emit propClicked(m_scene->getPropById(selected));
-      props()->selectProp(selected);
+      propManager()->selectProp(selected);
     }
     repaint();
   }
@@ -758,9 +758,9 @@ void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,
       }
       anim->getFigureType()==Animation::FIGURE_MALE ? drawSLMalePart(motion->name()):drawSLFemalePart(motion->name());
 
-      for(unsigned int index=0;index< (unsigned int) props()->count();index++)
+      for(unsigned int index=0;index< (unsigned int) propManager()->count();index++)
       {
-        Prop* prop=props()->at(index);
+        Prop* prop=propManager()->at(index);
         if(prop->isAttached()==selectName) drawProp(prop);
       } // for
     }
@@ -975,9 +975,9 @@ void AnimationView::drawCircle(int axis,float radius,int width)
 
 }
 
-Props* AnimationView::props() const
+PropManager* AnimationView::propManager() const
 {
-  return m_scene->props();
+  return m_scene->propManager();
 }
 
 Camera* AnimationView::camera() const
@@ -1017,7 +1017,7 @@ void AnimationView::selectPart(int partNum)
   {
     partSelected=0;
     mirrorSelected=0;
-    props()->selectProp(0);
+    propManager()->selectProp(0);
     propDragging=0;
     emit backgroundClicked();
     repaint();
@@ -1035,7 +1035,7 @@ void AnimationView::selectPart(BVHNode* node)
 
   qDebug("AnimationView::selectPart(node): %s",node->name().toLatin1().constData());
   // make sure no prop is selected anymore
-  props()->selectProp(0);
+  propManager()->selectProp(0);
   propDragging=0;
 
   // find out the index count of the animation we're working with currently
@@ -1059,7 +1059,7 @@ void AnimationView::selectProp(const QString& propName)
   partSelected=0;
   mirrorSelected=0;
   Prop* prop=m_scene->getPropByName(propName);
-  if(prop) props()->selectProp(prop->id());
+  if(prop) propManager()->selectProp(prop->id());
   repaint();
 }
 

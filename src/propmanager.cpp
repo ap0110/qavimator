@@ -20,24 +20,24 @@
 
 #include "prop.h"
 
-#include "props.h"
+#include "propmanager.h"
 
-Props::Props(QObject* parent)
+PropManager::PropManager(QObject* parent)
   : QObject(parent)
 {
   nextPropId = OBJECT_START;
 }
 
-Props::~Props()
+PropManager::~PropManager()
 {
 }
 
-unsigned int Props::getSelectedPropId()
+unsigned int PropManager::getSelectedPropId()
 {
   return propSelected;
 }
 
-Prop* Props::getPropByName(const QString &lookName)
+Prop* PropManager::getPropByName(const QString &lookName)
 {
   for(unsigned int index=0;index< (unsigned int) propList.count();index++)
   {
@@ -48,7 +48,7 @@ Prop* Props::getPropByName(const QString &lookName)
   return 0;
 }
 
-Prop* Props::getPropById(unsigned int id)
+Prop* PropManager::getPropById(unsigned int id)
 {
   for(unsigned int index=0;index< (unsigned int) propList.count();index++)
   {
@@ -60,17 +60,17 @@ Prop* Props::getPropById(unsigned int id)
   return 0;
 }
 
-Prop* Props::at(int i) const
+Prop* PropManager::at(int i) const
 {
   return propList.at(i);
 }
 
-int Props::count() const
+int PropManager::count() const
 {
   return propList.count();
 }
 
-Prop* Props::addProp(Prop::PropType type,
+Prop* PropManager::addProp(Prop::PropType type,
                     double x, double y, double z,
                     double xs, double ys, double zs,
                     double xr, double yr, double zr,
@@ -105,13 +105,13 @@ Prop* Props::addProp(Prop::PropType type,
   return newProp;
 }
 
-void Props::deleteProp(Prop *prop)
+void PropManager::deleteProp(Prop *prop)
 {
   propList.removeAll(prop);
   delete prop;
 }
 
-void Props::clearProps()
+void PropManager::clearProps()
 {
   while(propList.count())
   {
@@ -121,7 +121,7 @@ void Props::clearProps()
   }
 }
 
-void Props::selectProp(unsigned int id)
+void PropManager::selectProp(unsigned int id)
 {
   propSelected = id;
 }

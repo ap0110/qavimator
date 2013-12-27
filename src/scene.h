@@ -28,7 +28,7 @@
 class Animation;
 class Camera;
 class Floor;
-class Props;
+class PropManager;
 
 class Scene : public QObject
 {
@@ -68,7 +68,7 @@ class Scene : public QObject
 
     // TODO Temporary methods while logic is moved around
     Camera* camera();
-    Props* props();
+    PropManager* propManager();
 
     const Prop* addProp(Prop::PropType type,
                         double x, double y, double z,
@@ -95,7 +95,7 @@ class Scene : public QObject
     Animation* selectedAnimation; // this is the "currently selected" animation
 
     Floor* m_floor;
-    Props* m_props;
+    PropManager* m_propManager;
 
     Camera* m_camera;
 };
