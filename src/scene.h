@@ -26,6 +26,7 @@
 #include "prop.h"
 
 class Animation;
+class Camera;
 class Floor;
 class Props;
 
@@ -65,7 +66,8 @@ class Scene : public QObject
 
     void drawFloor();
 
-    // TODO Temporary method while logic is moved around
+    // TODO Temporary methods while logic is moved around
+    Camera* camera();
     Props* props();
 
     const Prop* addProp(Prop::PropType type,
@@ -85,12 +87,17 @@ class Scene : public QObject
   public slots:
     void protectFrame(bool on);
 
+    void storeCameraPosition(int num);
+    void restoreCameraPosition(int num);
+
   private:
     QList<Animation*> animationList;
     Animation* selectedAnimation; // this is the "currently selected" animation
 
-    Floor* floor;
+    Floor* m_floor;
     Props* m_props;
+
+    Camera* m_camera;
 };
 
 #endif

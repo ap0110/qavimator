@@ -42,7 +42,8 @@ CameraPosition::~CameraPosition()
 {
 }
 
-Camera::Camera()
+Camera::Camera(QObject* parent)
+  : QObject(parent)
 {
   positions.append(new CameraPosition(0.0, 40.0, 100.0, 40.0, 37.0));
   positions.append(new CameraPosition(0.0, 40.0, 100.0, 48.0, 320.0));

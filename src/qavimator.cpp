@@ -85,6 +85,9 @@ qavimator::qavimator() : QMainWindow(0)
   connect(scene, SIGNAL(animationSelected(Animation*)), this, SLOT(selectAnimation(Animation*)));
   connect(this, SIGNAL(protectFrame(bool)), scene, SLOT(protectFrame(bool)));
 
+  connect(animationView, SIGNAL(storeCameraPosition(int)), scene, SLOT(storeCameraPosition(int)));
+  connect(animationView, SIGNAL(restoreCameraPosition(int)), scene, SLOT(restoreCameraPosition(int)));
+
   connect(animationView,SIGNAL(partClicked(BVHNode*,
                                            QVector3D,
                                            RotationLimits,

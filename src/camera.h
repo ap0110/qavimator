@@ -46,7 +46,7 @@ class Camera : public QObject
   Q_OBJECT
 
   public:
-    Camera();
+    Camera(QObject* parent = 0);
     ~Camera();
 
     void rotate(float x, float y);

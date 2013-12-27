@@ -145,7 +145,6 @@ class AnimationView : public QGLWidget
 
     QStringList figureFiles;   // holds the names of the BVH files for male/female skeleton models
 
-    Camera camera;
     double changeX, changeY, changeZ;
     BVHNode* joints[Animation::NUM_FIGURES];
 
@@ -170,8 +169,9 @@ class AnimationView : public QGLWidget
     void drawCircle(int axis, float radius, int width);
 
   private:
-    // TODO Temporary method while logic is moved around
+    // TODO Temporary methods while logic is moved around
     Props* props() const;
+    Camera* camera() const;
 
     // TODO Temporary pointer to scene while logic is being moved around
     Scene* m_scene;

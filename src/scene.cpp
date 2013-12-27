@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "animation.h"
+#include "camera.h"
 #include "floor.h"
 #include "props.h"
 
@@ -28,7 +29,8 @@ Scene::Scene(QObject* parent)
   : QObject(parent)
 {
   selectedAnimation = NULL;
-  floor = new Floor(this);
+  m_camera = new Camera(this);
+  m_floor = new Floor(this);
   m_props = new Props(this);
 }
 
@@ -115,7 +117,12 @@ int Scene::getCountOfAnimations()
 
 void Scene::drawFloor()
 {
-  floor->draw();
+  m_floor->draw();
+}
+
+Camera* Scene::camera()
+{
+  return m_camera;
 }
 
 Props* Scene::props()
@@ -155,5 +162,15 @@ void Scene::clearProps()
 
 void Scene::protectFrame(bool on)
 {
-  floor->protectFrame(on);
+  m_floor->protectFrame(on);
+}
+
+void Scene::storeCameraPosition(int num)
+{
+  m_camera->storeCameraPosition(num);
+}
+
+void Scene::restoreCameraPosition(int num)
+{
+  m_camera->restoreCameraPosition(num);
 }

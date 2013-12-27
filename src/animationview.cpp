@@ -101,9 +101,6 @@ AnimationView::AnimationView(QWidget* parent,const char* /* name */,Animation* a
   if(anim) m_scene->setAnimation(anim);
   setMouseTracking(true);
   setFocusPolicy(Qt::StrongFocus);
-
-  connect(this,SIGNAL(storeCameraPosition(int)),&camera,SLOT(storeCameraPosition(int)));
-  connect(this,SIGNAL(restoreCameraPosition(int)),&camera,SLOT(restoreCameraPosition(int)));
 }
 
 AnimationView::~AnimationView()
@@ -232,7 +229,7 @@ void AnimationView::draw()
   glShadeModel(GL_FLAT);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-  camera.setModelView();
+  camera()->setModelView();
   drawAnimations();
   m_scene->drawFloor();
   drawProps();
@@ -270,7 +267,7 @@ int AnimationView::pickPart(int x, int y)
   glLoadIdentity();
   gluPickMatrix(x,(viewport[3]-y),5.0,5.0,viewport);
   setProjection();
-  camera.setModelView();
+  camera()->setModelView();
   drawAnimations();
   drawProps();
   glMatrixMode(GL_PROJECTION);
@@ -341,7 +338,7 @@ void AnimationView::mouseMoveEvent(QMouseEvent* event)
     }
     else if(propDragging)
     {
-      float rot=camera.yRotation();
+      float rot=camera()->yRotation();
       Prop* prop=m_scene->getPropById(props()->getSelectedPropId());
 
       if(propDragging==DRAG_HANDLE_X)
@@ -389,14 +386,14 @@ void AnimationView::mouseMoveEvent(QMouseEvent* event)
     else
     {
       if(modifier & SHIFT)
-        camera.pan(dragX/2,dragY/2,0);
+        camera()->pan(dragX/2,dragY/2,0);
       else if(modifier & ALT)
       {
-        camera.pan(0,0,dragY);
-        camera.rotate(0,dragX);
+        camera()->pan(0,0,dragY);
+        camera()->rotate(0,dragX);
       }
       else
-        camera.rotate(dragY,dragX);
+        camera()->rotate(dragY,dragX);
 
       repaint();
     }
@@ -527,7 +524,7 @@ void AnimationView::mouseDoubleClickEvent(QMouseEvent* event)
 
 void AnimationView::wheelEvent(QWheelEvent* event)
 {
-  camera.pan(0,0,-event->delta()/12);
+  camera()->pan(0,0,-event->delta()/12);
   repaint();
 }
 
@@ -538,11 +535,11 @@ void AnimationView::keyPressEvent(QKeyEvent* event)
   switch(event->key())
   {
     case Qt::Key_PageUp:
-      camera.pan(0,0,-5);
+      camera()->pan(0,0,-5);
       repaint();
       break;
     case Qt::Key_PageDown:
-        camera.pan(0,0,5);
+        camera()->pan(0,0,5);
         repaint();
         break;
     case Qt::Key_Shift:
@@ -983,6 +980,11 @@ Props* AnimationView::props() const
   return m_scene->props();
 }
 
+Camera* AnimationView::camera() const
+{
+  return m_scene->camera();
+}
+
 BVHNode* AnimationView::getSelectedPart()
 {
   return m_scene->getAnimation()->getNode(partSelected % ANIMATION_INCREMENT);
@@ -1063,7 +1065,7 @@ void AnimationView::selectProp(const QString& propName)
 
 void AnimationView::resetCamera()
 {
-  camera.reset();
+  camera()->reset();
   repaint();
 }
 
