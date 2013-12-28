@@ -1,52 +1,52 @@
 # Sources
-SET (QAVI_SRC	animation.cpp
-			animationview.cpp
-			bvh.cpp
-			bvhnode.cpp
-			camera.cpp
-                        floor.cpp
-			iktree.cpp
-			keyframelist.cpp
-			main.cpp
-			math3d.cpp
-			prop.cpp
-                        propmanager.cpp
-                        qavimator.cpp
-                        scene.cpp
-			settings.cpp
-			settingsdialog.cpp
-			slpartsfemale.cpp
-			slpartsmale.cpp
-			timeline.cpp
-			timelineview.cpp)
+SET (QAVI_SRC   animation.cpp
+                animationview.cpp
+                bvh.cpp
+                bvhnode.cpp
+                camera.cpp
+                floor.cpp
+                iktree.cpp
+                keyframelist.cpp
+                main.cpp
+                math3d.cpp
+                prop.cpp
+                propmanager.cpp
+                qavimator.cpp
+                scene.cpp
+                settings.cpp
+                settingsdialog.cpp
+                slpartsfemale.cpp
+                slpartsmale.cpp
+                timeline.cpp
+                timelineview.cpp)
 
 # Headers
-SET (QAVI_MOC_HDR 	animation.h
-			animationview.h
-			bvh.h
-			bvhnode.h
-			camera.h
-                        floor.h
-			iktree.h
-			keyframelist.h
-			math3d.h
-			playstate.h
-			prop.h
-                        propmanager.h
-                        qavimator.h
-                        scene.h
-			settings.h
-			settingsdialog.h
-			slparts.h
-			timeline.h
-			timelineview.h)
-			
+SET (QAVI_MOC_HDR   animation.h
+                    animationview.h
+                    bvh.h
+                    bvhnode.h
+                    camera.h
+                    floor.h
+                    iktree.h
+                    keyframelist.h
+                    math3d.h
+                    playstate.h
+                    prop.h
+                    propmanager.h
+                    qavimator.h
+                    scene.h
+                    settings.h
+                    settingsdialog.h
+                    slparts.h
+                    timeline.h
+                    timelineview.h)
+
 # Interfaces
-SET (QAVI_UI 	mainapplicationform.ui
-			settingsdialogform.ui)
-			
+SET (QAVI_UI    mainapplicationform.ui
+                settingsdialogform.ui)
+
 # Resources
-SET (QAVI_RSC	icons.qrc)
+SET (QAVI_RSC   icons.qrc)
 
 # Prepare and generate all needed sources and headers
 QT5_ADD_RESOURCES (QAVI_RSC_SRC ${QAVI_RSC})
