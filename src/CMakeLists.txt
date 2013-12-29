@@ -4,6 +4,7 @@ SET (QAVI_SRC   animation.cpp
                 bvh.cpp
                 bvhnode.cpp
                 camera.cpp
+                filemanager.cpp
                 floor.cpp
                 iktree.cpp
                 keyframelist.cpp
@@ -26,6 +27,7 @@ SET (QAVI_MOC_HDR   animation.h
                     bvh.h
                     bvhnode.h
                     camera.h
+                    filemanager.h
                     floor.h
                     iktree.h
                     keyframelist.h
