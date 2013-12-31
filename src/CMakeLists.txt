@@ -1,5 +1,6 @@
 # Sources
 SET (QAVI_SRC   animation.cpp
+                animationmanager.cpp
                 animationview.cpp
                 bvh.cpp
                 bvhnode.cpp
@@ -23,6 +24,7 @@ SET (QAVI_SRC   animation.cpp
 
 # Headers
 SET (QAVI_MOC_HDR   animation.h
+                    animationmanager.h
                     animationview.h
                     bvh.h
                     bvhnode.h
