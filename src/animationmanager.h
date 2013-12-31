@@ -23,6 +23,8 @@
 
 #include <QObject>
 
+class Animation;
+
 class AnimationManager : public QObject
 {
   Q_OBJECT
@@ -30,6 +32,28 @@ class AnimationManager : public QObject
   public:
     AnimationManager(QObject* parent = 0);
     ~AnimationManager();
+
+    //*** TODO Temporary methods during code organization ***
+
+    int count() const;
+    Animation* const at(int index) const;
+    bool contains(Animation* const animation) const;
+    bool isEmpty() const;
+    int indexOf(Animation* const animation) const;
+
+    Animation* first();
+    void append(Animation* const animation);
+    void deleteAll();
+    void clear();
+
+    void setAnimation(Animation* animation);
+    Animation* getAnimation();
+
+    //*** End of temporary methods ***
+
+  private:
+    QList<Animation*> animationList;
+    Animation* selectedAnimation; // this is the "currently selected" animation
 };
 
 #endif

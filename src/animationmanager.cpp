@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "animation.h"
+
 #include "animationmanager.h"
 
 AnimationManager::AnimationManager(QObject* parent)
@@ -27,4 +29,59 @@ AnimationManager::AnimationManager(QObject* parent)
 
 AnimationManager::~AnimationManager()
 {
+}
+
+int AnimationManager::count() const
+{
+  return animationList.count();
+}
+
+Animation* const AnimationManager::at(int index) const
+{
+  return animationList.at(index);
+}
+
+bool AnimationManager::contains(Animation* const animation) const
+{
+  return animationList.contains(animation);
+}
+
+bool AnimationManager::isEmpty() const
+{
+  return animationList.isEmpty();
+}
+
+int AnimationManager::indexOf(Animation* const animation) const
+{
+  return animationList.indexOf(animation);
+}
+
+Animation* AnimationManager::first()
+{
+  return animationList.first();
+}
+
+void AnimationManager::append(Animation* const animation)
+{
+  animationList.append(animation);
+}
+
+void AnimationManager::deleteAll()
+{
+  qDeleteAll(animationList);
+}
+
+void AnimationManager::clear()
+{
+  animationList.clear();
+}
+
+void AnimationManager::setAnimation(Animation* animation)
+{
+  selectedAnimation = animation;
+}
+
+Animation* AnimationManager::getAnimation()
+{
+  return selectedAnimation;
 }

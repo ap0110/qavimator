@@ -26,6 +26,7 @@
 #include "prop.h"
 
 class Animation;
+class AnimationManager;
 class Camera;
 class Floor;
 class PropManager;
@@ -59,8 +60,8 @@ class Scene : public QObject
     void setFPS(int fps);
 
     // getAnimation returns the *current* animation
-    Animation* getAnimation() { return selectedAnimation; }
-    Animation* getAnimation(unsigned int index) { return animationList.at(index); }
+    Animation* getAnimation();
+    Animation* getAnimation(unsigned int index);
     int getIndexOfAnimation(Animation* animation);
     int getCountOfAnimations();
 
@@ -91,8 +92,7 @@ class Scene : public QObject
     void restoreCameraPosition(int num);
 
   private:
-    QList<Animation*> animationList;
-    Animation* selectedAnimation; // this is the "currently selected" animation
+    AnimationManager* m_animationManager;
 
     Floor* m_floor;
     PropManager* m_propManager;
