@@ -25,10 +25,56 @@
 AnimationManager::AnimationManager(QObject* parent)
   : QObject(parent)
 {
+  selectedAnimation = NULL;
 }
 
 AnimationManager::~AnimationManager()
 {
+  clear();
+}
+
+bool AnimationManager::selectAnimation(int index)
+{
+  if (index < animationList.count())
+  {
+    selectedAnimation = animationList.at(index);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+void AnimationManager::clear()
+{
+  qDeleteAll(animationList);
+  animationList.clear();
+  selectedAnimation = NULL;
+}
+
+void AnimationManager::setFrame(int frame)
+{
+  for (int i = 0; i < animationList.count(); i++)
+  {
+    animationList.at(i)->setFrame(frame);
+  }
+}
+
+void AnimationManager::stepForward()
+{
+  for (int i = 0; i < animationList.count(); i++)
+  {
+    animationList.at(i)->stepForward();
+  }
+}
+
+void AnimationManager::setFPS(int fps)
+{
+  for (int i = 0; i < animationList.count(); i++)
+  {
+    animationList.at(i)->setFPS(fps);
+  }
 }
 
 int AnimationManager::count() const
@@ -64,16 +110,6 @@ Animation* AnimationManager::first()
 void AnimationManager::append(Animation* const animation)
 {
   animationList.append(animation);
-}
-
-void AnimationManager::deleteAll()
-{
-  qDeleteAll(animationList);
-}
-
-void AnimationManager::clear()
-{
-  animationList.clear();
 }
 
 void AnimationManager::setAnimation(Animation* animation)

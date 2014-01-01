@@ -33,6 +33,14 @@ class AnimationManager : public QObject
     AnimationManager(QObject* parent = 0);
     ~AnimationManager();
 
+    bool selectAnimation(int index);
+
+    void clear();
+
+    void setFrame(int frame);
+    void stepForward();
+    void setFPS(int fps);
+
     //*** TODO Temporary methods during code organization ***
 
     int count() const;
@@ -43,8 +51,6 @@ class AnimationManager : public QObject
 
     Animation* first();
     void append(Animation* const animation);
-    void deleteAll();
-    void clear();
 
     void setAnimation(Animation* animation);
     Animation* getAnimation();

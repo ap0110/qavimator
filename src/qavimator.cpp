@@ -489,7 +489,7 @@ void qavimator::updateInputs()
   Animation* anim=scene->getAnimation();
   if (anim)
   {
-    if(currentPart)
+    if(currentPart != NULL)
     {
       QVector3D rotation = anim->getRotation(currentPart);
 
@@ -585,7 +585,7 @@ void qavimator::updateKeyBtn()
   // re-enable toggle signal
   keyframeButton->blockSignals(false);
 
-  if(hasKeyframe && currentPart)
+  if(hasKeyframe && currentPart != NULL)
   {
     emit enableEaseInOut(true);
     easeInCheck->setChecked(anim->easeIn(currentPart,anim->getFrame()));
@@ -604,7 +604,7 @@ void qavimator::enableInputs(bool state)
   keyframeButton->setEnabled(state);
 
   // do not enable rotation if we have no part selected
-  if(!currentPart) state=false;
+  if(currentPart == NULL) state=false;
   emit enableRotation(state);
 }
 
@@ -1389,6 +1389,7 @@ bool qavimator::clearOpenFiles()
 
   timeline->setAnimation(0);
   scene->clear();
+  currentPart = NULL;
   openFiles.clear();
   selectAnimationCombo->clear();
   animationIds.clear();

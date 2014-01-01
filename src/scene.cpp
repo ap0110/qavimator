@@ -30,7 +30,6 @@ Scene::Scene(QObject* parent)
   : QObject(parent)
 {
   m_animationManager = new AnimationManager(this);
-  m_animationManager->setAnimation(NULL);
   m_camera = new Camera(this);
   m_floor = new Floor(this);
   m_propManager = new PropManager(this);
@@ -43,9 +42,8 @@ Scene::~Scene()
 
 void Scene::selectAnimation(int index)
 {
-  if (index < m_animationManager->count())
+  if (m_animationManager->selectAnimation(index))
   {
-    m_animationManager->setAnimation(m_animationManager->at(index));
     emit animationSelected(getAnimation());
     emit repaint();
   }
@@ -78,33 +76,22 @@ void Scene::addAnimation(Animation* animation)
 
 void Scene::clear()
 {
-  m_animationManager->deleteAll();
   m_animationManager->clear();
-  m_animationManager->setAnimation(NULL);
 }
 
 void Scene::setFrame(int frame)
 {
-  for (int i = 0; i < m_animationManager->count(); i++)
-  {
-    m_animationManager->at(i)->setFrame(frame);
-  }
+  m_animationManager->setFrame(frame);
 }
 
 void Scene::stepForward()
 {
-  for (int i = 0; i < m_animationManager->count(); i++)
-  {
-    m_animationManager->at(i)->stepForward();
-  }
+  m_animationManager->stepForward();
 }
 
 void Scene::setFPS(int fps)
 {
-  for (int i = 0; i < m_animationManager->count(); i++)
-  {
-    m_animationManager->at(i)->setFPS(fps);
-  }
+  m_animationManager->setFPS(fps);
 }
 
 Animation* Scene::getAnimation(unsigned int index)
