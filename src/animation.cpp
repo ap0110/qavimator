@@ -19,6 +19,8 @@
  *
  */
 
+#define QAVIMATOR_DATAPATH "."
+
 #ifdef __APPLE__
 #include <QApplication.h>
 #endif

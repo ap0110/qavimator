@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#define QAVIMATOR_DATAPATH "."
+
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>

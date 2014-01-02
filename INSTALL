@@ -2,7 +2,7 @@
 
 CMake on unix-like systems:
 
-	- install CMake 2.8.9+
+	- install CMake 2.8.11+
 	- install Qt5 development package
 	- install glut
 	
@@ -13,7 +13,7 @@ CMake on unix-like systems:
 
 OSX Bundle:
 
-	- install CMake 2.8.9+
+	- install CMake 2.8.11+
 	- install XCode
 	- install Qt5 frameworks
 	
@@ -23,7 +23,7 @@ OSX Bundle:
 Windows MinGW:
 	
 	- Install MinGW
-	- Install CMake 2.8.9+ and make sure cmake is in system PATH
+	- Install CMake 2.8.11+ and make sure cmake is in system PATH
 	- Install Qt5 and make sure qmake is in system PATH
 	- Download GLUT and make sure its header is in [glut package]\GL\glut.h
 	
