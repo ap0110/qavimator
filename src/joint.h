@@ -55,8 +55,15 @@ class Joint : public QObject
   Q_OBJECT
 
   public:
-    Joint(int maxFrameNumber, QObject* parent = 0);
+    Joint(const QString& name, int maxFrameNumber, QObject* parent = 0);
     ~Joint();
+
+    const QString& name() const;
+    int numChildren() const;
+    Joint* child(int num);
+    void addChild(Joint* child);
+    void insertChild(Joint* child, int index);
+    void removeChild(Joint* child);
 
     void setKeyframe(int frame, QVector3D& position, QVector3D& rotation);
     bool removeKeyframe(int frame);
@@ -70,6 +77,10 @@ class Joint : public QObject
     void setMaxFrameNumber(int maxFrameNumber);
 
   private:
+    QString m_name;
+
+    QList<Joint*> m_children;
+
     QMap<int, KeyframeData> m_keyframes;
     int m_maxFrameNumber;
 };

@@ -88,14 +88,45 @@ void KeyframeData::setEaseOut(bool on)
   m_easeOut = on;
 }
 
-Joint::Joint(int maxFrameNumber, QObject* parent)
+Joint::Joint(const QString& name, int maxFrameNumber, QObject* parent)
   : QObject(parent)
 {
+  m_name = name;
   m_maxFrameNumber = maxFrameNumber;
 }
 
 Joint::~Joint()
 {
+}
+
+const QString&Joint::name() const
+{
+  return m_name;
+}
+
+int Joint::numChildren() const
+{
+  return m_children.size();
+}
+
+Joint* Joint::child(int num)
+{
+  return m_children.at(num);
+}
+
+void Joint::addChild(Joint* child)
+{
+  m_children.append(child);
+}
+
+void Joint::insertChild(Joint* child, int index)
+{
+  m_children.insert(index, child);
+}
+
+void Joint::removeChild(Joint* child)
+{
+  m_children.removeAll(child);
 }
 
 void Joint::setKeyframe(int frame, QVector3D& position, QVector3D& rotation)
