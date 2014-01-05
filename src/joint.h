@@ -20,11 +20,56 @@
 
 #include <QObject>
 
+class KeyframeData
+{
+  public:
+    KeyframeData();
+    KeyframeData(int frame, QVector3D &position, QVector3D &rotation);
+    ~KeyframeData();
+
+    int frameNumber() const;
+    void setFrameNumber(int frame);
+
+    const QVector3D& position() const;
+    const QVector3D& rotation() const;
+    void setPosition(const QVector3D& position);
+    void setRotation(const QVector3D& rotation);
+
+    bool easeIn() const;
+    bool easeOut() const;
+    void setEaseIn(bool on);
+    void setEaseOut(bool on);
+
+  private:
+    int m_frameNumber;
+
+    QVector3D m_position;
+    QVector3D m_rotation;
+
+    bool m_easeIn;
+    bool m_easeOut;
+};
+
 class Joint : public QObject
 {
   Q_OBJECT
 
   public:
-    Joint(QObject* parent = 0);
+    Joint(int maxFrameNumber, QObject* parent = 0);
     ~Joint();
+
+    void setKeyframe(int frame, QVector3D& position, QVector3D& rotation);
+    bool removeKeyframe(int frame);
+    bool setKeyframePosition(int frame, const QVector3D& position);
+    bool setKeyframeRotation(int frame, const QVector3D& rotation);
+    void insertFrame(int frame);
+    void deleteFrame(int frame);
+    int numKeyframes() const;
+
+    int maxFrameNumber() const;
+    void setMaxFrameNumber(int maxFrameNumber);
+
+  private:
+    QMap<int, KeyframeData> m_keyframes;
+    int m_maxFrameNumber;
 };
