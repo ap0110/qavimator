@@ -23,6 +23,11 @@
 
 #include <QObject>
 
+class QDir;
+class QFile;
+
+class Animation;
+
 class FileManager : public QObject
 {
   Q_OBJECT
@@ -30,6 +35,26 @@ class FileManager : public QObject
   public:
     FileManager(QObject* parent = 0);
     ~FileManager();
+
+    Animation* loadAnimationFromFile(const QString& fileName);
+
+    Animation* loadAnimationFromApplicationData(const QString& fileName);
+
+  private:
+    typedef enum
+    {
+      FT_UNKNOWN = 0,
+      FT_BVH = 1,
+      FT_ANIM = 2,
+      FT_QAVM = 3
+    } FileType;
+
+    QDir getDataDirectoryByOperatingSystem() const;
+    const FileType determineFileType(const QFile& file) const;
+
+    Animation* readBvh(const QFile& file);
+    Animation* readAnim(const QFile& file);
+    Animation* readQavm(const QFile& file);
 };
 
 #endif
