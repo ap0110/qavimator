@@ -18,43 +18,40 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef FILEMANAGER_H
-#define FILEMANAGER_H
+#include <QStringList>
 
-#include <QObject>
+#include "animation.h"
 
-class QDir;
-class QFile;
+#include "bvhparser.h"
 
-class Animation;
-
-class FileManager : public QObject
+BvhParser::BvhParser(const QString& bvhData)
 {
-  Q_OBJECT
+  m_tokenList = bvhData.simplified().split(' ');
+}
 
-  public:
-    FileManager(QObject* parent = 0);
-    ~FileManager();
+BvhParser::~BvhParser()
+{
+}
 
-    Animation* loadAnimationFromFile(const QString& fileName);
+Animation* BvhParser::parseBvhData()
+{
+  QStringList::const_iterator parser = m_tokenList.cbegin();
 
-    Animation* loadAnimationFromApplicationData(const QString& fileName);
-
-  private:
-    typedef enum
+  while (parser != m_tokenList.cend())
+  {
+    if ((*parser) == "HIERARCHY")
     {
-      FT_UNKNOWN = 0,
-      FT_BVH = 1,
-      FT_ANIM = 2,
-      FT_QAVM = 3
-    } FileType;
-
-    QDir getDataDirectoryByOperatingSystem() const;
-    const FileType determineFileType(QFile& openedFile) const;
-
-    Animation* readBvh(QFile& openedFile);
-    Animation* readAnim(const QFile& file);
-    Animation* readQavm(const QFile& file);
-};
-
-#endif
+      // TODO Get hierarchy data (do not allow multiple hierarchies)
+    }
+    else if ((*parser) == "MOTION")
+    {
+      // TODO Get motion data
+    }
+    else
+    {
+      // TODO Error: Should have been HIERARCHY, MOTION, or end-of-file
+      return NULL;
+    }
+  }
+  return NULL;
+}

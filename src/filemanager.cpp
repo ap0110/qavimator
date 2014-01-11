@@ -21,6 +21,7 @@
 #include <QDir>
 
 #include "animation.h"
+#include "bvhparser.h"
 
 #include "filemanager.h"
 
@@ -38,6 +39,12 @@ Animation* FileManager::loadAnimationFromFile(const QString& filePath)
   QFile file(filePath);
   if (!file.exists())
   {
+    // TODO
+    return NULL;
+  }
+  if (!file.open(QIODevice::ReadOnly))
+  {
+    // TODO
     return NULL;
   }
 
@@ -60,6 +67,8 @@ Animation* FileManager::loadAnimationFromFile(const QString& filePath)
       result = NULL;
       break;
   }
+
+  file.close();
 
   return result;
 }
@@ -85,16 +94,48 @@ QDir FileManager::getDataDirectoryByOperatingSystem() const
 #endif
 }
 
-const FileManager::FileType FileManager::determineFileType(const QFile& file) const
+const FileManager::FileType FileManager::determineFileType(QFile& openedFile) const
 {
   // TODO Determine the file type by looking at the content, NOT by looking at the file extension
+
+  char buffer[21];
+  if (openedFile.peek(buffer, sizeof(buffer)) == -1)
+  {
+    // TODO Handle error
+    return FT_UNKNOWN;
+  }
+  QString text(buffer);
+
+  if (text.startsWith("HIERARCHY", Qt::CaseInsensitive))
+  {
+    return FT_BVH;
+  }
+  else if (text.startsWith("<?xml version=\"1.0\"?>", Qt::CaseInsensitive))
+  {
+    // TODO Check for "qavimator" tag here?
+    return FT_QAVM;
+  }
+  // TODO Check for Second Life (anim) file
+
+
   return FT_UNKNOWN;
 }
 
-Animation* FileManager::readBvh(const QFile& file)
+Animation* FileManager::readBvh(QFile& openedFile)
 {
-  // TODO Read BVH file
-  return NULL;
+  // Ensure we are at the beginning of the file
+  openedFile.seek(0);
+
+  QString bvhData = openedFile.readAll();
+  if (bvhData.isEmpty())
+  {
+    // TODO Handle read error
+    return NULL;
+  }
+
+  QScopedPointer<BvhParser> parser(new BvhParser(bvhData));
+
+  return parser->parseBvhData();
 }
 
 Animation* FileManager::readAnim(const QFile& file)

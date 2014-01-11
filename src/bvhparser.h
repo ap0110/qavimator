@@ -18,43 +18,19 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef FILEMANAGER_H
-#define FILEMANAGER_H
-
-#include <QObject>
-
-class QDir;
-class QFile;
+class QString;
+class QStringList;
 
 class Animation;
 
-class FileManager : public QObject
+class BvhParser
 {
-  Q_OBJECT
-
   public:
-    FileManager(QObject* parent = 0);
-    ~FileManager();
+    BvhParser(const QString& bvhData);
+    ~BvhParser();
 
-    Animation* loadAnimationFromFile(const QString& fileName);
-
-    Animation* loadAnimationFromApplicationData(const QString& fileName);
+    Animation* parseBvhData();
 
   private:
-    typedef enum
-    {
-      FT_UNKNOWN = 0,
-      FT_BVH = 1,
-      FT_ANIM = 2,
-      FT_QAVM = 3
-    } FileType;
-
-    QDir getDataDirectoryByOperatingSystem() const;
-    const FileType determineFileType(QFile& openedFile) const;
-
-    Animation* readBvh(QFile& openedFile);
-    Animation* readAnim(const QFile& file);
-    Animation* readQavm(const QFile& file);
+    QStringList m_tokenList;
 };
-
-#endif

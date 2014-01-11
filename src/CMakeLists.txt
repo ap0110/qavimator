@@ -4,6 +4,7 @@ SET (QAVI_SRC animation.cpp
               animationview.cpp
               bvh.cpp
               bvhnode.cpp
+              bvhparser.cpp
               camera.cpp
               filemanager.cpp
               floor.cpp
