@@ -99,9 +99,33 @@ Joint::~Joint()
 {
 }
 
-const QString&Joint::name() const
+const QString& Joint::name() const
 {
   return m_name;
+}
+
+const QVector3D* Joint::head() const
+{
+  return m_head.data();
+}
+
+const QVector3D* Joint::tail() const
+{
+  return m_tail.data();
+}
+
+void Joint::setHead(QVector3D* head)
+{
+  if (head == NULL)
+  {
+    // TODO Error: Head cannot be NULL
+  }
+  m_head.reset(head);
+}
+
+void Joint::setTail(QVector3D* tail)
+{
+  m_tail.reset(tail);
 }
 
 int Joint::numChildren() const

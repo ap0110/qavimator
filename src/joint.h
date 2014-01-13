@@ -55,10 +55,15 @@ class Joint : public QObject
   Q_OBJECT
 
   public:
-    Joint(const QString& name, int maxFrameNumber, QObject* parent = 0);
+    Joint(const QString& name, int maxFrameNumber = 0, QObject* parent = 0);
     ~Joint();
 
     const QString& name() const;
+    const QVector3D* head() const;
+    const QVector3D* tail() const;
+    void setHead(QVector3D* head);
+    void setTail(QVector3D* tail);
+
     int numChildren() const;
     Joint* child(int num);
     void addChild(Joint* child);
@@ -78,6 +83,8 @@ class Joint : public QObject
 
   private:
     QString m_name;
+    QScopedPointer<QVector3D> m_head;
+    QScopedPointer<QVector3D> m_tail;
 
     QList<Joint*> m_children;
 

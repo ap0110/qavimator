@@ -18,10 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-class QString;
-class QStringList;
+#include <QStringListIterator>
 
 class Animation;
+class Joint;
 
 class BvhParser
 {
@@ -32,5 +32,18 @@ class BvhParser
     Animation* parseBvhData();
 
   private:
+    Joint* parseHierarchy();
+    QVector3D* parseJoint(Joint* joint);
+
+    bool hasNext();
+    void next();
+    bool hasPrevious();
+    void previous();
+
+    const QString& token();
+
+    QScopedPointer<QStringListIterator> m_parser;
+
     QStringList m_tokenList;
+    QString m_token;
 };
