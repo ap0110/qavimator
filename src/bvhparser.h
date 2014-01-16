@@ -33,7 +33,9 @@ class BvhParser
 
   private:
     Joint* parseHierarchy();
-    QVector3D* parseJoint(Joint* joint);
+    void parseJoint(Joint* joint);
+    QVector3D* parseOffset();
+    void parseChannels(Joint* joint);
 
     bool hasNext();
     void next();
@@ -41,6 +43,10 @@ class BvhParser
     void previous();
 
     const QString& token();
+    const QString& nextToken();
+    void expectToken(const QString& expected);
+    void expectNextToken(const QString& expected);
+    bool isEqual(const QString& lhs, const QString& rhs) const;
 
     QScopedPointer<QStringListIterator> m_parser;
 

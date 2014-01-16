@@ -40,12 +40,12 @@ Animation* BvhParser::parseBvhData()
   while (hasNext())
   {
     next();
-    if (!isHierarchyParsed && token().compare("HIERARCHY", Qt::CaseInsensitive) == 0)
+    if (!isHierarchyParsed && isEqual(token(), "HIERARCHY"))
     {
       isHierarchyParsed = true;
       parseHierarchy();
     }
-    else if (!isMotionParsed && token().compare("MOTION", Qt::CaseInsensitive) == 0)
+    else if (!isMotionParsed && isEqual(token(), "MOTION"))
     {
       isMotionParsed = true;
       // TODO Get motion data
@@ -64,28 +64,18 @@ Joint* BvhParser::parseHierarchy()
   // Limit to one hierarchy for now
   bool isRootParsed = false;
 
-  Joint* result = NULL;
+  Joint* rootJoint = NULL;
   while (hasNext())
   {
     next();
-    if (!isRootParsed && token().compare("ROOT", Qt::CaseInsensitive) == 0)
+    if (!isRootParsed && isEqual(token(), "ROOT"))
     {
       isRootParsed = true;
-      next();
-      result = new Joint(token());
-      next();
-      if (token() == "{")
-      {
-        QVector3D* tail = parseJoint(result);
-        result->setTail(tail);
-      }
-      else
-      {
-        // TODO Handle error: Empty ROOT
-        return NULL;
-      }
+      rootJoint = new Joint(nextToken());
+      expectNextToken("{");
+      parseJoint(rootJoint);
     }
-    else if (token().compare("MOTION", Qt::CaseInsensitive) == 0)
+    else if (isEqual(token(), "MOTION"))
     {
       previous();
       break;
@@ -95,13 +85,14 @@ Joint* BvhParser::parseHierarchy()
       // TODO Error: Should have been ROOT or MOTION
     }
   }
-  return result;
+  return rootJoint;
 }
 
-QVector3D* BvhParser::parseJoint(Joint* joint)
+void BvhParser::parseJoint(Joint* joint)
 {
   bool hasOffset = false;
   bool hasChannels = false;
+  bool hasEndSite = false;
 
   while (hasNext())
   {
@@ -109,28 +100,229 @@ QVector3D* BvhParser::parseJoint(Joint* joint)
 
     // TODO Replace if-else chain with string switch
     //  or something that does better than a linear search
-    if (token().compare("OFFSET", Qt::CaseInsensitive) == 0)
+    if (!hasOffset && isEqual(token(), "OFFSET"))
     {
-
+      hasOffset = true;
+      joint->setHead(parseOffset());
     }
-    else if (token().compare("CHANNELS", Qt::CaseInsensitive) == 0)
+    else if (!hasChannels && isEqual(token(), "CHANNELS"))
     {
-
+      hasChannels = true;
+      parseChannels(joint);
     }
-    else if (token().compare("JOINT", Qt::CaseInsensitive) == 0)
+    else if (isEqual(token(), "JOINT"))
     {
+      Joint* childJoint = new Joint(nextToken());
 
+      expectNextToken("{");
+      parseJoint(childJoint);
+      joint->addChild(childJoint);
+      // Head of the child will be tail of the parent
+      const QVector3D tail = *childJoint->head();
+      joint->addTail(new QVector3D(tail.x(), tail.y(), tail.z()));
     }
-    else if (token().compare("END", Qt::CaseInsensitive) == 0)
+    else if (isEqual(token(), "}"))
     {
-      // TODO Ensure next token is "SITE"
+      // End of Joint data, so return
+      return;
+    }
+    else if (!hasEndSite && isEqual(token(), "END"))
+    {
+      hasEndSite = true;
+
+      expectNextToken("SITE");
+      expectNextToken("{");
+      expectNextToken("OFFSET");
+
+      joint->addTail(parseOffset());
+
+      expectNextToken("}");
     }
     else
     {
-
+      // TODO Handle Error: Unexpected token
     }
   }
-  return NULL;
+}
+
+QVector3D* BvhParser::parseOffset()
+{
+  bool* ok = new bool;
+
+  float x = nextToken().toFloat(ok);
+  if (!ok)
+  {
+    // TODO Handle error
+  }
+
+  float y = nextToken().toFloat(ok);
+  if (!ok)
+  {
+    // TODO Handle error
+  }
+
+  float z = nextToken().toFloat(ok);
+  if (!ok)
+  {
+    //  TODO Handle error
+  }
+
+  return new QVector3D(x, y, z);
+}
+
+void BvhParser::parseChannels(Joint* joint)
+{
+  QList<char> positionOrder;
+  QList<char> rotationOrder;
+
+  bool* ok;
+  int numChannels = nextToken().toInt(ok);
+  if (!ok)
+  {
+    // TODO Handle Error: Unexpected token
+  }
+
+  for (; numChannels > 0; numChannels--)
+  {
+    next();
+    if (token().endsWith("POSITION", Qt::CaseInsensitive))
+    {
+      positionOrder.append(token().at(0).toUpper().unicode());
+    }
+    else if (token().endsWith("ROTATION", Qt::CaseInsensitive))
+    {
+      rotationOrder.append(token().at(0).toUpper().unicode());
+    }
+    else
+    {
+      // TODO Handle Error: Unexpected token
+    }
+  }
+
+  if (!positionOrder.isEmpty())
+  {
+    if (positionOrder.length() != 3)
+    {
+      // TODO Handle error: unexpected token
+    }
+    // Currently, enforce XYZ order for position
+    if (positionOrder.at(0) != 'X'
+        || positionOrder.at(1) != 'Y'
+        || positionOrder.at(2) != 'Z')
+    {
+      // TODO Handle error: position order must be XYZ
+    }
+
+    joint->setHasPosition(true);
+  }
+  if (!rotationOrder.isEmpty())
+  {
+    if (rotationOrder.length() != 3)
+    {
+      // TODO Handle error: unexpected token
+    }
+
+    switch (rotationOrder.at(0))
+    {
+      case 'X':
+        switch (rotationOrder.at(1))
+        {
+          // XYZ
+          case 'Y':
+            if (rotationOrder.at(2) == 'Z')
+            {
+              joint->setRotationOrder(XYZ);
+            }
+            else
+            {
+              // TODO Handle error: unexpected token
+            }
+            break;
+          // XZY
+          case 'Z':
+            if (rotationOrder.at(2) == 'Y')
+            {
+              joint->setRotationOrder(XZY);
+            }
+            else
+            {
+              // TODO Handle error: unexpected token
+            }
+            break;
+          default:
+            // TODO Handle error: unexpected token
+            break;
+        }
+        break;
+      case 'Y':
+        switch (rotationOrder.at(1))
+        {
+          // YXZ
+          case 'X':
+            if (rotationOrder.at(2) == 'Z')
+            {
+              joint->setRotationOrder(YXZ);
+            }
+            else
+            {
+              // TODO Handle error: unexpected token
+            }
+            break;
+          // YZX
+          case 'Z':
+            if (rotationOrder.at(2) == 'X')
+            {
+              joint->setRotationOrder(YZX);
+            }
+            else
+            {
+              // TODO Handle error: unexpected token
+            }
+            break;
+          default:
+            // TODO Handle error: unexpected token
+            break;
+        }
+        break;
+      case 'Z':
+        switch (rotationOrder.at(1))
+        {
+          // ZXY
+          case 'X':
+            if (rotationOrder.at(2) == 'Y')
+            {
+              joint->setRotationOrder(ZXY);
+            }
+            else
+            {
+              // TODO Handle error: unexpected token
+            }
+            break;
+          // ZYX
+          case 'Y':
+            if (rotationOrder.at(2) == 'X')
+            {
+              joint->setRotationOrder(ZYX);
+            }
+            else
+            {
+              // TODO Handle error: unexpected token
+            }
+            break;
+          default:
+            // TODO Handle error: unexpected token
+            break;
+        }
+        break;
+      default:
+        // TODO Handle error: unexpected token
+        break;
+    }
+  }
+  else
+  {
+    // TODO Handle error: unexpected token
+  }
 }
 
 bool BvhParser::hasNext()
@@ -146,6 +338,7 @@ void BvhParser::next()
   }
   else
   {
+    // TODO Handle Error: Unexpected End of File
     m_token = QString();
   }
 }
@@ -163,6 +356,7 @@ void BvhParser::previous()
   }
   else
   {
+    // TODO Handle Error: Unexpected beginning of file
     m_token = QString();
   }
 }
@@ -170,4 +364,31 @@ void BvhParser::previous()
 const QString& BvhParser::token()
 {
   return m_token;
+}
+
+const QString&BvhParser::nextToken()
+{
+  next();
+  return m_token;
+}
+
+void BvhParser::expectToken(const QString& expected)
+{
+  if (!isEqual(token(), expected))
+  {
+    // TODO Handle Error: Unexpected token
+  }
+}
+
+void BvhParser::expectNextToken(const QString& expected)
+{
+  if (!isEqual(nextToken(), expected))
+  {
+    // TODO Handle Error: Unexpected token
+  }
+}
+
+bool BvhParser::isEqual(const QString& lhs, const QString& rhs) const
+{
+  return lhs.compare(rhs, Qt::CaseInsensitive) == 0;
 }

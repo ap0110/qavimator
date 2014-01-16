@@ -20,6 +20,13 @@
 
 #include <QObject>
 
+typedef enum
+{
+  XYZ, XZY,
+  YXZ, YZX,
+  ZXY, ZYX
+} RotationOrder;
+
 class KeyframeData
 {
   public:
@@ -60,15 +67,20 @@ class Joint : public QObject
 
     const QString& name() const;
     const QVector3D* head() const;
-    const QVector3D* tail() const;
+    const QVector3D* tail(int index) const;
     void setHead(QVector3D* head);
-    void setTail(QVector3D* tail);
+    void addTail(QVector3D* tail);
 
     int numChildren() const;
     Joint* child(int num);
     void addChild(Joint* child);
     void insertChild(Joint* child, int index);
     void removeChild(Joint* child);
+
+    const bool& hasPosition() const;
+    const RotationOrder& rotationOrder() const;
+    void setHasPosition(bool hasPosition);
+    void setRotationOrder(RotationOrder rotationOrder);
 
     void setKeyframe(int frame, QVector3D& position, QVector3D& rotation);
     bool removeKeyframe(int frame);
@@ -84,10 +96,12 @@ class Joint : public QObject
   private:
     QString m_name;
     QScopedPointer<QVector3D> m_head;
-    QScopedPointer<QVector3D> m_tail;
+    QList<QVector3D*> m_tails;
 
     QList<Joint*> m_children;
 
+    bool m_hasPosition;
+    RotationOrder m_rotationOrder;
     QMap<int, KeyframeData> m_keyframes;
     int m_maxFrameNumber;
 };

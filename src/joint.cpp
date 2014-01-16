@@ -93,10 +93,14 @@ Joint::Joint(const QString& name, int maxFrameNumber, QObject* parent)
 {
   m_name = name;
   m_maxFrameNumber = maxFrameNumber;
+
+  m_hasPosition = false;
+  m_rotationOrder = XZY;
 }
 
 Joint::~Joint()
 {
+  qDeleteAll(m_tails);
 }
 
 const QString& Joint::name() const
@@ -109,9 +113,9 @@ const QVector3D* Joint::head() const
   return m_head.data();
 }
 
-const QVector3D* Joint::tail() const
+const QVector3D* Joint::tail(int index) const
 {
-  return m_tail.data();
+  return m_tails.at(index);
 }
 
 void Joint::setHead(QVector3D* head)
@@ -123,9 +127,9 @@ void Joint::setHead(QVector3D* head)
   m_head.reset(head);
 }
 
-void Joint::setTail(QVector3D* tail)
+void Joint::addTail(QVector3D* tail)
 {
-  m_tail.reset(tail);
+  m_tails.append(tail);
 }
 
 int Joint::numChildren() const
@@ -151,6 +155,26 @@ void Joint::insertChild(Joint* child, int index)
 void Joint::removeChild(Joint* child)
 {
   m_children.removeAll(child);
+}
+
+const bool& Joint::hasPosition() const
+{
+  return m_hasPosition;
+}
+
+const RotationOrder& Joint::rotationOrder() const
+{
+  return m_rotationOrder;
+}
+
+void Joint::setHasPosition(bool hasPosition)
+{
+  m_hasPosition = hasPosition;
+}
+
+void Joint::setRotationOrder(RotationOrder rotationOrder)
+{
+  m_rotationOrder = rotationOrder;
 }
 
 void Joint::setKeyframe(int frame, QVector3D& position, QVector3D& rotation)
