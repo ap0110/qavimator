@@ -77,11 +77,6 @@ class Joint : public QObject
     void insertChild(Joint* child, int index);
     void removeChild(Joint* child);
 
-    const bool& hasPosition() const;
-    const RotationOrder& rotationOrder() const;
-    void setHasPosition(bool hasPosition);
-    void setRotationOrder(RotationOrder rotationOrder);
-
     void setKeyframe(int frame, QVector3D& position, QVector3D& rotation);
     bool removeKeyframe(int frame);
     bool setKeyframePosition(int frame, const QVector3D& position);
@@ -100,8 +95,6 @@ class Joint : public QObject
 
     QList<Joint*> m_children;
 
-    bool m_hasPosition;
-    RotationOrder m_rotationOrder;
     QMap<int, KeyframeData> m_keyframes;
     int m_maxFrameNumber;
 };

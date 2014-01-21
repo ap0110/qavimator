@@ -23,15 +23,46 @@
 
 #include "bvhparser.h"
 
+BvhFrame::BvhFrame()
+{
+}
+
+BvhFrame::~BvhFrame()
+{
+}
+
+const QVector3D* BvhFrame::position() const
+{
+  return m_position.data();
+}
+
+const QVector3D* BvhFrame::rotation() const
+{
+  return m_rotation.data();
+}
+
+void BvhFrame::setPosition(QVector3D* position)
+{
+  m_position.reset(position);
+}
+
+void BvhFrame::setRotation(QVector3D* rotation)
+{
+  m_rotation.reset(rotation);
+}
+
 BvhJoint::BvhJoint(const QString& name)
 {
   m_name = name;
-  m_hasPosition = false;
-  m_rotationOrder = ORDER_NONE;
 }
 
 BvhJoint::~BvhJoint()
 {
+}
+
+const QList<BvhJoint*> BvhJoint::children() const
+{
+  return m_children;
 }
 
 void BvhJoint::addChild(BvhJoint* child)
@@ -41,7 +72,7 @@ void BvhJoint::addChild(BvhJoint* child)
 
 const QVector3D* BvhJoint::head() const
 {
-  return m_head;
+  return m_head.data();
 }
 
 const QList<QVector3D*> BvhJoint::tail(int index) const
@@ -51,7 +82,7 @@ const QList<QVector3D*> BvhJoint::tail(int index) const
 
 void BvhJoint::setHead(QVector3D* head)
 {
-  m_head = head;
+  m_head.reset(head);
 }
 
 void BvhJoint::addTail(QVector3D* tail)
@@ -59,24 +90,25 @@ void BvhJoint::addTail(QVector3D* tail)
   m_tailList.append(tail);
 }
 
-const bool& BvhJoint::hasPosition() const
+const QList<Channel>& BvhJoint::channels() const
 {
-  return m_hasPosition;
+  return m_channels;
 }
 
-const AxisOrder& BvhJoint::rotationOrder() const
+void BvhJoint::addChannel(Channel channel)
 {
-  return m_rotationOrder;
+  m_channels.append(channel);
 }
 
-void BvhJoint::setHasPosition(bool hasPosition)
+void BvhJoint::setMaxFrameCount(int count)
 {
-  m_hasPosition = hasPosition;
+  m_maxFrameCount = count;
+  m_frames.reserve(count);
 }
 
-void BvhJoint::setRotationOrder(AxisOrder rotationOrder)
+void BvhJoint::addFrame(BvhFrame* frame)
 {
-  m_rotationOrder = rotationOrder;
+  m_frames.append(frame);
 }
 
 Joint* BvhJoint::toJoint()
@@ -98,22 +130,28 @@ Animation* BvhParser::parseBvhData()
 {
   bool isHierarchyParsed = false;
   bool isMotionParsed = false;
+  BvhJoint* rootJoint = NULL;
+
   while (hasNext())
   {
     next();
     if (!isHierarchyParsed && isEqual(token(), "HIERARCHY"))
     {
       isHierarchyParsed = true;
-      BvhJoint* rootJoint = parseHierarchy();
+      rootJoint = parseHierarchy();
     }
     else if (!isMotionParsed && isEqual(token(), "MOTION"))
     {
       isMotionParsed = true;
-      // TODO Get motion data
+      parseMotion(rootJoint);
+    }
+    else if (isHierarchyParsed && isMotionParsed)
+    {
+      // TODO Check for, and parse, any legacy AVM data
     }
     else
     {
-      // TODO Error: Should have been HIERARCHY or MOTION
+      // TODO Error: Should have been HIERARCHY or MOTION or AVM data
       return NULL;
     }
   }
@@ -147,6 +185,34 @@ BvhJoint* BvhParser::parseHierarchy()
     }
   }
   return rootJoint;
+}
+
+void BvhParser::parseMotion(BvhJoint* rootJoint)
+{
+  bool* ok;
+  int frameCount = 0;
+  float frameTime = 0.0f;
+
+  expectNextToken("Frames:");
+  frameCount = nextToken().toInt(ok);
+  if (!ok)
+  {
+    // TODO Handle error
+  }
+
+  expectNextToken("Frame");
+  expectNextToken("Time:");
+  frameTime = nextToken().toFloat(ok);
+  if (!ok)
+  {
+    // TODO Handle error
+  }
+
+  // Parse all the frames
+  for (int i = 0; i < frameCount; i++)
+  {
+    parseFrame(rootJoint);
+  }
 }
 
 void BvhParser::parseJoint(BvhJoint* joint)
@@ -233,9 +299,6 @@ QVector3D* BvhParser::parseOffset()
 
 void BvhParser::parseChannels(BvhJoint* joint)
 {
-  QList<char> positionOrder;
-  QList<char> rotationOrder;
-
   bool* ok;
   int numChannels = nextToken().toInt(ok);
   if (!ok)
@@ -248,141 +311,104 @@ void BvhParser::parseChannels(BvhJoint* joint)
     next();
     if (token().endsWith("POSITION", Qt::CaseInsensitive))
     {
-      positionOrder.append(token().at(0).toUpper().unicode());
+      switch (token().at(0).toUpper().unicode())
+      {
+        case 'X':
+          joint->addChannel(POSITION_X);
+          break;
+        case 'Y':
+          joint->addChannel(POSITION_Y);
+          break;
+        case 'Z':
+          joint->addChannel(POSITION_Z);
+          break;
+      }
     }
     else if (token().endsWith("ROTATION", Qt::CaseInsensitive))
     {
-      rotationOrder.append(token().at(0).toUpper().unicode());
+      switch (token().at(0).toUpper().unicode())
+      {
+        case 'X':
+          joint->addChannel(ROTATION_X);
+          break;
+        case 'Y':
+          joint->addChannel(ROTATION_Y);
+          break;
+        case 'Z':
+          joint->addChannel(ROTATION_Z);
+          break;
+      }
     }
     else
     {
       // TODO Handle Error: Unexpected token
     }
   }
+}
 
-  if (!positionOrder.isEmpty())
+void BvhParser::parseFrame(BvhJoint* joint)
+{
+  bool* ok;
+
+  QScopedPointer<float> positionX;
+  QScopedPointer<float> positionY;
+  QScopedPointer<float> positionZ;
+  QScopedPointer<float> rotationX;
+  QScopedPointer<float> rotationY;
+  QScopedPointer<float> rotationZ;
+
+  for (QList<Channel>::const_iterator iter = joint->channels().constBegin();
+       iter != joint->channels().constEnd();
+       iter++)
   {
-    if (positionOrder.length() != 3)
+    switch (*iter)
     {
-      // TODO Handle error: unexpected token
-    }
-    // Currently, enforce XYZ order for position
-    if (positionOrder.at(0) != 'X'
-        || positionOrder.at(1) != 'Y'
-        || positionOrder.at(2) != 'Z')
-    {
-      // TODO Handle error: position order must be XYZ
-    }
-
-    joint->setHasPosition(true);
-  }
-  if (!rotationOrder.isEmpty())
-  {
-    if (rotationOrder.length() != 3)
-    {
-      // TODO Handle error: unexpected token
-    }
-
-    switch (rotationOrder.at(0))
-    {
-      case 'X':
-        switch (rotationOrder.at(1))
-        {
-          // XYZ
-          case 'Y':
-            if (rotationOrder.at(2) == 'Z')
-            {
-              joint->setRotationOrder(ORDER_XYZ);
-            }
-            else
-            {
-              // TODO Handle error: unexpected token
-            }
-            break;
-          // XZY
-          case 'Z':
-            if (rotationOrder.at(2) == 'Y')
-            {
-              joint->setRotationOrder(ORDER_XZY);
-            }
-            else
-            {
-              // TODO Handle error: unexpected token
-            }
-            break;
-          default:
-            // TODO Handle error: unexpected token
-            break;
-        }
+      case POSITION_X:
+        positionX.reset(new float(nextToken().toFloat(ok)));
         break;
-      case 'Y':
-        switch (rotationOrder.at(1))
-        {
-          // YXZ
-          case 'X':
-            if (rotationOrder.at(2) == 'Z')
-            {
-              joint->setRotationOrder(ORDER_YXZ);
-            }
-            else
-            {
-              // TODO Handle error: unexpected token
-            }
-            break;
-          // YZX
-          case 'Z':
-            if (rotationOrder.at(2) == 'X')
-            {
-              joint->setRotationOrder(ORDER_YZX);
-            }
-            else
-            {
-              // TODO Handle error: unexpected token
-            }
-            break;
-          default:
-            // TODO Handle error: unexpected token
-            break;
-        }
+      case POSITION_Y:
+        positionY.reset(new float(nextToken().toFloat(ok)));
         break;
-      case 'Z':
-        switch (rotationOrder.at(1))
-        {
-          // ZXY
-          case 'X':
-            if (rotationOrder.at(2) == 'Y')
-            {
-              joint->setRotationOrder(ORDER_ZXY);
-            }
-            else
-            {
-              // TODO Handle error: unexpected token
-            }
-            break;
-          // ZYX
-          case 'Y':
-            if (rotationOrder.at(2) == 'X')
-            {
-              joint->setRotationOrder(ORDER_ZYX);
-            }
-            else
-            {
-              // TODO Handle error: unexpected token
-            }
-            break;
-          default:
-            // TODO Handle error: unexpected token
-            break;
-        }
+      case POSITION_Z:
+        positionZ.reset(new float(nextToken().toFloat(ok)));
+        break;
+      case ROTATION_X:
+        rotationX.reset(new float(nextToken().toFloat(ok)));
+        break;
+      case ROTATION_Y:
+        rotationY.reset(new float(nextToken().toFloat(ok)));
+        break;
+      case ROTATION_Z:
+        rotationZ.reset(new float(nextToken().toFloat(ok)));
         break;
       default:
-        // TODO Handle error: unexpected token
+        // TODO Handle error
         break;
     }
+    if (!ok)
+    {
+      // TODO Handle error
+    }
   }
-  else
+
+  BvhFrame* frame = new BvhFrame();
+  if (!positionX.isNull())
   {
-    // TODO Handle error: unexpected token
+    frame->setPosition(new QVector3D(*positionX, *positionY, *positionZ));
+  }
+  if (!rotationX.isNull())
+  {
+    frame->setRotation(new QVector3D(*rotationX, *rotationY, *rotationZ));
+  }
+
+  joint->addFrame(frame);
+
+  // Recurse through the BvhJoint hierarchy
+  for (QList<BvhJoint*>::const_iterator iter = joint->children().constBegin();
+       iter != joint->children().constEnd();
+       iter++)
+  {
+    parseFrame(*iter);
   }
 }
 

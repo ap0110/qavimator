@@ -93,9 +93,6 @@ Joint::Joint(const QString& name, int maxFrameNumber, QObject* parent)
 {
   m_name = name;
   m_maxFrameNumber = maxFrameNumber;
-
-  m_hasPosition = false;
-  m_rotationOrder = XZY;
 }
 
 Joint::~Joint()
@@ -155,26 +152,6 @@ void Joint::insertChild(Joint* child, int index)
 void Joint::removeChild(Joint* child)
 {
   m_children.removeAll(child);
-}
-
-const bool& Joint::hasPosition() const
-{
-  return m_hasPosition;
-}
-
-const RotationOrder& Joint::rotationOrder() const
-{
-  return m_rotationOrder;
-}
-
-void Joint::setHasPosition(bool hasPosition)
-{
-  m_hasPosition = hasPosition;
-}
-
-void Joint::setRotationOrder(RotationOrder rotationOrder)
-{
-  m_rotationOrder = rotationOrder;
 }
 
 void Joint::setKeyframe(int frame, QVector3D& position, QVector3D& rotation)
