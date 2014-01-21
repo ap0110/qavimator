@@ -23,6 +23,67 @@
 
 #include "bvhparser.h"
 
+BvhJoint::BvhJoint(const QString& name)
+{
+  m_name = name;
+  m_hasPosition = false;
+  m_rotationOrder = ORDER_NONE;
+}
+
+BvhJoint::~BvhJoint()
+{
+}
+
+void BvhJoint::addChild(BvhJoint* child)
+{
+  m_children.append(child);
+}
+
+const QVector3D* BvhJoint::head() const
+{
+  return m_head;
+}
+
+const QList<QVector3D*> BvhJoint::tail(int index) const
+{
+  return m_tailList;
+}
+
+void BvhJoint::setHead(QVector3D* head)
+{
+  m_head = head;
+}
+
+void BvhJoint::addTail(QVector3D* tail)
+{
+  m_tailList.append(tail);
+}
+
+const bool& BvhJoint::hasPosition() const
+{
+  return m_hasPosition;
+}
+
+const AxisOrder& BvhJoint::rotationOrder() const
+{
+  return m_rotationOrder;
+}
+
+void BvhJoint::setHasPosition(bool hasPosition)
+{
+  m_hasPosition = hasPosition;
+}
+
+void BvhJoint::setRotationOrder(AxisOrder rotationOrder)
+{
+  m_rotationOrder = rotationOrder;
+}
+
+Joint* BvhJoint::toJoint()
+{
+
+}
+
 BvhParser::BvhParser(const QString& bvhData)
 {
   m_tokenList = bvhData.simplified().split(' ');
@@ -43,7 +104,7 @@ Animation* BvhParser::parseBvhData()
     if (!isHierarchyParsed && isEqual(token(), "HIERARCHY"))
     {
       isHierarchyParsed = true;
-      parseHierarchy();
+      BvhJoint* rootJoint = parseHierarchy();
     }
     else if (!isMotionParsed && isEqual(token(), "MOTION"))
     {
@@ -59,19 +120,19 @@ Animation* BvhParser::parseBvhData()
   return NULL;
 }
 
-Joint* BvhParser::parseHierarchy()
+BvhJoint* BvhParser::parseHierarchy()
 {
   // Limit to one hierarchy for now
   bool isRootParsed = false;
 
-  Joint* rootJoint = NULL;
+  BvhJoint* rootJoint = NULL;
   while (hasNext())
   {
     next();
     if (!isRootParsed && isEqual(token(), "ROOT"))
     {
       isRootParsed = true;
-      rootJoint = new Joint(nextToken());
+      rootJoint = new BvhJoint(nextToken());
       expectNextToken("{");
       parseJoint(rootJoint);
     }
@@ -88,7 +149,7 @@ Joint* BvhParser::parseHierarchy()
   return rootJoint;
 }
 
-void BvhParser::parseJoint(Joint* joint)
+void BvhParser::parseJoint(BvhJoint* joint)
 {
   bool hasOffset = false;
   bool hasChannels = false;
@@ -112,7 +173,7 @@ void BvhParser::parseJoint(Joint* joint)
     }
     else if (isEqual(token(), "JOINT"))
     {
-      Joint* childJoint = new Joint(nextToken());
+      BvhJoint* childJoint = new BvhJoint(nextToken());
 
       expectNextToken("{");
       parseJoint(childJoint);
@@ -170,7 +231,7 @@ QVector3D* BvhParser::parseOffset()
   return new QVector3D(x, y, z);
 }
 
-void BvhParser::parseChannels(Joint* joint)
+void BvhParser::parseChannels(BvhJoint* joint)
 {
   QList<char> positionOrder;
   QList<char> rotationOrder;
@@ -231,7 +292,7 @@ void BvhParser::parseChannels(Joint* joint)
           case 'Y':
             if (rotationOrder.at(2) == 'Z')
             {
-              joint->setRotationOrder(XYZ);
+              joint->setRotationOrder(ORDER_XYZ);
             }
             else
             {
@@ -242,7 +303,7 @@ void BvhParser::parseChannels(Joint* joint)
           case 'Z':
             if (rotationOrder.at(2) == 'Y')
             {
-              joint->setRotationOrder(XZY);
+              joint->setRotationOrder(ORDER_XZY);
             }
             else
             {
@@ -261,7 +322,7 @@ void BvhParser::parseChannels(Joint* joint)
           case 'X':
             if (rotationOrder.at(2) == 'Z')
             {
-              joint->setRotationOrder(YXZ);
+              joint->setRotationOrder(ORDER_YXZ);
             }
             else
             {
@@ -272,7 +333,7 @@ void BvhParser::parseChannels(Joint* joint)
           case 'Z':
             if (rotationOrder.at(2) == 'X')
             {
-              joint->setRotationOrder(YZX);
+              joint->setRotationOrder(ORDER_YZX);
             }
             else
             {
@@ -291,7 +352,7 @@ void BvhParser::parseChannels(Joint* joint)
           case 'X':
             if (rotationOrder.at(2) == 'Y')
             {
-              joint->setRotationOrder(ZXY);
+              joint->setRotationOrder(ORDER_ZXY);
             }
             else
             {
@@ -302,7 +363,7 @@ void BvhParser::parseChannels(Joint* joint)
           case 'Y':
             if (rotationOrder.at(2) == 'X')
             {
-              joint->setRotationOrder(ZYX);
+              joint->setRotationOrder(ORDER_ZYX);
             }
             else
             {

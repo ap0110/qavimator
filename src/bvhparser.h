@@ -23,6 +23,50 @@
 class Animation;
 class Joint;
 
+typedef enum
+{
+  ORDER_NONE,
+  ORDER_XYZ,
+  ORDER_XZY,
+  ORDER_YXZ,
+  ORDER_YZX,
+  ORDER_ZXY,
+  ORDER_ZYX
+} AxisOrder;
+
+class BvhJoint
+{
+  public:
+    BvhJoint(const QString& name);
+    ~BvhJoint();
+
+    void addChild(BvhJoint* child);
+
+    const QVector3D* head() const;
+    const QList<QVector3D*> tail(int index) const;
+    void setHead(QVector3D* head);
+    void addTail(QVector3D* tail);
+
+    const bool& hasPosition() const;
+    const AxisOrder& rotationOrder() const;
+    void setHasPosition(bool hasPosition);
+    void setRotationOrder(AxisOrder rotationOrder);
+
+    Joint* toJoint();
+
+  private:
+    QString m_name;
+    QVector3D* m_head;
+    QList<QVector3D*> m_tailList;
+
+    QList<BvhJoint*> m_children;
+
+    bool m_hasPosition;
+    AxisOrder m_rotationOrder;
+    QList<QVector3D*> m_positionFrames;
+    QList<QVector3D*> m_rotationFrames;
+};
+
 class BvhParser
 {
   public:
@@ -32,10 +76,10 @@ class BvhParser
     Animation* parseBvhData();
 
   private:
-    Joint* parseHierarchy();
-    void parseJoint(Joint* joint);
+    BvhJoint* parseHierarchy();
+    void parseJoint(BvhJoint* joint);
     QVector3D* parseOffset();
-    void parseChannels(Joint* joint);
+    void parseChannels(BvhJoint* joint);
 
     bool hasNext();
     void next();
