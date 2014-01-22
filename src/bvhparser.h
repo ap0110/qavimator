@@ -38,8 +38,8 @@ class BvhFrame
     const QVector3D* position() const;
     const QVector3D* rotation() const;
 
-    void setPosition(QVector3D* position);
-    void setRotation(QVector3D* rotation);
+    void setPosition(float x, float y, float z);
+    void setRotation(float x, float y, float z);
 
   private:
     QScopedPointer<QVector3D> m_position;
@@ -53,18 +53,18 @@ class BvhJoint
     ~BvhJoint();
 
     const QList<BvhJoint*> children() const;
-    void addChild(BvhJoint* child);
+    void addChild(QScopedPointer<BvhJoint>& child);
 
     const QVector3D* head() const;
     const QList<QVector3D*> tail(int index) const;
-    void setHead(QVector3D* head);
-    void addTail(QVector3D* tail);
+    void setHead(float x, float y, float z);
+    void addTail(float x, float y, float z);
 
-    const QList<Channel>& channels() const;
+    const QList<Channel> channels() const;
     void addChannel(Channel channel);
 
     void setMaxFrameCount(int count);
-    void addFrame(BvhFrame* frame);
+    void addFrame(QScopedPointer<BvhFrame>& frame);
 
     Joint* toJoint();
 
@@ -90,11 +90,11 @@ class BvhParser
     Animation* parseBvhData();
 
   private:
-    BvhJoint* parseHierarchy();
-    void parseMotion(BvhJoint* rootJoint);
-    void parseJoint(BvhJoint* joint);
-    QVector3D* parseOffset();
-    void parseChannels(BvhJoint* joint);
+    void parseHierarchy(QScopedPointer<BvhJoint>& rootJoint);
+    void parseMotion(const QScopedPointer<BvhJoint>& rootJoint);
+    void parseJoint(const QScopedPointer<BvhJoint>& joint);
+    QVector3D parseOffset();
+    void parseChannels(const QScopedPointer<BvhJoint>& joint);
     void parseFrame(BvhJoint* joint);
 
     bool hasNext();

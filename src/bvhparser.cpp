@@ -41,14 +41,14 @@ const QVector3D* BvhFrame::rotation() const
   return m_rotation.data();
 }
 
-void BvhFrame::setPosition(QVector3D* position)
+void BvhFrame::setPosition(float x, float y, float z)
 {
-  m_position.reset(position);
+  m_position.reset(new QVector3D(x, y, z));
 }
 
-void BvhFrame::setRotation(QVector3D* rotation)
+void BvhFrame::setRotation(float x, float y, float z)
 {
-  m_rotation.reset(rotation);
+  m_rotation.reset(new QVector3D(x, y, z));
 }
 
 BvhJoint::BvhJoint(const QString& name)
@@ -65,9 +65,9 @@ const QList<BvhJoint*> BvhJoint::children() const
   return m_children;
 }
 
-void BvhJoint::addChild(BvhJoint* child)
+void BvhJoint::addChild(QScopedPointer<BvhJoint>& child)
 {
-  m_children.append(child);
+  m_children.append(child.take());
 }
 
 const QVector3D* BvhJoint::head() const
@@ -80,17 +80,17 @@ const QList<QVector3D*> BvhJoint::tail(int index) const
   return m_tailList;
 }
 
-void BvhJoint::setHead(QVector3D* head)
+void BvhJoint::setHead(float x, float y, float z)
 {
-  m_head.reset(head);
+  m_head.reset(new QVector3D(x, y, z));
 }
 
-void BvhJoint::addTail(QVector3D* tail)
+void BvhJoint::addTail(float x, float y, float z)
 {
-  m_tailList.append(tail);
+  m_tailList.append(new QVector3D(x, y, z));
 }
 
-const QList<Channel>& BvhJoint::channels() const
+const QList<Channel> BvhJoint::channels() const
 {
   return m_channels;
 }
@@ -106,9 +106,9 @@ void BvhJoint::setMaxFrameCount(int count)
   m_frames.reserve(count);
 }
 
-void BvhJoint::addFrame(BvhFrame* frame)
+void BvhJoint::addFrame(QScopedPointer<BvhFrame>& frame)
 {
-  m_frames.append(frame);
+  m_frames.append(frame.take());
 }
 
 Joint* BvhJoint::toJoint()
@@ -130,7 +130,7 @@ Animation* BvhParser::parseBvhData()
 {
   bool isHierarchyParsed = false;
   bool isMotionParsed = false;
-  BvhJoint* rootJoint = NULL;
+  QScopedPointer<BvhJoint> rootJoint;
 
   while (hasNext())
   {
@@ -138,7 +138,7 @@ Animation* BvhParser::parseBvhData()
     if (!isHierarchyParsed && isEqual(token(), "HIERARCHY"))
     {
       isHierarchyParsed = true;
-      rootJoint = parseHierarchy();
+      parseHierarchy(rootJoint);
     }
     else if (!isMotionParsed && isEqual(token(), "MOTION"))
     {
@@ -158,19 +158,18 @@ Animation* BvhParser::parseBvhData()
   return NULL;
 }
 
-BvhJoint* BvhParser::parseHierarchy()
+void BvhParser::parseHierarchy(QScopedPointer<BvhJoint>& rootJoint)
 {
   // Limit to one hierarchy for now
   bool isRootParsed = false;
 
-  BvhJoint* rootJoint = NULL;
   while (hasNext())
   {
     next();
     if (!isRootParsed && isEqual(token(), "ROOT"))
     {
       isRootParsed = true;
-      rootJoint = new BvhJoint(nextToken());
+      rootJoint.reset(new BvhJoint(nextToken()));
       expectNextToken("{");
       parseJoint(rootJoint);
     }
@@ -184,17 +183,16 @@ BvhJoint* BvhParser::parseHierarchy()
       // TODO Error: Should have been ROOT or MOTION
     }
   }
-  return rootJoint;
 }
 
-void BvhParser::parseMotion(BvhJoint* rootJoint)
+void BvhParser::parseMotion(const QScopedPointer<BvhJoint>& rootJoint)
 {
-  bool* ok;
+  bool ok;
   int frameCount = 0;
   float frameTime = 0.0f;
 
   expectNextToken("Frames:");
-  frameCount = nextToken().toInt(ok);
+  frameCount = nextToken().toInt(&ok);
   if (!ok)
   {
     // TODO Handle error
@@ -202,7 +200,7 @@ void BvhParser::parseMotion(BvhJoint* rootJoint)
 
   expectNextToken("Frame");
   expectNextToken("Time:");
-  frameTime = nextToken().toFloat(ok);
+  frameTime = nextToken().toFloat(&ok);
   if (!ok)
   {
     // TODO Handle error
@@ -211,11 +209,11 @@ void BvhParser::parseMotion(BvhJoint* rootJoint)
   // Parse all the frames
   for (int i = 0; i < frameCount; i++)
   {
-    parseFrame(rootJoint);
+    parseFrame(rootJoint.data());
   }
 }
 
-void BvhParser::parseJoint(BvhJoint* joint)
+void BvhParser::parseJoint(const QScopedPointer<BvhJoint>& joint)
 {
   bool hasOffset = false;
   bool hasChannels = false;
@@ -230,7 +228,9 @@ void BvhParser::parseJoint(BvhJoint* joint)
     if (!hasOffset && isEqual(token(), "OFFSET"))
     {
       hasOffset = true;
-      joint->setHead(parseOffset());
+
+      QVector3D offset = parseOffset();
+      joint->setHead(offset.x(), offset.y(), offset.z());
     }
     else if (!hasChannels && isEqual(token(), "CHANNELS"))
     {
@@ -239,14 +239,14 @@ void BvhParser::parseJoint(BvhJoint* joint)
     }
     else if (isEqual(token(), "JOINT"))
     {
-      BvhJoint* childJoint = new BvhJoint(nextToken());
+      QScopedPointer<BvhJoint> childJoint(new BvhJoint(nextToken()));
 
       expectNextToken("{");
       parseJoint(childJoint);
       joint->addChild(childJoint);
       // Head of the child will be tail of the parent
-      const QVector3D tail = *childJoint->head();
-      joint->addTail(new QVector3D(tail.x(), tail.y(), tail.z()));
+      const QVector3D* tail = childJoint->head();
+      joint->addTail(tail->x(), tail->y(), tail->z());
     }
     else if (isEqual(token(), "}"))
     {
@@ -261,7 +261,8 @@ void BvhParser::parseJoint(BvhJoint* joint)
       expectNextToken("{");
       expectNextToken("OFFSET");
 
-      joint->addTail(parseOffset());
+      QVector3D offset = parseOffset();
+      joint->addTail(offset.x(), offset.y(), offset.z());
 
       expectNextToken("}");
     }
@@ -272,35 +273,35 @@ void BvhParser::parseJoint(BvhJoint* joint)
   }
 }
 
-QVector3D* BvhParser::parseOffset()
+QVector3D BvhParser::parseOffset()
 {
-  bool* ok = new bool;
+  bool ok;
 
-  float x = nextToken().toFloat(ok);
+  float x = nextToken().toFloat(&ok);
   if (!ok)
   {
     // TODO Handle error
   }
 
-  float y = nextToken().toFloat(ok);
+  float y = nextToken().toFloat(&ok);
   if (!ok)
   {
     // TODO Handle error
   }
 
-  float z = nextToken().toFloat(ok);
+  float z = nextToken().toFloat(&ok);
   if (!ok)
   {
     //  TODO Handle error
   }
 
-  return new QVector3D(x, y, z);
+  return QVector3D(x, y, z);
 }
 
-void BvhParser::parseChannels(BvhJoint* joint)
+void BvhParser::parseChannels(const QScopedPointer<BvhJoint>& joint)
 {
-  bool* ok;
-  int numChannels = nextToken().toInt(ok);
+  bool ok;
+  int numChannels = nextToken().toInt(&ok);
   if (!ok)
   {
     // TODO Handle Error: Unexpected token
@@ -348,7 +349,7 @@ void BvhParser::parseChannels(BvhJoint* joint)
 
 void BvhParser::parseFrame(BvhJoint* joint)
 {
-  bool* ok;
+  bool ok;
 
   QScopedPointer<float> positionX;
   QScopedPointer<float> positionY;
@@ -364,22 +365,22 @@ void BvhParser::parseFrame(BvhJoint* joint)
     switch (*iter)
     {
       case POSITION_X:
-        positionX.reset(new float(nextToken().toFloat(ok)));
+        positionX.reset(new float(nextToken().toFloat(&ok)));
         break;
       case POSITION_Y:
-        positionY.reset(new float(nextToken().toFloat(ok)));
+        positionY.reset(new float(nextToken().toFloat(&ok)));
         break;
       case POSITION_Z:
-        positionZ.reset(new float(nextToken().toFloat(ok)));
+        positionZ.reset(new float(nextToken().toFloat(&ok)));
         break;
       case ROTATION_X:
-        rotationX.reset(new float(nextToken().toFloat(ok)));
+        rotationX.reset(new float(nextToken().toFloat(&ok)));
         break;
       case ROTATION_Y:
-        rotationY.reset(new float(nextToken().toFloat(ok)));
+        rotationY.reset(new float(nextToken().toFloat(&ok)));
         break;
       case ROTATION_Z:
-        rotationZ.reset(new float(nextToken().toFloat(ok)));
+        rotationZ.reset(new float(nextToken().toFloat(&ok)));
         break;
       default:
         // TODO Handle error
@@ -391,14 +392,14 @@ void BvhParser::parseFrame(BvhJoint* joint)
     }
   }
 
-  BvhFrame* frame = new BvhFrame();
+  QScopedPointer<BvhFrame> frame(new BvhFrame());
   if (!positionX.isNull())
   {
-    frame->setPosition(new QVector3D(*positionX, *positionY, *positionZ));
+    frame->setPosition(*positionX, *positionY, *positionZ);
   }
   if (!rotationX.isNull())
   {
-    frame->setRotation(new QVector3D(*rotationX, *rotationY, *rotationZ));
+    frame->setRotation(*rotationX, *rotationY, *rotationZ);
   }
 
   joint->addFrame(frame);
@@ -453,7 +454,7 @@ const QString& BvhParser::token()
   return m_token;
 }
 
-const QString&BvhParser::nextToken()
+const QString& BvhParser::nextToken()
 {
   next();
   return m_token;
