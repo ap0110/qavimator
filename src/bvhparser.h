@@ -93,7 +93,6 @@ class BvhParser
     void parseHierarchy(QScopedPointer<BvhJoint>& rootJoint);
     void parseMotion(const QScopedPointer<BvhJoint>& rootJoint);
     void parseJoint(const QScopedPointer<BvhJoint>& joint);
-    QVector3D parseOffset();
     void parseChannels(const QScopedPointer<BvhJoint>& joint);
     void parseFrame(BvhJoint* joint);
 
@@ -106,7 +105,10 @@ class BvhParser
     const QString& nextToken();
     void expectToken(const QString& expected);
     void expectNextToken(const QString& expected);
-    bool isEqual(const QString& lhs, const QString& rhs) const;
+
+    bool isEqualIgnoreCase(const QString& lhs, const QString& rhs) const;
+    int parseInt(const QString& integerString) const;
+    float parseFloat(const QString& floatString) const;
 
     QScopedPointer<QStringListIterator> m_parser;
 

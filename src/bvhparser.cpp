@@ -135,12 +135,12 @@ Animation* BvhParser::parseBvhData()
   while (hasNext())
   {
     next();
-    if (!isHierarchyParsed && isEqual(token(), "HIERARCHY"))
+    if (!isHierarchyParsed && isEqualIgnoreCase(token(), "HIERARCHY"))
     {
       isHierarchyParsed = true;
       parseHierarchy(rootJoint);
     }
-    else if (!isMotionParsed && isEqual(token(), "MOTION"))
+    else if (!isMotionParsed && isEqualIgnoreCase(token(), "MOTION"))
     {
       isMotionParsed = true;
       parseMotion(rootJoint);
@@ -166,14 +166,14 @@ void BvhParser::parseHierarchy(QScopedPointer<BvhJoint>& rootJoint)
   while (hasNext())
   {
     next();
-    if (!isRootParsed && isEqual(token(), "ROOT"))
+    if (!isRootParsed && isEqualIgnoreCase(token(), "ROOT"))
     {
       isRootParsed = true;
       rootJoint.reset(new BvhJoint(nextToken()));
       expectNextToken("{");
       parseJoint(rootJoint);
     }
-    else if (isEqual(token(), "MOTION"))
+    else if (isEqualIgnoreCase(token(), "MOTION"))
     {
       previous();
       break;
@@ -187,24 +187,15 @@ void BvhParser::parseHierarchy(QScopedPointer<BvhJoint>& rootJoint)
 
 void BvhParser::parseMotion(const QScopedPointer<BvhJoint>& rootJoint)
 {
-  bool ok;
   int frameCount = 0;
   float frameTime = 0.0f;
 
   expectNextToken("Frames:");
-  frameCount = nextToken().toInt(&ok);
-  if (!ok)
-  {
-    // TODO Handle error
-  }
+  frameCount = parseInt(nextToken());
 
   expectNextToken("Frame");
   expectNextToken("Time:");
-  frameTime = nextToken().toFloat(&ok);
-  if (!ok)
-  {
-    // TODO Handle error
-  }
+  frameTime = parseFloat(nextToken());
 
   // Parse all the frames
   for (int i = 0; i < frameCount; i++)
@@ -225,19 +216,21 @@ void BvhParser::parseJoint(const QScopedPointer<BvhJoint>& joint)
 
     // TODO Replace if-else chain with string switch
     //  or something that does better than a linear search
-    if (!hasOffset && isEqual(token(), "OFFSET"))
+    if (!hasOffset && isEqualIgnoreCase(token(), "OFFSET"))
     {
       hasOffset = true;
 
-      QVector3D offset = parseOffset();
-      joint->setHead(offset.x(), offset.y(), offset.z());
+      float x = parseFloat(nextToken());
+      float y = parseFloat(nextToken());
+      float z = parseFloat(nextToken());
+      joint->setHead(x, y, z);
     }
-    else if (!hasChannels && isEqual(token(), "CHANNELS"))
+    else if (!hasChannels && isEqualIgnoreCase(token(), "CHANNELS"))
     {
       hasChannels = true;
       parseChannels(joint);
     }
-    else if (isEqual(token(), "JOINT"))
+    else if (isEqualIgnoreCase(token(), "JOINT"))
     {
       QScopedPointer<BvhJoint> childJoint(new BvhJoint(nextToken()));
 
@@ -248,12 +241,12 @@ void BvhParser::parseJoint(const QScopedPointer<BvhJoint>& joint)
       const QVector3D* tail = childJoint->head();
       joint->addTail(tail->x(), tail->y(), tail->z());
     }
-    else if (isEqual(token(), "}"))
+    else if (isEqualIgnoreCase(token(), "}"))
     {
       // End of Joint data, so return
       return;
     }
-    else if (!hasEndSite && isEqual(token(), "END"))
+    else if (!hasEndSite && isEqualIgnoreCase(token(), "END"))
     {
       hasEndSite = true;
 
@@ -261,8 +254,11 @@ void BvhParser::parseJoint(const QScopedPointer<BvhJoint>& joint)
       expectNextToken("{");
       expectNextToken("OFFSET");
 
-      QVector3D offset = parseOffset();
-      joint->addTail(offset.x(), offset.y(), offset.z());
+
+      float x = parseFloat(nextToken());
+      float y = parseFloat(nextToken());
+      float z = parseFloat(nextToken());
+      joint->addTail(x, y, z);
 
       expectNextToken("}");
     }
@@ -273,39 +269,9 @@ void BvhParser::parseJoint(const QScopedPointer<BvhJoint>& joint)
   }
 }
 
-QVector3D BvhParser::parseOffset()
-{
-  bool ok;
-
-  float x = nextToken().toFloat(&ok);
-  if (!ok)
-  {
-    // TODO Handle error
-  }
-
-  float y = nextToken().toFloat(&ok);
-  if (!ok)
-  {
-    // TODO Handle error
-  }
-
-  float z = nextToken().toFloat(&ok);
-  if (!ok)
-  {
-    //  TODO Handle error
-  }
-
-  return QVector3D(x, y, z);
-}
-
 void BvhParser::parseChannels(const QScopedPointer<BvhJoint>& joint)
 {
-  bool ok;
-  int numChannels = nextToken().toInt(&ok);
-  if (!ok)
-  {
-    // TODO Handle Error: Unexpected token
-  }
+  int numChannels = parseInt(nextToken());
 
   for (; numChannels > 0; numChannels--)
   {
@@ -349,8 +315,6 @@ void BvhParser::parseChannels(const QScopedPointer<BvhJoint>& joint)
 
 void BvhParser::parseFrame(BvhJoint* joint)
 {
-  bool ok;
-
   QScopedPointer<float> positionX;
   QScopedPointer<float> positionY;
   QScopedPointer<float> positionZ;
@@ -365,30 +329,26 @@ void BvhParser::parseFrame(BvhJoint* joint)
     switch (*iter)
     {
       case POSITION_X:
-        positionX.reset(new float(nextToken().toFloat(&ok)));
+        positionX.reset(new float(parseFloat(nextToken())));
         break;
       case POSITION_Y:
-        positionY.reset(new float(nextToken().toFloat(&ok)));
+        positionY.reset(new float(parseFloat(nextToken())));
         break;
       case POSITION_Z:
-        positionZ.reset(new float(nextToken().toFloat(&ok)));
+        positionZ.reset(new float(parseFloat(nextToken())));
         break;
       case ROTATION_X:
-        rotationX.reset(new float(nextToken().toFloat(&ok)));
+        rotationX.reset(new float(parseFloat(nextToken())));
         break;
       case ROTATION_Y:
-        rotationY.reset(new float(nextToken().toFloat(&ok)));
+        rotationY.reset(new float(parseFloat(nextToken())));
         break;
       case ROTATION_Z:
-        rotationZ.reset(new float(nextToken().toFloat(&ok)));
+        rotationZ.reset(new float(parseFloat(nextToken())));
         break;
       default:
         // TODO Handle error
         break;
-    }
-    if (!ok)
-    {
-      // TODO Handle error
     }
   }
 
@@ -462,7 +422,7 @@ const QString& BvhParser::nextToken()
 
 void BvhParser::expectToken(const QString& expected)
 {
-  if (!isEqual(token(), expected))
+  if (!isEqualIgnoreCase(token(), expected))
   {
     // TODO Handle Error: Unexpected token
   }
@@ -470,13 +430,35 @@ void BvhParser::expectToken(const QString& expected)
 
 void BvhParser::expectNextToken(const QString& expected)
 {
-  if (!isEqual(nextToken(), expected))
+  if (!isEqualIgnoreCase(nextToken(), expected))
   {
     // TODO Handle Error: Unexpected token
   }
 }
 
-bool BvhParser::isEqual(const QString& lhs, const QString& rhs) const
+bool BvhParser::isEqualIgnoreCase(const QString& lhs, const QString& rhs) const
 {
   return lhs.compare(rhs, Qt::CaseInsensitive) == 0;
+}
+
+int BvhParser::parseInt(const QString& integerString) const
+{
+  bool ok;
+  int result = integerString.toInt(&ok);
+  if (!ok)
+  {
+    // TODO Handle error
+  }
+  return result;
+}
+
+float BvhParser::parseFloat(const QString& floatString) const
+{
+  bool ok;
+  float result = floatString.toFloat(&ok);
+  if (!ok)
+  {
+    // TODO Handle error
+  }
+  return result;
 }
