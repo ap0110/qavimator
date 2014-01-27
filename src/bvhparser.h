@@ -18,6 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifndef BVHPARSER_H
+#define BVHPARSER_H
+
 #include <QStringListIterator>
 
 class Animation;
@@ -114,3 +117,5 @@ class BvhParser
     QStringList m_bvhTokens;
     QStringList::const_iterator m_bvhTokensIterator;
 };
+
+#endif

@@ -18,6 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifndef JOINT_H
+#define JOINT_H
+
 #include <QObject>
 
 typedef enum
@@ -99,3 +102,5 @@ class Joint : public QObject
     QMap<int, QSharedPointer<KeyframeData> > m_keyframes;
     int m_maxFrameNumber;
 };
+
+#endif

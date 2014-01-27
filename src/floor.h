@@ -18,6 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifndef FLOOR_H
+#define FLOOR_H
+
 #include <QObject>
 
 class Floor : public QObject
@@ -38,3 +41,5 @@ class Floor : public QObject
   private:
     bool frameProtected;
 };
+
+#endif
