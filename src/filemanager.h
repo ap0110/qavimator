@@ -36,9 +36,9 @@ class FileManager : public QObject
     FileManager(QObject* parent = 0);
     ~FileManager();
 
-    Animation* loadAnimationFromFile(const QString& fileName);
+    QSharedPointer<Animation> loadAnimationFromFile(const QString& fileName);
 
-    Animation* loadAnimationFromApplicationData(const QString& fileName);
+    QSharedPointer<Animation> loadAnimationFromApplicationData(const QString& fileName);
 
   private:
     typedef enum
@@ -52,9 +52,9 @@ class FileManager : public QObject
     QDir getDataDirectoryByOperatingSystem() const;
     const FileType determineFileType(QFile& openedFile) const;
 
-    Animation* readBvh(QFile& openedFile);
-    Animation* readAnim(const QFile& file);
-    Animation* readQavm(const QFile& file);
+    QSharedPointer<Animation> readBvh(QFile& openedFile);
+    QSharedPointer<Animation> readAnim(const QFile& file);
+    QSharedPointer<Animation> readQavm(const QFile& file);
 };
 
 #endif

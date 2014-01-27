@@ -87,9 +87,10 @@ class BvhParser
     BvhParser(const QString& bvhData);
     ~BvhParser();
 
-    Animation* parseBvhData();
+    QSharedPointer<Animation> parse();
 
   private:
+    QSharedPointer<Joint> parseBvhData();
     void parseHierarchy(QSharedPointer<BvhJoint>& rootJoint);
     void parseMotion(const QSharedPointer<BvhJoint>& rootJoint);
     void parseJoint(const QSharedPointer<BvhJoint>& joint);

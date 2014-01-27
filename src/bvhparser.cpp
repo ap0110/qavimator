@@ -130,7 +130,16 @@ BvhParser::~BvhParser()
 {
 }
 
-Animation* BvhParser::parseBvhData()
+QSharedPointer<Animation> BvhParser::parse()
+{
+  QSharedPointer<Animation> animation;
+
+  // TODO Parse the BVH data and create the Animation to return
+
+  return animation;
+}
+
+QSharedPointer<Joint> BvhParser::parseBvhData()
 {
   bool isHierarchyParsed = false;
   bool isMotionParsed = false;
@@ -156,10 +165,10 @@ Animation* BvhParser::parseBvhData()
     else
     {
       // TODO Error: Should have been HIERARCHY or MOTION or AVM data
-      return NULL;
+      return QSharedPointer<Joint>();
     }
   }
-  return NULL;
+  return rootJoint->toJoint();
 }
 
 void BvhParser::parseHierarchy(QSharedPointer<BvhJoint>& rootJoint)

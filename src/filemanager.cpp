@@ -34,21 +34,21 @@ FileManager::~FileManager()
 {
 }
 
-Animation* FileManager::loadAnimationFromFile(const QString& filePath)
+QSharedPointer<Animation> FileManager::loadAnimationFromFile(const QString& filePath)
 {
   QFile file(filePath);
   if (!file.exists())
   {
     // TODO
-    return NULL;
+    return QSharedPointer<Animation>();
   }
   if (!file.open(QIODevice::ReadOnly))
   {
     // TODO
-    return NULL;
+    return QSharedPointer<Animation>();
   }
 
-  Animation* result = NULL;
+  QSharedPointer<Animation> result;
 
   FileType type = determineFileType(file);
   switch (type)
@@ -64,7 +64,6 @@ Animation* FileManager::loadAnimationFromFile(const QString& filePath)
       break;
     default:
       // TODO Alert user to unknown file type
-      result = NULL;
       break;
   }
 
@@ -73,13 +72,13 @@ Animation* FileManager::loadAnimationFromFile(const QString& filePath)
   return result;
 }
 
-Animation* FileManager::loadAnimationFromApplicationData(const QString& fileName)
+QSharedPointer<Animation> FileManager::loadAnimationFromApplicationData(const QString& fileName)
 {
   QDir dataDirectory = getDataDirectoryByOperatingSystem();
 
   if (!dataDirectory.exists(fileName))
   {
-    return NULL;
+    return QSharedPointer<Animation>();
   }
 
   return loadAnimationFromFile(dataDirectory.absoluteFilePath(fileName));
@@ -121,7 +120,7 @@ const FileManager::FileType FileManager::determineFileType(QFile& openedFile) co
   return FT_UNKNOWN;
 }
 
-Animation* FileManager::readBvh(QFile& openedFile)
+QSharedPointer<Animation> FileManager::readBvh(QFile& openedFile)
 {
   // Ensure we are at the beginning of the file
   openedFile.seek(0);
@@ -130,22 +129,22 @@ Animation* FileManager::readBvh(QFile& openedFile)
   if (bvhData.isEmpty())
   {
     // TODO Handle read error
-    return NULL;
+    return QSharedPointer<Animation>();
   }
 
   QScopedPointer<BvhParser> parser(new BvhParser(bvhData));
 
-  return parser->parseBvhData();
+  return parser->parse();
 }
 
-Animation* FileManager::readAnim(const QFile& file)
+QSharedPointer<Animation> FileManager::readAnim(const QFile& file)
 {
   // TODO Read Second Life animation file
-  return NULL;
+  return QSharedPointer<Animation>();
 }
 
-Animation* FileManager::readQavm(const QFile& file)
+QSharedPointer<Animation> FileManager::readQavm(const QFile& file)
 {
   // TODO Read QAvimator file
-  return NULL;
+  return QSharedPointer<Animation>();
 }
