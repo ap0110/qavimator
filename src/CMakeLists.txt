@@ -10,7 +10,6 @@ SET (QAVI_SRC animation.cpp
               floor.cpp
               iktree.cpp
               joint.cpp
-              keyframelist.cpp
               main.cpp
               math3d.cpp
               prop.cpp

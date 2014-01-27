@@ -23,8 +23,6 @@
 
 #include <QFrame>
 
-#include "keyframelist.h"
-
 #define KEY_WIDTH   10
 #define KEY_HEIGHT  10
 #define LINE_HEIGHT 11
