@@ -35,8 +35,8 @@ class BvhFrame
     BvhFrame();
     ~BvhFrame();
 
-    const QVector3D* position() const;
-    const QVector3D* rotation() const;
+    QVector3D position() const;
+    QVector3D rotation() const;
 
     void setPosition(float x, float y, float z);
     void setRotation(float x, float y, float z);
@@ -52,11 +52,11 @@ class BvhJoint
     BvhJoint(const QString& name);
     ~BvhJoint();
 
-    const QList<BvhJoint*> children() const;
-    void addChild(QScopedPointer<BvhJoint>& child);
+    const QList<QSharedPointer<BvhJoint> > children() const;
+    void addChild(QSharedPointer<BvhJoint> child);
 
-    const QVector3D* head() const;
-    const QList<QVector3D*> tail(int index) const;
+    QVector3D head() const;
+    QVector3D tail(int index) const;
     void setHead(float x, float y, float z);
     void addTail(float x, float y, float z);
 
@@ -64,21 +64,21 @@ class BvhJoint
     void addChannel(Channel channel);
 
     void setMaxFrameCount(int count);
-    void addFrame(QScopedPointer<BvhFrame>& frame);
+    void addFrame(QSharedPointer<BvhFrame> frame);
 
-    Joint* toJoint();
+    QSharedPointer<Joint> toJoint();
 
   private:
     QString m_name;
     QScopedPointer<QVector3D> m_head;
-    QList<QVector3D*> m_tailList;
+    QList<QSharedPointer<QVector3D> > m_tailList;
 
-    QList<BvhJoint*> m_children;
+    QList<QSharedPointer<BvhJoint> > m_children;
 
     QList<Channel> m_channels;
 
     int m_maxFrameCount;
-    QList<BvhFrame*> m_frames;
+    QList<QSharedPointer<BvhFrame> > m_frames;
 };
 
 class BvhParser
@@ -90,11 +90,11 @@ class BvhParser
     Animation* parseBvhData();
 
   private:
-    void parseHierarchy(QScopedPointer<BvhJoint>& rootJoint);
-    void parseMotion(const QScopedPointer<BvhJoint>& rootJoint);
-    void parseJoint(const QScopedPointer<BvhJoint>& joint);
-    void parseChannels(const QScopedPointer<BvhJoint>& joint);
-    void parseFrame(BvhJoint* joint);
+    void parseHierarchy(QSharedPointer<BvhJoint>& rootJoint);
+    void parseMotion(const QSharedPointer<BvhJoint>& rootJoint);
+    void parseJoint(const QSharedPointer<BvhJoint>& joint);
+    void parseChannels(const QSharedPointer<BvhJoint>& joint);
+    void parseFrame(const QSharedPointer<BvhJoint>& joint);
 
     bool hasNext();
     void next();
@@ -110,8 +110,6 @@ class BvhParser
     int parseInt(const QString& integerString) const;
     float parseFloat(const QString& floatString) const;
 
-    QScopedPointer<QStringListIterator> m_parser;
-
-    QStringList m_tokenList;
-    QString m_token;
+    QStringList m_bvhTokens;
+    QStringList::const_iterator m_bvhTokensIterator;
 };

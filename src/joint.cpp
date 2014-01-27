@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include <QMap>
+#include <QScopedPointer>
+#include <QSharedPointer>
 #include <QVector3D>
 
 #include "joint.h"
@@ -27,11 +29,12 @@ KeyframeData::KeyframeData()
 {
 }
 
-KeyframeData::KeyframeData(int frame, QVector3D& position, QVector3D& rotation)
+KeyframeData::KeyframeData(int frame, float xPosition, float yPosition, float zPosition,
+                           float xRotation, float yRotation, float zRotation)
 {
   m_frameNumber = frame;
-  m_position = position;
-  m_rotation = rotation;
+  m_position.reset(new QVector3D(xPosition, yPosition, zPosition));
+  m_rotation.reset(new QVector3D(xRotation, yRotation, zRotation));
 }
 
 KeyframeData::~KeyframeData()
@@ -48,24 +51,24 @@ void KeyframeData::setFrameNumber(int frame)
   m_frameNumber = frame;
 }
 
-const QVector3D& KeyframeData::position() const
+QVector3D KeyframeData::position() const
 {
-  return m_position;
+  return *m_position;
 }
 
-const QVector3D& KeyframeData::rotation() const
+QVector3D KeyframeData::rotation() const
 {
-  return m_rotation;
+  return *m_rotation;
 }
 
-void KeyframeData::setPosition(const QVector3D& position)
+void KeyframeData::setPosition(float x, float y, float z)
 {
-  m_position = position;
+  m_position.reset(new QVector3D(x, y, z));
 }
 
-void KeyframeData::setRotation(const QVector3D& rotation)
+void KeyframeData::setRotation(float x, float y, float z)
 {
-  m_rotation = rotation;
+  m_rotation.reset(new QVector3D(x, y, z));
 }
 
 bool KeyframeData::easeIn() const
@@ -97,7 +100,6 @@ Joint::Joint(const QString& name, int maxFrameNumber, QObject* parent)
 
 Joint::~Joint()
 {
-  qDeleteAll(m_tails);
 }
 
 const QString& Joint::name() const
@@ -105,28 +107,24 @@ const QString& Joint::name() const
   return m_name;
 }
 
-const QVector3D* Joint::head() const
+QVector3D Joint::head() const
 {
-  return m_head.data();
+  return *m_head;
 }
 
-const QVector3D* Joint::tail(int index) const
+QVector3D Joint::tail(int index) const
 {
-  return m_tails.at(index);
+  return *(m_tails.at(index));
 }
 
-void Joint::setHead(QVector3D* head)
+void Joint::setHead(float x, float y, float z)
 {
-  if (head == NULL)
-  {
-    // TODO Error: Head cannot be NULL
-  }
-  m_head.reset(head);
+  m_head.reset(new QVector3D(x, y, z));
 }
 
-void Joint::addTail(QVector3D* tail)
+void Joint::addTail(float x, float y, float z)
 {
-  m_tails.append(tail);
+  m_tails.append(QSharedPointer<QVector3D>(new QVector3D(x, y, z)));
 }
 
 int Joint::numChildren() const
@@ -134,29 +132,33 @@ int Joint::numChildren() const
   return m_children.size();
 }
 
-Joint* Joint::child(int num)
+QSharedPointer<Joint> Joint::child(int num)
 {
   return m_children.at(num);
 }
 
-void Joint::addChild(Joint* child)
+void Joint::addChild(QSharedPointer<Joint> child)
 {
   m_children.append(child);
 }
 
-void Joint::insertChild(Joint* child, int index)
+void Joint::insertChild(int index, QSharedPointer<Joint> child)
 {
   m_children.insert(index, child);
 }
 
-void Joint::removeChild(Joint* child)
+int Joint::removeChild(QSharedPointer<Joint> child)
 {
-  m_children.removeAll(child);
+  return m_children.removeAll(child);
 }
 
-void Joint::setKeyframe(int frame, QVector3D& position, QVector3D& rotation)
+void Joint::setKeyframe(int frame, float xPosition, float yPosition, float zPosition,
+                        float xRotation, float yRotation, float zRotation)
 {
-  m_keyframes.insert(frame, KeyframeData(frame, position, rotation));
+  m_keyframes.insert(frame,QSharedPointer<KeyframeData>(
+                       new KeyframeData(frame,
+                                        xPosition, yPosition, zPosition,
+                                        xRotation, yRotation, zRotation)));
 }
 
 bool Joint::removeKeyframe(int frame)
@@ -164,12 +166,12 @@ bool Joint::removeKeyframe(int frame)
   return (m_keyframes.remove(frame) > 0);
 }
 
-bool Joint::setKeyframePosition(int frame, const QVector3D& position)
+bool Joint::setKeyframePosition(int frame, float x, float y, float z)
 {
-  QMap<int, KeyframeData>::iterator iter = m_keyframes.find(frame);
+  QMap<int, QSharedPointer<KeyframeData> >::iterator iter = m_keyframes.find(frame);
   if (iter != m_keyframes.end())
   {
-    iter->setPosition(position);
+    (*iter)->setPosition(x, y, z);
     return true;
   }
   else
@@ -178,12 +180,12 @@ bool Joint::setKeyframePosition(int frame, const QVector3D& position)
   }
 }
 
-bool Joint::setKeyframeRotation(int frame, const QVector3D& rotation)
+bool Joint::setKeyframeRotation(int frame, float x, float y, float z)
 {
-  QMap<int, KeyframeData>::iterator iter = m_keyframes.find(frame);
+  QMap<int, QSharedPointer<KeyframeData> >::iterator iter = m_keyframes.find(frame);
   if (iter != m_keyframes.end())
   {
-    iter->setRotation(rotation);
+    (*iter)->setRotation(x, y, z);
     return true;
   }
   else
@@ -200,7 +202,7 @@ void Joint::insertFrame(int frame)
     return;
   }
 
-  QMap<int, KeyframeData>::iterator iter = m_keyframes.end();
+  QMap<int, QSharedPointer<KeyframeData> >::iterator iter = m_keyframes.end();
 
   // Start with the last keyframe
   iter--;
@@ -212,7 +214,7 @@ void Joint::insertFrame(int frame)
     if (iter.key() < m_maxFrameNumber)
     {
       iter = m_keyframes.insert(iter + 1, iter.key() + 1, *iter);
-      iter->setFrameNumber(iter.key());
+      (*iter)->setFrameNumber(iter.key());
       iter--;
     }
     // Erase the keyframe containing either an outdated or invalid frame number
@@ -239,7 +241,7 @@ void Joint::deleteFrame(int frame)
     return;
   }
 
-  QMap<int, KeyframeData>::iterator iter = m_keyframes.lowerBound(frame);
+  QMap<int, QSharedPointer<KeyframeData> >::iterator iter = m_keyframes.lowerBound(frame);
   // If the frame we are deleting is a keyframe, then erase without re-inserting
   if (iter != m_keyframes.end() && iter.key() == frame)
   {
@@ -251,7 +253,7 @@ void Joint::deleteFrame(int frame)
     // Re-insert the current keyframe with a decremented key
     iter = m_keyframes.insert(iter, iter.key() - 1, *iter);
     // Update the keyframe's frame number with its key
-    iter->setFrameNumber(iter.key());
+    (*iter)->setFrameNumber(iter.key());
     // Erase the keyframe containing an outdated frame number
     iter = m_keyframes.erase(iter + 1);
   }
@@ -272,7 +274,7 @@ void Joint::setMaxFrameNumber(int maxFrameNumber)
   m_maxFrameNumber = maxFrameNumber;
 
   // Erase any keyframes containing a frame number greater than the maximum
-  QMap<int, KeyframeData>::iterator iter = m_keyframes.end();
+  QMap<int, QSharedPointer<KeyframeData> >::iterator iter = m_keyframes.end();
   while (iter != m_keyframes.begin())
   {
     iter--;
