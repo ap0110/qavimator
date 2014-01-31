@@ -168,7 +168,7 @@ bool Joint::removeKeyframe(int frame)
 
 bool Joint::setKeyframePosition(int frame, float x, float y, float z)
 {
-  QMap<int, QSharedPointer<KeyframeData> >::iterator iter = m_keyframes.find(frame);
+  auto iter = m_keyframes.find(frame);
   if (iter != m_keyframes.end())
   {
     (*iter)->setPosition(x, y, z);
@@ -182,7 +182,7 @@ bool Joint::setKeyframePosition(int frame, float x, float y, float z)
 
 bool Joint::setKeyframeRotation(int frame, float x, float y, float z)
 {
-  QMap<int, QSharedPointer<KeyframeData> >::iterator iter = m_keyframes.find(frame);
+  auto iter = m_keyframes.find(frame);
   if (iter != m_keyframes.end())
   {
     (*iter)->setRotation(x, y, z);
@@ -202,7 +202,7 @@ void Joint::insertFrame(int frame)
     return;
   }
 
-  QMap<int, QSharedPointer<KeyframeData> >::iterator iter = m_keyframes.end();
+  auto iter = m_keyframes.end();
 
   // Start with the last keyframe
   iter--;
@@ -241,7 +241,7 @@ void Joint::deleteFrame(int frame)
     return;
   }
 
-  QMap<int, QSharedPointer<KeyframeData> >::iterator iter = m_keyframes.lowerBound(frame);
+  auto iter = m_keyframes.lowerBound(frame);
   // If the frame we are deleting is a keyframe, then erase without re-inserting
   if (iter != m_keyframes.end() && iter.key() == frame)
   {
@@ -274,7 +274,7 @@ void Joint::setMaxFrameNumber(int maxFrameNumber)
   m_maxFrameNumber = maxFrameNumber;
 
   // Erase any keyframes containing a frame number greater than the maximum
-  QMap<int, QSharedPointer<KeyframeData> >::iterator iter = m_keyframes.end();
+  auto iter = m_keyframes.end();
   while (iter != m_keyframes.begin())
   {
     iter--;

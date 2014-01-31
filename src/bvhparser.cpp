@@ -35,24 +35,24 @@ BvhFrame::~BvhFrame()
 {
 }
 
-QVector3D BvhFrame::position() const
+const QVector3D& BvhFrame::position() const
 {
-  return *m_position;
+  return m_position;
 }
 
-QVector3D BvhFrame::rotation() const
+const QVector3D& BvhFrame::rotation() const
 {
-  return *m_rotation;
+  return m_rotation;
 }
 
-void BvhFrame::setPosition(float x, float y, float z)
+void BvhFrame::setPosition(const QVector3D& position)
 {
-  m_position.reset(new QVector3D(x, y, z));
+  m_position = position;
 }
 
-void BvhFrame::setRotation(float x, float y, float z)
+void BvhFrame::setRotation(const QVector3D& rotation)
 {
-  m_rotation.reset(new QVector3D(x, y, z));
+  m_rotation = rotation;
 }
 
 BvhJoint::BvhJoint(const QString& name)
@@ -74,24 +74,24 @@ void BvhJoint::addChild(QSharedPointer<BvhJoint> child)
   m_children.append(child);
 }
 
-QVector3D BvhJoint::head() const
+const QVector3D& BvhJoint::head() const
 {
-  return *m_head;
+  return m_head;
 }
 
-QVector3D BvhJoint::tail(int index) const
+const QVector3D& BvhJoint::tail(int index) const
 {
-  return *(m_tailList.at(index));
+  return m_tailList.at(index);
 }
 
-void BvhJoint::setHead(float x, float y, float z)
+void BvhJoint::setHead(const QVector3D& head)
 {
-  m_head.reset(new QVector3D(x, y, z));
+  m_head = head;
 }
 
-void BvhJoint::addTail(float x, float y, float z)
+void BvhJoint::addTail(const QVector3D& tail)
 {
-  m_tailList.append(QSharedPointer<QVector3D>(new QVector3D(x, y, z)));
+  m_tailList.append(tail);
 }
 
 const QList<Channel> BvhJoint::channels() const
@@ -111,7 +111,7 @@ void BvhJoint::setMaxFrameCount(int count)
   m_frames.reserve(count);
 }
 
-void BvhJoint::addFrame(QSharedPointer<BvhFrame> frame)
+void BvhJoint::addFrame(const BvhFrame& frame)
 {
   m_frames.append(frame);
 }
@@ -237,7 +237,7 @@ void BvhParser::parseJoint(const QSharedPointer<BvhJoint>& joint)
       float x = parseFloat(nextToken());
       float y = parseFloat(nextToken());
       float z = parseFloat(nextToken());
-      joint->setHead(x, y, z);
+      joint->setHead(QVector3D(x, y, z));
     }
     else if (!hasChannels && isEqualIgnoreCase(token(), "CHANNELS"))
     {
@@ -252,8 +252,7 @@ void BvhParser::parseJoint(const QSharedPointer<BvhJoint>& joint)
       parseJoint(childJoint);
       joint->addChild(childJoint);
       // Head of the child will be tail of the parent
-      QVector3D tail = childJoint->head();
-      joint->addTail(tail.x(), tail.y(), tail.z());
+      joint->addTail(childJoint->head());
     }
     else if (isEqualIgnoreCase(token(), "}"))
     {
@@ -272,7 +271,7 @@ void BvhParser::parseJoint(const QSharedPointer<BvhJoint>& joint)
       float x = parseFloat(nextToken());
       float y = parseFloat(nextToken());
       float z = parseFloat(nextToken());
-      joint->addTail(x, y, z);
+      joint->addTail(QVector3D(x, y, z));
 
       expectNextToken("}");
     }
@@ -336,9 +335,7 @@ void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint)
   Nullable<float> yRotation;
   Nullable<float> zRotation;
 
-  for (QList<Channel>::const_iterator iter = joint->channels().constBegin();
-       iter != joint->channels().constEnd();
-       iter++)
+  for (auto iter = joint->channels().constBegin(); iter != joint->channels().constEnd(); iter++)
   {
     switch (*iter)
     {
@@ -366,22 +363,20 @@ void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint)
     }
   }
 
-  QSharedPointer<BvhFrame> frame(new BvhFrame());
+  BvhFrame frame;
   if (xPosition.hasValue() && yPosition.hasValue() && zPosition.hasValue())
   {
-    frame->setPosition(xPosition.value(), yPosition.value(), zPosition.value());
+    frame.setPosition(QVector3D(xPosition.value(), yPosition.value(), zPosition.value()));
   }
   if (xRotation.hasValue() && yRotation.hasValue() && zRotation.hasValue())
   {
-    frame->setRotation(xRotation.value(), yRotation.value(), zRotation.value());
+    frame.setRotation(QVector3D(xRotation.value(), yRotation.value(), zRotation.value()));
   }
 
   joint->addFrame(frame);
 
   // Recurse through the BvhJoint hierarchy
-  for (QList<QSharedPointer<BvhJoint> >::const_iterator iter = joint->children().constBegin();
-       iter != joint->children().constEnd();
-       iter++)
+  for (auto iter = joint->children().constBegin(); iter != joint->children().constEnd(); iter++)
   {
     parseFrame(*iter);
   }

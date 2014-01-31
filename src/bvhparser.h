@@ -38,15 +38,15 @@ class BvhFrame
     BvhFrame();
     ~BvhFrame();
 
-    QVector3D position() const;
-    QVector3D rotation() const;
+    const QVector3D& position() const;
+    const QVector3D& rotation() const;
 
-    void setPosition(float x, float y, float z);
-    void setRotation(float x, float y, float z);
+    void setPosition(const QVector3D& position);
+    void setRotation(const QVector3D& rotation);
 
   private:
-    QScopedPointer<QVector3D> m_position;
-    QScopedPointer<QVector3D> m_rotation;
+    QVector3D m_position;
+    QVector3D m_rotation;
 };
 
 class BvhJoint
@@ -58,30 +58,30 @@ class BvhJoint
     const QList<QSharedPointer<BvhJoint> > children() const;
     void addChild(QSharedPointer<BvhJoint> child);
 
-    QVector3D head() const;
-    QVector3D tail(int index) const;
-    void setHead(float x, float y, float z);
-    void addTail(float x, float y, float z);
+    const QVector3D& head() const;
+    const QVector3D& tail(int index) const;
+    void setHead(const QVector3D& head);
+    void addTail(const QVector3D& tail);
 
     const QList<Channel> channels() const;
     void addChannel(Channel channel);
 
     void setMaxFrameCount(int count);
-    void addFrame(QSharedPointer<BvhFrame> frame);
+    void addFrame(const BvhFrame& frame);
 
     QSharedPointer<Joint> toJoint();
 
   private:
     QString m_name;
-    QScopedPointer<QVector3D> m_head;
-    QList<QSharedPointer<QVector3D> > m_tailList;
+    QVector3D m_head;
+    QList<QVector3D> m_tailList;
 
     QList<QSharedPointer<BvhJoint> > m_children;
 
     QList<Channel> m_channels;
 
     int m_maxFrameCount;
-    QList<QSharedPointer<BvhFrame> > m_frames;
+    QList<BvhFrame> m_frames;
 };
 
 class BvhParser
