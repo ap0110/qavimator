@@ -23,6 +23,7 @@
 
 #include "animation.h"
 #include "joint.h"
+#include "nullable.h"
 
 #include "bvhparser.h"
 
@@ -328,12 +329,12 @@ void BvhParser::parseChannels(const QSharedPointer<BvhJoint>& joint)
 
 void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint)
 {
-  QScopedPointer<float> xPosition;
-  QScopedPointer<float> yPosition;
-  QScopedPointer<float> zPosition;
-  QScopedPointer<float> xRotation;
-  QScopedPointer<float> yRotation;
-  QScopedPointer<float> zRotation;
+  Nullable<float> xPosition;
+  Nullable<float> yPosition;
+  Nullable<float> zPosition;
+  Nullable<float> xRotation;
+  Nullable<float> yRotation;
+  Nullable<float> zRotation;
 
   for (QList<Channel>::const_iterator iter = joint->channels().constBegin();
        iter != joint->channels().constEnd();
@@ -342,22 +343,22 @@ void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint)
     switch (*iter)
     {
       case POSITION_X:
-        xPosition.reset(new float(parseFloat(nextToken())));
+        xPosition = parseFloat(nextToken());
         break;
       case POSITION_Y:
-        yPosition.reset(new float(parseFloat(nextToken())));
+        yPosition = parseFloat(nextToken());
         break;
       case POSITION_Z:
-        zPosition.reset(new float(parseFloat(nextToken())));
+        zPosition = parseFloat(nextToken());
         break;
       case ROTATION_X:
-        xRotation.reset(new float(parseFloat(nextToken())));
+        xRotation = parseFloat(nextToken());
         break;
       case ROTATION_Y:
-        yRotation.reset(new float(parseFloat(nextToken())));
+        yRotation = parseFloat(nextToken());
         break;
       case ROTATION_Z:
-        zRotation.reset(new float(parseFloat(nextToken())));
+        zRotation = parseFloat(nextToken());
         break;
       default:
         // TODO Handle error
@@ -366,13 +367,13 @@ void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint)
   }
 
   QSharedPointer<BvhFrame> frame(new BvhFrame());
-  if (!xPosition.isNull() && !yPosition.isNull() && !zPosition.isNull())
+  if (xPosition.hasValue() && yPosition.hasValue() && zPosition.hasValue())
   {
-    frame->setPosition(*xPosition, *yPosition, *zPosition);
+    frame->setPosition(xPosition.value(), yPosition.value(), zPosition.value());
   }
-  if (!xRotation.isNull() && !yRotation.isNull() && !zRotation.isNull())
+  if (xRotation.hasValue() && yRotation.hasValue() && zRotation.hasValue())
   {
-    frame->setRotation(*xRotation, *yRotation, *zRotation);
+    frame->setRotation(xRotation.value(), yRotation.value(), zRotation.value());
   }
 
   joint->addFrame(frame);
