@@ -22,11 +22,13 @@
 #define BVHPARSER_H
 
 #include <QStringListIterator>
+#include <QVector3D>
 
-class Animation;
 class Joint;
+class KeyframeData;
+class NewAnimation;
 
-typedef enum
+typedef enum class
 {
   POSITION_X, POSITION_Y, POSITION_Z,
   ROTATION_X, ROTATION_Y, ROTATION_Z
@@ -35,7 +37,7 @@ typedef enum
 class BvhFrame
 {
   public:
-    BvhFrame();
+    BvhFrame(const int& frameNumber);
     ~BvhFrame();
 
     const QVector3D& position() const;
@@ -44,7 +46,11 @@ class BvhFrame
     void setPosition(const QVector3D& position);
     void setRotation(const QVector3D& rotation);
 
+    KeyframeData toKeyframeData() const;
+
   private:
+    int m_frameNumber;
+
     QVector3D m_position;
     QVector3D m_rotation;
 };
@@ -55,7 +61,7 @@ class BvhJoint
     BvhJoint(const QString& name);
     ~BvhJoint();
 
-    const QList<QSharedPointer<BvhJoint> > children() const;
+    const QList<QSharedPointer<BvhJoint>> children() const;
     void addChild(QSharedPointer<BvhJoint> child);
 
     const QVector3D& head() const;
@@ -66,7 +72,6 @@ class BvhJoint
     const QList<Channel> channels() const;
     void addChannel(Channel channel);
 
-    void setMaxFrameCount(int count);
     void addFrame(const BvhFrame& frame);
 
     QSharedPointer<Joint> toJoint();
@@ -74,13 +79,12 @@ class BvhJoint
   private:
     QString m_name;
     QVector3D m_head;
-    QList<QVector3D> m_tailList;
+    QList<QVector3D> m_tails;
 
-    QList<QSharedPointer<BvhJoint> > m_children;
+    QList<QSharedPointer<BvhJoint>> m_children;
 
     QList<Channel> m_channels;
 
-    int m_maxFrameCount;
     QList<BvhFrame> m_frames;
 };
 
@@ -90,15 +94,15 @@ class BvhParser
     BvhParser(const QString& bvhData);
     ~BvhParser();
 
-    QSharedPointer<Animation> parse();
+    QSharedPointer<NewAnimation> parse();
 
   private:
-    QSharedPointer<Joint> parseBvhData();
+    float parseBvhData(QSharedPointer<Joint>& rootJoint);
     void parseHierarchy(QSharedPointer<BvhJoint>& rootJoint);
-    void parseMotion(const QSharedPointer<BvhJoint>& rootJoint);
+    float parseMotion(const QSharedPointer<BvhJoint>& rootJoint);
     void parseJoint(const QSharedPointer<BvhJoint>& joint);
     void parseChannels(const QSharedPointer<BvhJoint>& joint);
-    void parseFrame(const QSharedPointer<BvhJoint>& joint);
+    void parseFrame(const QSharedPointer<BvhJoint>& joint, const int& frameNumber);
 
     bool hasNext();
     void next();

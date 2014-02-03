@@ -23,7 +23,10 @@
 
 #include <QObject>
 
-typedef enum
+#include <QMap>
+#include <QVector3D>
+
+typedef enum class
 {
   XYZ, XZY,
   YXZ, YZX,
@@ -33,7 +36,6 @@ typedef enum
 class KeyframeData
 {
   public:
-    KeyframeData();
     KeyframeData(int frame, float xPosition, float yPosition, float zPosition,
                  float xRotation, float yRotation, float zRotation);
     ~KeyframeData();
@@ -41,10 +43,10 @@ class KeyframeData
     int frameNumber() const;
     void setFrameNumber(int frame);
 
-    QVector3D position() const;
-    QVector3D rotation() const;
-    void setPosition(float x, float y, float z);
-    void setRotation(float x, float y, float z);
+    const QVector3D& position() const;
+    const QVector3D& rotation() const;
+    void setPosition(const QVector3D& position);
+    void setRotation(const QVector3D& rotation);
 
     bool easeIn() const;
     bool easeOut() const;
@@ -54,8 +56,8 @@ class KeyframeData
   private:
     int m_frameNumber;
 
-    QScopedPointer<QVector3D> m_position;
-    QScopedPointer<QVector3D> m_rotation;
+    QVector3D m_position;
+    QVector3D m_rotation;
 
     bool m_easeIn;
     bool m_easeOut;
@@ -66,41 +68,41 @@ class Joint : public QObject
   Q_OBJECT
 
   public:
-    Joint(const QString& name, int maxFrameNumber = 0, QObject* parent = 0);
+    Joint(QObject* parent = nullptr, const QString& name = "joint");
     ~Joint();
 
     const QString& name() const;
-    QVector3D head() const;
-    QVector3D tail(int index) const;
-    void setHead(float x, float y, float z);
-    void addTail(float x, float y, float z);
+    const QVector3D& head() const;
+    const QVector3D& tail(int index) const;
+    void setHead(const QVector3D& head);
+    void setTails(const QList<QVector3D>& tails);
 
     int numChildren() const;
     QSharedPointer<Joint> child(int num);
+    void setChildren(const QList<QSharedPointer<Joint>>& children);
     void addChild(QSharedPointer<Joint> child);
     void insertChild(int index, QSharedPointer<Joint> child);
     int removeChild(QSharedPointer<Joint> child);
 
+    void setKeyframes(const QMap<int, KeyframeData>& keyframes);
     void setKeyframe(int frame, float xPosition, float yPosition, float zPosition, float xRotation, float yRotation, float zRotation);
     bool removeKeyframe(int frame);
-    bool setKeyframePosition(int frame, float x, float y, float z);
-    bool setKeyframeRotation(int frame, float x, float y, float z);
-    void insertFrame(int frame);
+    bool setKeyframePosition(const int& frame, const QVector3D& position);
+    bool setKeyframeRotation(const int& frame, const QVector3D& rotation);
+    void insertFrame(int frame, int maxFrameNumber);
     void deleteFrame(int frame);
     int numKeyframes() const;
 
-    int maxFrameNumber() const;
     void setMaxFrameNumber(int maxFrameNumber);
 
   private:
     QString m_name;
-    QScopedPointer<QVector3D> m_head;
-    QList<QSharedPointer<QVector3D> > m_tails;
+    QVector3D m_head;
+    QList<QVector3D> m_tails;
 
-    QList<QSharedPointer<Joint> > m_children;
+    QList<QSharedPointer<Joint>> m_children;
 
-    QMap<int, QSharedPointer<KeyframeData> > m_keyframes;
-    int m_maxFrameNumber;
+    QMap<int, KeyframeData> m_keyframes;
 };
 
 #endif

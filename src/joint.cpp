@@ -18,23 +18,18 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <QMap>
-#include <QScopedPointer>
 #include <QSharedPointer>
-#include <QVector3D>
 
 #include "joint.h"
 
-KeyframeData::KeyframeData()
-{
-}
-
 KeyframeData::KeyframeData(int frame, float xPosition, float yPosition, float zPosition,
                            float xRotation, float yRotation, float zRotation)
+  : m_frameNumber(frame),
+    m_position(xPosition, yPosition, zPosition),
+    m_rotation(xRotation, yRotation, zRotation),
+    m_easeIn(false),
+    m_easeOut(false)
 {
-  m_frameNumber = frame;
-  m_position.reset(new QVector3D(xPosition, yPosition, zPosition));
-  m_rotation.reset(new QVector3D(xRotation, yRotation, zRotation));
 }
 
 KeyframeData::~KeyframeData()
@@ -51,24 +46,24 @@ void KeyframeData::setFrameNumber(int frame)
   m_frameNumber = frame;
 }
 
-QVector3D KeyframeData::position() const
+const QVector3D& KeyframeData::position() const
 {
-  return *m_position;
+  return m_position;
 }
 
-QVector3D KeyframeData::rotation() const
+const QVector3D& KeyframeData::rotation() const
 {
-  return *m_rotation;
+  return m_rotation;
 }
 
-void KeyframeData::setPosition(float x, float y, float z)
+void KeyframeData::setPosition(const QVector3D& position)
 {
-  m_position.reset(new QVector3D(x, y, z));
+  m_position = position;
 }
 
-void KeyframeData::setRotation(float x, float y, float z)
+void KeyframeData::setRotation(const QVector3D& rotation)
 {
-  m_rotation.reset(new QVector3D(x, y, z));
+  m_rotation = rotation;
 }
 
 bool KeyframeData::easeIn() const
@@ -91,11 +86,10 @@ void KeyframeData::setEaseOut(bool on)
   m_easeOut = on;
 }
 
-Joint::Joint(const QString& name, int maxFrameNumber, QObject* parent)
-  : QObject(parent)
+Joint::Joint(QObject* parent, const QString& name)
+  : QObject(parent),
+    m_name(name)
 {
-  m_name = name;
-  m_maxFrameNumber = maxFrameNumber;
 }
 
 Joint::~Joint()
@@ -107,24 +101,24 @@ const QString& Joint::name() const
   return m_name;
 }
 
-QVector3D Joint::head() const
+const QVector3D& Joint::head() const
 {
-  return *m_head;
+  return m_head;
 }
 
-QVector3D Joint::tail(int index) const
+const QVector3D& Joint::tail(int index) const
 {
-  return *(m_tails.at(index));
+  return m_tails.at(index);
 }
 
-void Joint::setHead(float x, float y, float z)
+void Joint::setHead(const QVector3D& head)
 {
-  m_head.reset(new QVector3D(x, y, z));
+  m_head = head;
 }
 
-void Joint::addTail(float x, float y, float z)
+void Joint::setTails(const QList<QVector3D>& tails)
 {
-  m_tails.append(QSharedPointer<QVector3D>(new QVector3D(x, y, z)));
+  m_tails = tails;
 }
 
 int Joint::numChildren() const
@@ -135,6 +129,11 @@ int Joint::numChildren() const
 QSharedPointer<Joint> Joint::child(int num)
 {
   return m_children.at(num);
+}
+
+void Joint::setChildren(const QList<QSharedPointer<Joint>>& children)
+{
+  m_children = children;
 }
 
 void Joint::addChild(QSharedPointer<Joint> child)
@@ -152,13 +151,17 @@ int Joint::removeChild(QSharedPointer<Joint> child)
   return m_children.removeAll(child);
 }
 
+void Joint::setKeyframes(const QMap<int, KeyframeData>& keyframes)
+{
+  m_keyframes = keyframes;
+}
+
 void Joint::setKeyframe(int frame, float xPosition, float yPosition, float zPosition,
                         float xRotation, float yRotation, float zRotation)
 {
-  m_keyframes.insert(frame,QSharedPointer<KeyframeData>(
-                       new KeyframeData(frame,
-                                        xPosition, yPosition, zPosition,
-                                        xRotation, yRotation, zRotation)));
+  m_keyframes.insert(frame, KeyframeData(frame,
+                                         xPosition, yPosition, zPosition,
+                                         xRotation, yRotation, zRotation));
 }
 
 bool Joint::removeKeyframe(int frame)
@@ -166,12 +169,12 @@ bool Joint::removeKeyframe(int frame)
   return (m_keyframes.remove(frame) > 0);
 }
 
-bool Joint::setKeyframePosition(int frame, float x, float y, float z)
+bool Joint::setKeyframePosition(const int& frame, const QVector3D& position)
 {
   auto iter = m_keyframes.find(frame);
   if (iter != m_keyframes.end())
   {
-    (*iter)->setPosition(x, y, z);
+    iter->setPosition(position);
     return true;
   }
   else
@@ -180,12 +183,12 @@ bool Joint::setKeyframePosition(int frame, float x, float y, float z)
   }
 }
 
-bool Joint::setKeyframeRotation(int frame, float x, float y, float z)
+bool Joint::setKeyframeRotation(const int& frame, const QVector3D& rotation)
 {
   auto iter = m_keyframes.find(frame);
   if (iter != m_keyframes.end())
   {
-    (*iter)->setRotation(x, y, z);
+    iter->setRotation(rotation);
     return true;
   }
   else
@@ -194,7 +197,7 @@ bool Joint::setKeyframeRotation(int frame, float x, float y, float z)
   }
 }
 
-void Joint::insertFrame(int frame)
+void Joint::insertFrame(int frame, int maxFrameNumber)
 {
   // If there are no keyframes, then do nothing
   if (m_keyframes.empty())
@@ -211,10 +214,10 @@ void Joint::insertFrame(int frame)
   {
     // If the frame number is less than the maximum,
     //  then increment it and re-insert
-    if (iter.key() < m_maxFrameNumber)
+    if (iter.key() < maxFrameNumber)
     {
       iter = m_keyframes.insert(iter + 1, iter.key() + 1, *iter);
-      (*iter)->setFrameNumber(iter.key());
+      iter->setFrameNumber(iter.key());
       iter--;
     }
     // Erase the keyframe containing either an outdated or invalid frame number
@@ -253,7 +256,7 @@ void Joint::deleteFrame(int frame)
     // Re-insert the current keyframe with a decremented key
     iter = m_keyframes.insert(iter, iter.key() - 1, *iter);
     // Update the keyframe's frame number with its key
-    (*iter)->setFrameNumber(iter.key());
+    iter->setFrameNumber(iter.key());
     // Erase the keyframe containing an outdated frame number
     iter = m_keyframes.erase(iter + 1);
   }
@@ -264,15 +267,8 @@ int Joint::numKeyframes() const
   return m_keyframes.size();
 }
 
-int Joint::maxFrameNumber() const
-{
-  return m_maxFrameNumber;
-}
-
 void Joint::setMaxFrameNumber(int maxFrameNumber)
 {
-  m_maxFrameNumber = maxFrameNumber;
-
   // Erase any keyframes containing a frame number greater than the maximum
   auto iter = m_keyframes.end();
   while (iter != m_keyframes.begin())
@@ -286,5 +282,10 @@ void Joint::setMaxFrameNumber(int maxFrameNumber)
     {
       break;
     }
+  }
+
+  for (auto iter = m_children.cbegin(); iter != m_children.cend(); iter++)
+  {
+    (*iter)->setMaxFrameNumber(maxFrameNumber);
   }
 }

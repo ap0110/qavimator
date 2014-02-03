@@ -18,13 +18,36 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "joint.h"
+
 #include "newanimation.h"
 
-NewAnimation::NewAnimation(QObject* parent)
-  : QObject(parent)
+NewAnimation::NewAnimation(QObject* parent,
+                           const QSharedPointer<Joint>& rootJoint,
+                           const int& maxFrameNumber,
+                           const float& frameTime)
+  : QObject(parent),
+    m_rootJoint(rootJoint),
+    m_maxFrameNumber(maxFrameNumber),
+    m_frameTime(frameTime),
+    m_loopInPoint(1),
+    m_loopOutPoint(maxFrameNumber),
+    m_isDirty(false)
 {
+  // TODO Assert root joint is not null
 }
 
 NewAnimation::~NewAnimation()
 {
+}
+
+int NewAnimation::maxFrameNumber() const
+{
+  return m_maxFrameNumber;
+}
+
+void NewAnimation::setMaxFrameNumber(int maxFrameNumber)
+{
+  m_maxFrameNumber = maxFrameNumber;
+  m_rootJoint->setMaxFrameNumber(maxFrameNumber);
 }

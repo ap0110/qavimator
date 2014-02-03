@@ -23,13 +23,34 @@
 
 #include <QObject>
 
+#include <QSharedPointer>
+
+class Joint;
+
 class NewAnimation : public QObject
 {
   Q_OBJECT
 
   public:
-    NewAnimation(QObject* parent = 0);
+    NewAnimation(QObject* parent = nullptr,
+                 const QSharedPointer<Joint>& rootJoint = QSharedPointer<Joint>(),
+                 const int& maxFrameNumber = 2,
+                 const float& frameTime = 0.1f);
     ~NewAnimation();
+
+    int maxFrameNumber() const;
+    void setMaxFrameNumber(int maxFrameNumber);
+
+  private:
+    QSharedPointer<Joint> m_rootJoint;
+
+    int m_maxFrameNumber;
+    float m_frameTime;
+
+    int m_loopInPoint;
+    int m_loopOutPoint;
+
+    bool m_isDirty;
 };
 
 #endif

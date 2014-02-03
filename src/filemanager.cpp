@@ -20,7 +20,7 @@
 
 #include <QDir>
 
-#include "animation.h"
+#include "newanimation.h"
 #include "bvhparser.h"
 
 #include "filemanager.h"
@@ -34,32 +34,32 @@ FileManager::~FileManager()
 {
 }
 
-QSharedPointer<Animation> FileManager::loadAnimationFromFile(const QString& filePath)
+QSharedPointer<NewAnimation> FileManager::loadAnimationFromFile(const QString& filePath)
 {
   QFile file(filePath);
   if (!file.exists())
   {
     // TODO
-    return QSharedPointer<Animation>();
+    return QSharedPointer<NewAnimation>();
   }
   if (!file.open(QIODevice::ReadOnly))
   {
     // TODO
-    return QSharedPointer<Animation>();
+    return QSharedPointer<NewAnimation>();
   }
 
-  QSharedPointer<Animation> result;
+  QSharedPointer<NewAnimation> result;
 
   FileType type = determineFileType(file);
   switch (type)
   {
-    case FT_BVH:
+    case FileType::BVH:
       result = readBvh(file);
       break;
-    case FT_ANIM:
+    case FileType::ANIM:
       result = readAnim(file);
       break;
-    case FT_QAVM:
+    case FileType::QAVM:
       result = readQavm(file);
       break;
     default:
@@ -72,13 +72,13 @@ QSharedPointer<Animation> FileManager::loadAnimationFromFile(const QString& file
   return result;
 }
 
-QSharedPointer<Animation> FileManager::loadAnimationFromApplicationData(const QString& fileName)
+QSharedPointer<NewAnimation> FileManager::loadAnimationFromApplicationData(const QString& fileName)
 {
   QDir dataDirectory = getDataDirectoryByOperatingSystem();
 
   if (!dataDirectory.exists(fileName))
   {
-    return QSharedPointer<Animation>();
+    return QSharedPointer<NewAnimation>();
   }
 
   return loadAnimationFromFile(dataDirectory.absoluteFilePath(fileName));
@@ -101,26 +101,26 @@ const FileManager::FileType FileManager::determineFileType(QFile& openedFile) co
   if (openedFile.peek(buffer, sizeof(buffer)) == -1)
   {
     // TODO Handle error
-    return FT_UNKNOWN;
+    return FileType::UNKNOWN;
   }
   QString text(buffer);
 
   if (text.startsWith("HIERARCHY", Qt::CaseInsensitive))
   {
-    return FT_BVH;
+    return FileType::BVH;
   }
   else if (text.startsWith("<?xml version=\"1.0\"?>", Qt::CaseInsensitive))
   {
     // TODO Check for "qavimator" tag here?
-    return FT_QAVM;
+    return FileType::QAVM;
   }
   // TODO Check for Second Life (anim) file
 
 
-  return FT_UNKNOWN;
+  return FileType::UNKNOWN;
 }
 
-QSharedPointer<Animation> FileManager::readBvh(QFile& openedFile)
+QSharedPointer<NewAnimation> FileManager::readBvh(QFile& openedFile)
 {
   // Ensure we are at the beginning of the file
   openedFile.seek(0);
@@ -129,22 +129,22 @@ QSharedPointer<Animation> FileManager::readBvh(QFile& openedFile)
   if (bvhData.isEmpty())
   {
     // TODO Handle read error
-    return QSharedPointer<Animation>();
+    return QSharedPointer<NewAnimation>();
   }
 
-  QScopedPointer<BvhParser> parser(new BvhParser(bvhData));
+  BvhParser parser(bvhData);
 
-  return parser->parse();
+  return parser.parse();
 }
 
-QSharedPointer<Animation> FileManager::readAnim(const QFile& file)
+QSharedPointer<NewAnimation> FileManager::readAnim(const QFile& file)
 {
   // TODO Read Second Life animation file
-  return QSharedPointer<Animation>();
+  return QSharedPointer<NewAnimation>();
 }
 
-QSharedPointer<Animation> FileManager::readQavm(const QFile& file)
+QSharedPointer<NewAnimation> FileManager::readQavm(const QFile& file)
 {
   // TODO Read QAvimator file
-  return QSharedPointer<Animation>();
+  return QSharedPointer<NewAnimation>();
 }

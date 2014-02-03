@@ -36,7 +36,7 @@ class Scene : public QObject
   Q_OBJECT
 
   public:
-    Scene(QObject* parent = 0);
+    Scene(QObject* parent = nullptr);
     ~Scene();
 
     // Sets an animation "active"

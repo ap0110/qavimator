@@ -28,7 +28,7 @@ class Floor : public QObject
   Q_OBJECT
 
   public:
-    Floor(QObject* parent = 0);
+    Floor(QObject* parent = nullptr);
     ~Floor();
 
     void draw();

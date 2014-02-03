@@ -26,35 +26,35 @@
 class QDir;
 class QFile;
 
-class Animation;
+class NewAnimation;
 
 class FileManager : public QObject
 {
   Q_OBJECT
 
   public:
-    FileManager(QObject* parent = 0);
+    FileManager(QObject* parent = nullptr);
     ~FileManager();
 
-    QSharedPointer<Animation> loadAnimationFromFile(const QString& fileName);
+    QSharedPointer<NewAnimation> loadAnimationFromFile(const QString& fileName);
 
-    QSharedPointer<Animation> loadAnimationFromApplicationData(const QString& fileName);
+    QSharedPointer<NewAnimation> loadAnimationFromApplicationData(const QString& fileName);
 
   private:
-    typedef enum
+    typedef enum class
     {
-      FT_UNKNOWN = 0,
-      FT_BVH = 1,
-      FT_ANIM = 2,
-      FT_QAVM = 3
+      UNKNOWN,
+      BVH,
+      ANIM,
+      QAVM
     } FileType;
 
     QDir getDataDirectoryByOperatingSystem() const;
     const FileType determineFileType(QFile& openedFile) const;
 
-    QSharedPointer<Animation> readBvh(QFile& openedFile);
-    QSharedPointer<Animation> readAnim(const QFile& file);
-    QSharedPointer<Animation> readQavm(const QFile& file);
+    QSharedPointer<NewAnimation> readBvh(QFile& openedFile);
+    QSharedPointer<NewAnimation> readAnim(const QFile& file);
+    QSharedPointer<NewAnimation> readQavm(const QFile& file);
 };
 
 #endif

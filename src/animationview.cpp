@@ -286,7 +286,7 @@ int AnimationView::pickPart(int x, int y)
       name = *(p+2);
     }
     p+=2;
-    for (unsigned int j=0; j < num; j++) { *(p++); }
+    for (unsigned int j=0; j < num; j++) { p++; }
   }
   free(selectBuf);
 

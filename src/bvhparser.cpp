@@ -21,13 +21,14 @@
 #include <QScopedPointer>
 #include <QSharedPointer>
 
-#include "animation.h"
+#include "newanimation.h"
 #include "joint.h"
 #include "nullable.h"
 
 #include "bvhparser.h"
 
-BvhFrame::BvhFrame()
+BvhFrame::BvhFrame(const int& frameNumber)
+  : m_frameNumber(frameNumber)
 {
 }
 
@@ -55,16 +56,22 @@ void BvhFrame::setRotation(const QVector3D& rotation)
   m_rotation = rotation;
 }
 
-BvhJoint::BvhJoint(const QString& name)
+KeyframeData BvhFrame::toKeyframeData() const
 {
-  m_name = name;
+  return KeyframeData(m_frameNumber, m_position.x(), m_position.y(), m_position.z(),
+                      m_rotation.x(), m_rotation.y(), m_rotation.z());
+}
+
+BvhJoint::BvhJoint(const QString& name)
+  : m_name(name)
+{
 }
 
 BvhJoint::~BvhJoint()
 {
 }
 
-const QList<QSharedPointer<BvhJoint> > BvhJoint::children() const
+const QList<QSharedPointer<BvhJoint>> BvhJoint::children() const
 {
   return m_children;
 }
@@ -81,7 +88,7 @@ const QVector3D& BvhJoint::head() const
 
 const QVector3D& BvhJoint::tail(int index) const
 {
-  return m_tailList.at(index);
+  return m_tails.at(index);
 }
 
 void BvhJoint::setHead(const QVector3D& head)
@@ -91,7 +98,7 @@ void BvhJoint::setHead(const QVector3D& head)
 
 void BvhJoint::addTail(const QVector3D& tail)
 {
-  m_tailList.append(tail);
+  m_tails.append(tail);
 }
 
 const QList<Channel> BvhJoint::channels() const
@@ -104,13 +111,6 @@ void BvhJoint::addChannel(Channel channel)
   m_channels.append(channel);
 }
 
-void BvhJoint::setMaxFrameCount(int count)
-{
-  m_maxFrameCount = count;
-  // BVH doesn't skip frames, so count is the actual frame count
-  m_frames.reserve(count);
-}
-
 void BvhJoint::addFrame(const BvhFrame& frame)
 {
   m_frames.append(frame);
@@ -118,33 +118,63 @@ void BvhJoint::addFrame(const BvhFrame& frame)
 
 QSharedPointer<Joint> BvhJoint::toJoint()
 {
+  QSharedPointer<Joint> joint(new Joint(nullptr, m_name));
 
+  QMap<int, KeyframeData> keyframes;
+  for (int i = 0; i < m_frames.size(); i++)
+  {
+    keyframes.insert(i, m_frames.at(i).toKeyframeData());
+  }
+
+  QList<QSharedPointer<Joint>> children;
+  for (auto iter = m_children.cbegin(); iter != m_children.cend(); iter++)
+  {
+    children.append((*iter)->toJoint());
+  }
+
+  joint->setHead(m_head);
+  joint->setTails(m_tails);
+  joint->setKeyframes(keyframes);
+  joint->setChildren(children);
+
+  return joint;
 }
 
 BvhParser::BvhParser(const QString& bvhData)
+  : m_bvhTokens(bvhData.simplified().split(' ')),
+    m_bvhTokensIterator(m_bvhTokens.constBegin())
 {
-  m_bvhTokens = bvhData.simplified().split(' ');
-  m_bvhTokensIterator = m_bvhTokens.constBegin();
 }
 
 BvhParser::~BvhParser()
 {
 }
 
-QSharedPointer<Animation> BvhParser::parse()
+QSharedPointer<NewAnimation> BvhParser::parse()
 {
-  QSharedPointer<Animation> animation;
+  QSharedPointer<NewAnimation> animation;
 
-  // TODO Parse the BVH data and create the Animation to return
+  QSharedPointer<Joint> rootJoint;
+  float frameTime = parseBvhData(rootJoint);
+
+  if (frameTime > 0.0f)
+  {
+    animation.reset(new NewAnimation(nullptr,
+                                     rootJoint,
+                                     rootJoint->numKeyframes() - 1,
+                                     frameTime));
+  }
 
   return animation;
 }
 
-QSharedPointer<Joint> BvhParser::parseBvhData()
+float BvhParser::parseBvhData(QSharedPointer<Joint>& rootJoint)
 {
+  float frameTime = -1.0f;
+
   bool isHierarchyParsed = false;
   bool isMotionParsed = false;
-  QSharedPointer<BvhJoint> rootJoint;
+  QSharedPointer<BvhJoint> rootBvhJoint;
 
   while (hasNext())
   {
@@ -152,12 +182,14 @@ QSharedPointer<Joint> BvhParser::parseBvhData()
     if (!isHierarchyParsed && isEqualIgnoreCase(token(), "HIERARCHY"))
     {
       isHierarchyParsed = true;
-      parseHierarchy(rootJoint);
+      parseHierarchy(rootBvhJoint);
     }
-    else if (!isMotionParsed && isEqualIgnoreCase(token(), "MOTION"))
+    else if ((!rootBvhJoint.isNull())
+             && !isMotionParsed
+             && isEqualIgnoreCase(token(), "MOTION"))
     {
       isMotionParsed = true;
-      parseMotion(rootJoint);
+      frameTime = parseMotion(rootBvhJoint);
     }
     else if (isHierarchyParsed && isMotionParsed)
     {
@@ -166,10 +198,15 @@ QSharedPointer<Joint> BvhParser::parseBvhData()
     else
     {
       // TODO Error: Should have been HIERARCHY or MOTION or AVM data
-      return QSharedPointer<Joint>();
+      break;
     }
   }
-  return rootJoint->toJoint();
+
+  if (!rootBvhJoint.isNull())
+  {
+    rootJoint = rootBvhJoint->toJoint();
+  }
+  return frameTime;
 }
 
 void BvhParser::parseHierarchy(QSharedPointer<BvhJoint>& rootJoint)
@@ -199,7 +236,7 @@ void BvhParser::parseHierarchy(QSharedPointer<BvhJoint>& rootJoint)
   }
 }
 
-void BvhParser::parseMotion(const QSharedPointer<BvhJoint>& rootJoint)
+float BvhParser::parseMotion(const QSharedPointer<BvhJoint>& rootJoint)
 {
   int frameCount = 0;
   float frameTime = 0.0f;
@@ -214,8 +251,10 @@ void BvhParser::parseMotion(const QSharedPointer<BvhJoint>& rootJoint)
   // Parse all the frames
   for (int i = 0; i < frameCount; i++)
   {
-    parseFrame(rootJoint);
+    parseFrame(rootJoint, i);
   }
+
+  return frameTime;
 }
 
 void BvhParser::parseJoint(const QSharedPointer<BvhJoint>& joint)
@@ -294,13 +333,13 @@ void BvhParser::parseChannels(const QSharedPointer<BvhJoint>& joint)
       switch (token().at(0).toUpper().unicode())
       {
         case 'X':
-          joint->addChannel(POSITION_X);
+          joint->addChannel(Channel::POSITION_X);
           break;
         case 'Y':
-          joint->addChannel(POSITION_Y);
+          joint->addChannel(Channel::POSITION_Y);
           break;
         case 'Z':
-          joint->addChannel(POSITION_Z);
+          joint->addChannel(Channel::POSITION_Z);
           break;
       }
     }
@@ -309,13 +348,13 @@ void BvhParser::parseChannels(const QSharedPointer<BvhJoint>& joint)
       switch (token().at(0).toUpper().unicode())
       {
         case 'X':
-          joint->addChannel(ROTATION_X);
+          joint->addChannel(Channel::ROTATION_X);
           break;
         case 'Y':
-          joint->addChannel(ROTATION_Y);
+          joint->addChannel(Channel::ROTATION_Y);
           break;
         case 'Z':
-          joint->addChannel(ROTATION_Z);
+          joint->addChannel(Channel::ROTATION_Z);
           break;
       }
     }
@@ -326,7 +365,7 @@ void BvhParser::parseChannels(const QSharedPointer<BvhJoint>& joint)
   }
 }
 
-void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint)
+void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint, const int& frameNumber)
 {
   Nullable<float> xPosition;
   Nullable<float> yPosition;
@@ -339,22 +378,22 @@ void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint)
   {
     switch (*iter)
     {
-      case POSITION_X:
+      case Channel::POSITION_X:
         xPosition = parseFloat(nextToken());
         break;
-      case POSITION_Y:
+      case Channel::POSITION_Y:
         yPosition = parseFloat(nextToken());
         break;
-      case POSITION_Z:
+      case Channel::POSITION_Z:
         zPosition = parseFloat(nextToken());
         break;
-      case ROTATION_X:
+      case Channel::ROTATION_X:
         xRotation = parseFloat(nextToken());
         break;
-      case ROTATION_Y:
+      case Channel::ROTATION_Y:
         yRotation = parseFloat(nextToken());
         break;
-      case ROTATION_Z:
+      case Channel::ROTATION_Z:
         zRotation = parseFloat(nextToken());
         break;
       default:
@@ -363,7 +402,7 @@ void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint)
     }
   }
 
-  BvhFrame frame;
+  BvhFrame frame(frameNumber);
   if (xPosition.hasValue() && yPosition.hasValue() && zPosition.hasValue())
   {
     frame.setPosition(QVector3D(xPosition.value(), yPosition.value(), zPosition.value()));
@@ -378,7 +417,7 @@ void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint)
   // Recurse through the BvhJoint hierarchy
   for (auto iter = joint->children().constBegin(); iter != joint->children().constEnd(); iter++)
   {
-    parseFrame(*iter);
+    parseFrame(*iter, frameNumber);
   }
 }
 
