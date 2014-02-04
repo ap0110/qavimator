@@ -51,3 +51,25 @@ void NewAnimation::setMaxFrameNumber(int maxFrameNumber)
   m_maxFrameNumber = maxFrameNumber;
   m_rootJoint->setMaxFrameNumber(maxFrameNumber);
 }
+
+int NewAnimation::loopInPoint() const
+{
+  return m_loopInPoint;
+}
+
+int NewAnimation::loopOutPoint() const
+{
+  return m_loopOutPoint;
+}
+
+void NewAnimation::setLoopInPoint(int frame)
+{
+  // TODO Assert frame is valid
+  m_loopInPoint = frame;
+}
+
+void NewAnimation::setLoopOutPoint(int frame)
+{
+  // TODO Assert frame is valid
+  m_loopOutPoint = frame;
+}

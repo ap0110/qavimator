@@ -102,7 +102,7 @@ class BvhParser
     float parseMotion(const QSharedPointer<BvhJoint>& rootJoint);
     void parseJoint(const QSharedPointer<BvhJoint>& joint);
     void parseChannels(const QSharedPointer<BvhJoint>& joint);
-    void parseFrame(const QSharedPointer<BvhJoint>& joint, const int& frameNumber);
+    void parseFrame(const QSharedPointer<BvhJoint>& joint, int frameNumber);
 
     bool hasNext();
     void next();

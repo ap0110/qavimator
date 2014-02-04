@@ -169,7 +169,7 @@ bool Joint::removeKeyframe(int frame)
   return (m_keyframes.remove(frame) > 0);
 }
 
-bool Joint::setKeyframePosition(const int& frame, const QVector3D& position)
+bool Joint::setKeyframePosition(int frame, const QVector3D& position)
 {
   auto iter = m_keyframes.find(frame);
   if (iter != m_keyframes.end())
@@ -183,7 +183,7 @@ bool Joint::setKeyframePosition(const int& frame, const QVector3D& position)
   }
 }
 
-bool Joint::setKeyframeRotation(const int& frame, const QVector3D& rotation)
+bool Joint::setKeyframeRotation(int frame, const QVector3D& rotation)
 {
   auto iter = m_keyframes.find(frame);
   if (iter != m_keyframes.end())

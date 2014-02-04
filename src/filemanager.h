@@ -53,8 +53,8 @@ class FileManager : public QObject
     const FileType determineFileType(QFile& openedFile) const;
 
     QSharedPointer<NewAnimation> readBvh(QFile& openedFile);
-    QSharedPointer<NewAnimation> readAnim(const QFile& file);
-    QSharedPointer<NewAnimation> readQavm(const QFile& file);
+    QSharedPointer<NewAnimation> readAnim(QFile& file);
+    QSharedPointer<NewAnimation> readQavm(QFile& file);
 };
 
 #endif

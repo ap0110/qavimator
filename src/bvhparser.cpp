@@ -365,7 +365,7 @@ void BvhParser::parseChannels(const QSharedPointer<BvhJoint>& joint)
   }
 }
 
-void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint, const int& frameNumber)
+void BvhParser::parseFrame(const QSharedPointer<BvhJoint>& joint, int frameNumber)
 {
   Nullable<float> xPosition;
   Nullable<float> yPosition;

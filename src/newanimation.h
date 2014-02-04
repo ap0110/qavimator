@@ -41,6 +41,11 @@ class NewAnimation : public QObject
     int maxFrameNumber() const;
     void setMaxFrameNumber(int maxFrameNumber);
 
+    int loopInPoint() const;
+    int loopOutPoint() const;
+    void setLoopInPoint(int frame);
+    void setLoopOutPoint(int frame);
+
   private:
     QSharedPointer<Joint> m_rootJoint;
 

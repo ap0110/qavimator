@@ -87,8 +87,8 @@ class Joint : public QObject
     void setKeyframes(const QMap<int, KeyframeData>& keyframes);
     void setKeyframe(int frame, float xPosition, float yPosition, float zPosition, float xRotation, float yRotation, float zRotation);
     bool removeKeyframe(int frame);
-    bool setKeyframePosition(const int& frame, const QVector3D& position);
-    bool setKeyframeRotation(const int& frame, const QVector3D& rotation);
+    bool setKeyframePosition(int frame, const QVector3D& position);
+    bool setKeyframeRotation(int frame, const QVector3D& rotation);
     void insertFrame(int frame, int maxFrameNumber);
     void deleteFrame(int frame);
     int numKeyframes() const;

@@ -137,13 +137,13 @@ QSharedPointer<NewAnimation> FileManager::readBvh(QFile& openedFile)
   return parser.parse();
 }
 
-QSharedPointer<NewAnimation> FileManager::readAnim(const QFile& file)
+QSharedPointer<NewAnimation> FileManager::readAnim(QFile& file)
 {
   // TODO Read Second Life animation file
   return QSharedPointer<NewAnimation>();
 }
 
-QSharedPointer<NewAnimation> FileManager::readQavm(const QFile& file)
+QSharedPointer<NewAnimation> FileManager::readQavm(QFile& file)
 {
   // TODO Read QAvimator file
   return QSharedPointer<NewAnimation>();
