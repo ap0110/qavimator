@@ -2,6 +2,8 @@
 SET (QAVI_SRC animation.cpp
               animationmanager.cpp
               animationview.cpp
+              avatar.cpp
+              avatarmanager.cpp
               bvh.cpp
               bvhnode.cpp
               bvhparser.cpp
