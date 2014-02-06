@@ -20,11 +20,33 @@
 
 #include "avatar.h"
 
-Avatar::Avatar(QObject* parent)
-  : QObject(parent)
+Avatar::Avatar(QObject* parent, float scale, FigureType figureType)
+  : QObject(parent),
+    m_scale(scale),
+    m_figureType(figureType)
 {
 }
 
 Avatar::~Avatar()
 {
+}
+
+float Avatar::scale() const
+{
+  return m_scale;
+}
+
+void Avatar::setScale(float scale)
+{
+  m_scale = scale;
+}
+
+FigureType Avatar::figureType() const
+{
+  return m_figureType;
+}
+
+void Avatar::setFigureType(FigureType figureType)
+{
+  m_figureType = figureType;
 }

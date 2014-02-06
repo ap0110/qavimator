@@ -18,13 +18,35 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifndef AVATAR_H
+#define AVATAR_H
+
 #include <QObject>
+
+typedef enum class
+{
+  MALE, FEMALE
+} FigureType;
 
 class Avatar : public QObject
 {
   Q_OBJECT
 
   public:
-    Avatar(QObject* parent = nullptr);
+    Avatar(QObject* parent = nullptr,
+           float scale = 1.0,
+           FigureType figureType = FigureType::FEMALE);
     ~Avatar();
+
+    float scale() const;
+    void setScale(float scale);
+
+    FigureType figureType() const;
+    void setFigureType(FigureType figureType);
+
+  private:
+    float m_scale;
+    FigureType m_figureType;
 };
+
+#endif

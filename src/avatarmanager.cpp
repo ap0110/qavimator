@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QSharedPointer>
+
 #include "avatarmanager.h"
 
 AvatarManager::AvatarManager(QObject* parent)
@@ -27,4 +29,24 @@ AvatarManager::AvatarManager(QObject* parent)
 
 AvatarManager::~AvatarManager()
 {
+}
+
+const QSharedPointer<Avatar>& AvatarManager::at(int index) const
+{
+  return m_avatars.at(index);
+}
+
+int AvatarManager::size() const
+{
+  return m_avatars.size();
+}
+
+void AvatarManager::add(QSharedPointer<Avatar> avatar)
+{
+  m_avatars.append(avatar);
+}
+
+void AvatarManager::clear()
+{
+  m_avatars.clear();
 }
