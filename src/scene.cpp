@@ -19,19 +19,17 @@
  ***************************************************************************/
 
 #include "animation.h"
-#include "animationmanager.h"
 #include "camera.h"
-#include "floor.h"
 #include "propmanager.h"
 
 #include "scene.h"
 
 Scene::Scene(QObject* parent)
-  : QObject(parent)
+  : QObject(parent),
+    m_animationManager(this),
+    m_floor(this)
 {
-  m_animationManager = new AnimationManager(this);
   m_camera = new Camera(this);
-  m_floor = new Floor(this);
   m_propManager = new PropManager(this);
 }
 
@@ -42,7 +40,7 @@ Scene::~Scene()
 
 void Scene::selectAnimation(int index)
 {
-  if (m_animationManager->selectAnimation(index))
+  if (m_animationManager.selectAnimation(index))
   {
     emit animationSelected(getAnimation());
     emit repaint();
@@ -53,8 +51,8 @@ void Scene::setAnimation(Animation* animation)
 {
   clear();
 
-  m_animationManager->setAnimation(animation);
-  m_animationManager->append(animation);
+  m_animationManager.setAnimation(animation);
+  m_animationManager.append(animation);
   connect(animation, SIGNAL(frameChanged()), this, SIGNAL(repaint()));
   emit repaint();
 }
@@ -62,12 +60,12 @@ void Scene::setAnimation(Animation* animation)
 // Adds a new animation without overriding others, and sets it current
 void Scene::addAnimation(Animation* animation)
 {
-  if (!m_animationManager->contains(animation))
+  if (!m_animationManager.contains(animation))
   {
-    m_animationManager->append(animation);
-    m_animationManager->setAnimation(animation); // set it as the current one
-    if (!m_animationManager->isEmpty() && animation != m_animationManager->first())
-      animation->setFrame(m_animationManager->first()->getFrame());
+    m_animationManager.append(animation);
+    m_animationManager.setAnimation(animation); // set it as the current one
+    if (!m_animationManager.isEmpty() && animation != m_animationManager.first())
+      animation->setFrame(m_animationManager.first()->getFrame());
 
     connect(animation, SIGNAL(frameChanged()), this, SIGNAL(repaint()));
     emit repaint();
@@ -76,47 +74,47 @@ void Scene::addAnimation(Animation* animation)
 
 void Scene::clear()
 {
-  m_animationManager->clear();
+  m_animationManager.clear();
 }
 
 void Scene::setFrame(int frame)
 {
-  m_animationManager->setFrame(frame);
+  m_animationManager.setFrame(frame);
 }
 
 void Scene::stepForward()
 {
-  m_animationManager->stepForward();
+  m_animationManager.stepForward();
 }
 
 void Scene::setFPS(int fps)
 {
-  m_animationManager->setFPS(fps);
+  m_animationManager.setFPS(fps);
 }
 
 Animation* Scene::getAnimation(unsigned int index)
 {
-  return m_animationManager->at(index);
+  return m_animationManager.at(index);
 }
 
 Animation* Scene::getAnimation()
 {
-  return m_animationManager->getAnimation();
+  return m_animationManager.getAnimation();
 }
 
 int Scene::getIndexOfAnimation(Animation* animation)
 {
-  return m_animationManager->indexOf(animation);
+  return m_animationManager.indexOf(animation);
 }
 
 int Scene::getCountOfAnimations()
 {
-  return m_animationManager->count();
+  return m_animationManager.count();
 }
 
 void Scene::drawFloor()
 {
-  m_floor->draw();
+  m_floor.draw();
 }
 
 Camera* Scene::camera()
@@ -161,7 +159,7 @@ void Scene::clearProps()
 
 void Scene::protectFrame(bool on)
 {
-  m_floor->protectFrame(on);
+  m_floor.protectFrame(on);
 }
 
 void Scene::storeCameraPosition(int num)

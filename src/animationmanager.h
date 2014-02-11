@@ -30,7 +30,7 @@ class AnimationManager : public QObject
   Q_OBJECT
 
   public:
-    AnimationManager(QObject* parent = 0);
+    AnimationManager(QObject* parent = nullptr);
     ~AnimationManager();
 
     bool selectAnimation(int index);

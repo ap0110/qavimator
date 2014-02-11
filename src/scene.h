@@ -23,12 +23,12 @@
 
 #include <QObject>
 
+#include "animationmanager.h"
+#include "floor.h"
 #include "prop.h"
 
 class Animation;
-class AnimationManager;
 class Camera;
-class Floor;
 class PropManager;
 
 class Scene : public QObject
@@ -92,9 +92,9 @@ class Scene : public QObject
     void restoreCameraPosition(int num);
 
   private:
-    AnimationManager* m_animationManager;
+    AnimationManager m_animationManager;
 
-    Floor* m_floor;
+    Floor m_floor;
     PropManager* m_propManager;
 
     Camera* m_camera;
