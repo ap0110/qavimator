@@ -25,6 +25,8 @@
 
 #include <QSharedPointer>
 
+#include "avatar.h"
+
 class Joint;
 
 class NewAnimation : public QObject
@@ -48,6 +50,8 @@ class NewAnimation : public QObject
 
   private:
     QSharedPointer<Joint> m_rootJoint;
+
+    Avatar m_avatar;
 
     int m_maxFrameNumber;
     float m_frameTime;

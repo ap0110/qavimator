@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+// TODO Perhaps as part of a future feature, separate Avatar from Animation
+/*
 #ifndef AVATARMANAGER_H
 #define AVATARMANAGER_H
 
@@ -44,3 +46,4 @@ class AvatarManager : public QObject
 };
 
 #endif
+*/

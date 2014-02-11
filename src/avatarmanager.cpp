@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+// TODO Perhaps as part of a future feature, separate Avatar from Animation
+/*
 #include <QSharedPointer>
 
 #include "avatarmanager.h"
@@ -50,3 +52,4 @@ void AvatarManager::clear()
 {
   m_avatars.clear();
 }
+*/
