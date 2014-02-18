@@ -22,11 +22,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "math3d.h"
-
 #include <QObject>
-
-using namespace Math3D;
 
 class CameraPosition
 {

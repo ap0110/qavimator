@@ -13,7 +13,6 @@ SET (QAVI_SRC animation.cpp
               iktree.cpp
               joint.cpp
               main.cpp
-              math3d.cpp
               newanimation.cpp
               prop.cpp
               propmanager.cpp
