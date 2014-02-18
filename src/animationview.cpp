@@ -518,9 +518,6 @@ void AnimationView::mouseDoubleClickEvent(QMouseEvent* event)
     if(mirrorSelected)
       m_scene->getAnimation()->setMirrored(true);
   }
-  else if(selected && selected < OBJECT_START)
-    m_scene->getAnimation()->setIK(m_scene->getAnimation()->getNode(selected),
-                     !m_scene->getAnimation()->getIK(m_scene->getAnimation()->getNode(selected)));
   repaint();
 }
 
@@ -657,8 +654,6 @@ void AnimationView::drawFigure(Animation* anim,unsigned int index)
 // NOTE: joints == motion for now
 void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,int frame,BVHNode* motion,BVHNode* joints,int mode)
 {
-  float color[4];
-
   GLint renderMode;
   bool selecting;
 
@@ -715,15 +710,12 @@ void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,
         default: break;
       } */
 
-      QVector3D ikRotation;
-      if(motion->ikOn) ikRotation = motion->ikRotation;
-
       // need to do rotations in the right order
       switch(motion->channelType[i])
       {
-        case BVH_XROT: glRotatef(rotation.x() + ikRotation.x(), 1, 0, 0); break;
-        case BVH_YROT: glRotatef(rotation.y() + ikRotation.y(), 0, 1, 0); break;
-        case BVH_ZROT: glRotatef(rotation.z() + ikRotation.z(), 0, 0, 1); break;
+        case BVH_XROT: glRotatef(rotation.x(), 1, 0, 0); break;
+        case BVH_YROT: glRotatef(rotation.y(), 0, 1, 0); break;
+        case BVH_ZROT: glRotatef(rotation.z(), 0, 0, 1); break;
         default: break;
       }
 
@@ -753,11 +745,6 @@ void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,
         glColor4f(0.4,0.5,0.3,1);
       else
         glColor4f(0.6,0.5,0.5,1);
-      if(anim->getIK(motion))
-      {
-        glGetFloatv(GL_CURRENT_COLOR,color);
-        glColor4f(color[0],color[1],color[2]+0.3,color[3]);
-      }
       anim->getFigureType()==Animation::FIGURE_MALE ? drawSLMalePart(motion->name()):drawSLFemalePart(motion->name());
 
       for(unsigned int index=0;index< (unsigned int) propManager()->count();index++)

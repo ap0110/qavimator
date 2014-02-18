@@ -25,7 +25,7 @@
 #include <QTimer>
 #include <QVector3D>
 
-#include "iktree.h"
+#include "bvhnode.h"
 #include "playstate.h"
 
 #define DEFAULT_POSE "data/TPose.avm"
@@ -51,15 +51,6 @@ class Animation : public QObject
   public:
     typedef enum
     {
-      IK_LHAND=0,
-      IK_RHAND,
-      IK_LFOOT,
-      IK_RFOOT,
-      NUM_IK
-    } IKPartType;
-
-    typedef enum
-    {
       FIGURE_MALE=0,
       FIGURE_FEMALE,
       NUM_FIGURES
@@ -79,8 +70,6 @@ class Animation : public QObject
     int getLoopInPoint();
     void setLoopOutPoint(int outFrame);
     int getLoopOutPoint();
-    void setIK(BVHNode* node, bool flag);
-    bool getIK(BVHNode* node);
     const QString getPartName(int index) const;
     int getPartIndex(BVHNode* node);
     void setMirrored(bool mirror);
@@ -190,8 +179,6 @@ class Animation : public QObject
     int loopOutPoint;
 
     bool mirrored;
-    bool ikOn[NUM_IK];
-    IKTree ikTree;
 
     void recursiveAddKeyFrame(BVHNode* joint);
     bool isKeyFrameHelper(BVHNode* joint);
@@ -202,10 +189,6 @@ class Animation : public QObject
     void mirrorHelper(BVHNode* joint);
 
     void calcPartMirrors();
-    void setIK(IKPartType part, bool flag);
-    bool getIK(IKPartType part);
-    void applyIK(const QString& name);
-    void solveIK();
 
     QString dataPath;
     // FIXME: Timer disabled since playbackTimeout() is unused.

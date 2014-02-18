@@ -102,8 +102,6 @@ BVHNode* BVH::bvhReadNode()
   node->offset[0]=token().toFloat();
   node->offset[1]=token().toFloat();
   node->offset[2]=token().toFloat();
-  node->ikOn=false;
-  node->ikWeight=0.0;
   if(node->type!=BVH_END)
   {
     expect_token("CHANNELS");
@@ -255,13 +253,10 @@ void BVH::parseLimFile(BVHNode* root,const QString& limFile) const
 
     QStringList parameters=line.split(' ');
     QString name=parameters[0];
-    double weight=parameters[1].toDouble();
 
     BVHNode* node=bvhFindNode(root,name);
     if(node)
     {
-      node->ikWeight=weight;
-
       for(int i=0;i<3;i++)
       {
         QString channel=parameters[i*3+2];
@@ -801,19 +796,6 @@ void BVH::bvhGetChannelLimits(BVHNode* node,BVHChannelType type,double* min, dou
     {
       *min=node->channelMin[i];
       *max=node->channelMax[i];
-    }
-  }
-}
-
-void BVH::bvhResetIK(BVHNode* root)
-{
-  int i;
-  if(root)
-  {
-    root->ikOn=false;
-    for(i=0;i<root->numChildren();i++)
-    {
-      bvhResetIK(root->child(i));
     }
   }
 }

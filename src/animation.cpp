@@ -73,12 +73,6 @@ Animation::Animation(BVH* newBVH,const QString& bvhFile) :
   positionNode=bvh->lastLoadedPositionNode;
   addKeyFrameAllJoints();
 
-  ikTree.set(frames);
-  setIK(IK_LHAND, false);
-  setIK(IK_RHAND, false);
-  setIK(IK_LFOOT, false);
-  setIK(IK_RFOOT, false);
-
   setDirty(false);
 
   currentPlayTime=0.0;
@@ -166,19 +160,7 @@ void Animation::setFrame(int frameNumber)
 {
   if(frameNumber>=0 && frameNumber<totalFrames && frame!=frameNumber)
   {
-//    for (int i=0; i<NUM_IK; i++) {
-//      setIK((IKPartType)i, false);
-//    }
     frame=frameNumber;
-
-    for(int i=0;i<NUM_IK;i++)
-    {
-      if(ikOn[i])
-      {
-        solveIK();
-        break;
-      }
-    }
 
     emit currentFrame(frame);
     emit frameChanged();
@@ -308,189 +290,11 @@ int Animation::getLoopOutPoint()
   return loopOutPoint;
 }
 
-void Animation::applyIK(const QString& name)
-{
-  BVHNode* node=bvh->bvhFindNode(frames,name);
-
-  QVector3D rotation = node->frameData(frame).rotation();
-
-  if(node)
-  {
-//    for (int i=0; i<3; i++) {
-    rotation += node->ikRotation;
-
-
-    node->ikRotation.setX(0);
-    node->ikRotation.setY(0);
-    node->ikRotation.setZ(0);
-/*
-      node->frame[frame][i] += node->ikRot[i];
-      node->ikRot[i] = 0;
-*/
-//      node->ikOn = false;
-
-    setDirty(true);
-    addKeyFrame(node);
-    node->setKeyframeRotation(frame, rotation);
-    emit redrawTrack(getPartIndex(node));
-//    }
-  }
-}
-
-void Animation::setIK(IKPartType part,bool flag)
-{
-  if(ikOn[part]==flag) return;
-
-  ikOn[part]=flag;
-
-  if(flag)
-  {
-    switch(part)
-    {
-      case IK_LHAND: ikTree.setGoal(frame,"lHand"); break;
-      case IK_RHAND: ikTree.setGoal(frame,"rHand"); break;
-      case IK_LFOOT: ikTree.setGoal(frame,"lFoot"); break;
-      case IK_RFOOT: ikTree.setGoal(frame,"rFoot"); break;
-      default: break;
-    }
-  }
-  else
-  {
-    switch(part)
-    {
-      case IK_LHAND:
-        applyIK("lHand");
-        applyIK("lForeArm");
-        applyIK("lShldr");
-        applyIK("lCollar");
-        if(!ikOn[IK_RHAND])
-        {
-          applyIK("chest");
-          applyIK("abdomen");
-        }
-        break;
-      case IK_RHAND:
-        applyIK("rHand");
-        applyIK("rForeArm");
-        applyIK("rShldr");
-        applyIK("rCollar");
-        if (!ikOn[IK_LHAND])
-        {
-          applyIK("chest");
-          applyIK("abdomen");
-        }
-        break;
-      case IK_LFOOT:
-        applyIK("lThigh");
-        applyIK("lShin");
-        applyIK("lFoot");
-        break;
-      case IK_RFOOT:
-        applyIK("rThigh");
-        applyIK("rShin");
-        applyIK("rFoot");
-        break;
-      default:
-        break;
-    }
-  }
-}
-
-void Animation::setIK(BVHNode* node,bool flag)
-{
-  QString jointName=node->name();
-
-  if(jointName=="lHand" ||
-     jointName=="lForeArm" ||
-     jointName=="lShldr" ||
-     jointName=="lCollar")
-  {
-    setIK(IK_LHAND, flag);
-  }
-  else if(jointName=="rHand" ||
-          jointName=="rForeArm" ||
-          jointName=="rShldr" ||
-          jointName=="rCollar")
-  {
-    setIK(IK_RHAND, flag);
-  }
-  else if(jointName=="lThigh" ||
-          jointName=="lShin" ||
-          jointName=="lFoot")
-  {
-    setIK(IK_LFOOT, flag);
-  }
-  else if(jointName=="rThigh" ||
-          jointName=="rShin" ||
-          jointName=="rFoot")
-  {
-    setIK(IK_RFOOT, flag);
-  }
-}
-
-bool Animation::getIK(BVHNode* node)
-{
-  QString jointName=node->name();
-
-  if(jointName=="lHand" ||
-     jointName=="lForeArm" ||
-     jointName=="lShldr" ||
-     jointName=="lCollar")
-  {
-    return getIK(IK_LHAND);
-  }
-  else if(jointName=="rHand" ||
-          jointName=="rForeArm" ||
-          jointName=="rShldr" ||
-          jointName=="rCollar")
-  {
-    return getIK(IK_RHAND);
-  }
-  else if(jointName=="lThigh" ||
-          jointName=="lShin" ||
-          jointName=="lFoot")
-  {
-    return getIK(IK_LFOOT);
-  }
-  else if(jointName=="rThigh" ||
-          jointName=="rShin" ||
-          jointName=="rFoot")
-  {
-    return getIK(IK_RFOOT);
-  }
-  return false;
-}
-
-bool Animation::getIK(IKPartType part)
-{
-  return ikOn[part];
-}
-
-void Animation::solveIK()
-{
-  bvh->bvhResetIK(frames);
-  if(ikOn[IK_LFOOT]) getEndSite("lFoot")->ikOn=true;
-  if(ikOn[IK_RFOOT]) getEndSite("rFoot")->ikOn=true;
-  if(ikOn[IK_LHAND]) getEndSite("lHand")->ikOn=true;
-  if(ikOn[IK_RHAND]) getEndSite("rHand")->ikOn=true;
-
-  ikTree.solve(frame);
-}
-
 void Animation::setRotation(BVHNode* node,double x,double y,double z)
 {
   if (node)
   {
     //qDebug(QString("Animation::setRotation(")+jointName+")");
-
-    for(int i=0;i<NUM_IK;i++)
-    {
-      if(ikOn[i])
-      {
-        solveIK();
-        break;
-      }
-    }
 
     if(node->isKeyframe(frame))
       node->setKeyframeRotation(frame, QVector3D(x, y, z));
@@ -582,14 +386,6 @@ int Animation::getRotationOrder(const QString& jointName)
 
 void Animation::setPosition(double x,double y,double z)
 {
-  for(int i=0;i<NUM_IK;i++)
-  {
-    if(ikOn[i])
-    {
-      solveIK();
-      break;
-    }
-  }
   // new keyframe system
   if(positionNode->isKeyframe(frame))
     positionNode->setKeyframePosition(frame, QVector3D(x, y, z));

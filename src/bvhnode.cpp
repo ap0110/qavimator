@@ -37,18 +37,6 @@ BVHNode::BVHNode(const QString& name)
   setMirror(NULL,0);
 
   numChannels=0;
-
-  ikRotation.setX(0);
-  ikRotation.setY(0);
-  ikRotation.setZ(0);
-
-  ikGoalPos[0]=0;
-  ikGoalPos[1]=0;
-  ikGoalPos[2]=0;
-
-  ikGoalDir[0]=0;
-  ikGoalDir[1]=1;
-  ikGoalDir[2]=0;
 }
 
 BVHNode::~BVHNode()

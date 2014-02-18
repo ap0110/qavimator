@@ -126,12 +126,6 @@ class BVHNode
     double channelMin[6];
     double channelMax[6];
 
-    bool ikOn;
-    QVector3D ikRotation;
-    double ikGoalPos[3];
-    double ikGoalDir[3];
-    double ikWeight;
-
   protected:
     void setName(const QString& newName);
     double interpolate(double from,double to,int steps,int pos,bool easeOut,bool easeIn) const;

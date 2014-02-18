@@ -56,7 +56,6 @@ class BVH
     BVHNode* bvhFindNode(BVHNode* root,const QString& name) const;
 
     void bvhGetChannelLimits(BVHNode* node, BVHChannelType type, double *min, double *max);
-    void bvhResetIK(BVHNode* root);
 
     const QString bvhGetName(BVHNode* node,int index);
     int bvhGetIndex(BVHNode* node,const QString& name);

@@ -10,7 +10,6 @@ SET (QAVI_SRC animation.cpp
               camera.cpp
               filemanager.cpp
               floor.cpp
-              iktree.cpp
               joint.cpp
               main.cpp
               newanimation.cpp
@@ -42,7 +41,7 @@ INCLUDE_DIRECTORIES (${CMAKE_CURRENT_BINARY_DIR})
 # Compile and link
 ADD_EXECUTABLE (qavimator ${QAVI_RSC_SRC} ${QAVI_UI_HDR} ${QAVI_SRC})
 QT5_USE_MODULES (qavimator Core OpenGL Gui)
-TARGET_LINK_LIBRARIES (qavimator ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} quat)
+TARGET_LINK_LIBRARIES (qavimator ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
 # Install qavimator
 INSTALL (TARGETS qavimator DESTINATION ${INSTALL_BIN})
