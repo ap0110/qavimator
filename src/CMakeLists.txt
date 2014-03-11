@@ -22,7 +22,8 @@ SET (QAVI_SRC animation.cpp
               slpartsfemale.cpp
               slpartsmale.cpp
               timeline.cpp
-              timelineview.cpp)
+              timelineview.cpp
+              updatechecker.cpp)
 
 # Interfaces
 SET (QAVI_UI  mainapplicationform.ui
