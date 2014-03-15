@@ -27,12 +27,14 @@
   @author Zi Ree <Zi Ree @ Second Life>
 */
 
-class SettingsDialog : public QDialog, Ui::SettingsDialogForm
+class SettingsDialog :
+    public QDialog,
+    Ui::SettingsDialogForm
 {
   Q_OBJECT
 
   public:
-    SettingsDialog(QWidget* parent=0);
+    SettingsDialog(QWidget* parent = nullptr);
     ~SettingsDialog();
 
   signals:
@@ -48,6 +50,9 @@ class SettingsDialog : public QDialog, Ui::SettingsDialogForm
 
     void on_easeInCheckbox_toggled(bool state);
     void on_easeOutCheckbox_toggled(bool state);
+
+  private:
+    void apply();
 };
 
 #endif

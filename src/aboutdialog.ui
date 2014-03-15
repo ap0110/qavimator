@@ -84,8 +84,14 @@
      <height>121</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
    <property name="title">
-    <string>Updates</string>
+    <string>Check for Updates</string>
    </property>
    <widget class="QPushButton" name="checkUpdatesButton">
     <property name="geometry">
@@ -99,29 +105,37 @@
     <property name="font">
      <font>
       <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
      </font>
     </property>
     <property name="text">
-     <string>Check for Updates</string>
+     <string>Check Now</string>
     </property>
    </widget>
    <widget class="QLabel" name="lastUpdateCheckLabel">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>20</y>
-      <width>191</width>
+      <width>211</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="text">
      <string>Updates Last Checked:  Never</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignCenter</set>
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QCheckBox" name="autoUpdatesCheckBox">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -129,6 +143,12 @@
       <width>191</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="text">
      <string>Automatically Check for Updates</string>
@@ -138,11 +158,11 @@
     </property>
    </widget>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="descriptionLabel">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>70</y>
+     <y>60</y>
      <width>231</width>
      <height>41</height>
     </rect>
