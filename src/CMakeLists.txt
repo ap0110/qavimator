@@ -1,5 +1,6 @@
 # Sources
-SET (QAVI_SRC animation.cpp
+SET (QAVI_SRC aboutdialog.cpp
+              animation.cpp
               animationmanager.cpp
               animationview.cpp
               avatar.cpp
@@ -26,7 +27,8 @@ SET (QAVI_SRC animation.cpp
               updatechecker.cpp)
 
 # Interfaces
-SET (QAVI_UI  mainapplicationform.ui
+SET (QAVI_UI  aboutdialog.ui
+              mainapplicationform.ui
               settingsdialogform.ui)
 
 # Resources

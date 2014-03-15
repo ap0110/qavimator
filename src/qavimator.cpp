@@ -21,7 +21,9 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QScopedPointer>
 
+#include "aboutdialog.h"
 #include "animationview.h"
 #include "prop.h"
 #include "scene.h"
@@ -35,8 +37,6 @@
 #define ANIM_FILTER "Animation Files (*.avm *.bvh)"
 #define PROP_FILTER "Props (*.prp)"
 #define PRECISION   100
-
-#define SVN_ID      "$Id$"
 
 qavimator::qavimator() : QMainWindow(0)
 {
@@ -1249,7 +1249,8 @@ void qavimator::configChanged()
 // Menu Action: Help / About ...
 void qavimator::helpAbout()
 {
-  QMessageBox::about(this,QObject::tr("About QAvimator"),QObject::tr("QAvimator - Animation editor for Second Life<br />%1").arg(SVN_ID));
+  QScopedPointer<AboutDialog> dialog(new AboutDialog(this));
+  dialog->exec();
 }
 
 // checks if a file already exists at the given path and displays a warning message
