@@ -8,6 +8,12 @@ SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -pedantic")
 
 PROJECT (qavimator)
 
+# If update channel and version number were defined
+IF ((DEFINED UPDATE_CHANNEL) AND (DEFINED VERSION_NUMBER))
+  # Pass them to the compiler
+  ADD_DEFINITIONS (-DUPDATE_CHANNEL=${UPDATE_CHANNEL} -DVERSION_NUMBER="${VERSION_NUMBER}")
+ENDIF ((DEFINED UPDATE_CHANNEL) AND (DEFINED VERSION_NUMBER))
+
 # Configurable install variables, use CMAKE_INSTALL_PREFIX to install into target directory
 SET (INSTALL_BIN "." CACHE PATH "Executable install path")
 SET (INSTALL_DATA "." CACHE PATH "Data install path")

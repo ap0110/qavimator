@@ -66,10 +66,11 @@
    <property name="font">
     <font>
      <pointsize>12</pointsize>
+     <underline>true</underline>
     </font>
    </property>
    <property name="text">
-    <string>Version 0.0.3</string>
+    <string>Version</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>

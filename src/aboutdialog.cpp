@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "versioning.h"
+
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 
@@ -31,9 +33,11 @@ AboutDialog::AboutDialog(QWidget* parent) :
   flags &= ~Qt::WindowContextHelpButtonHint;
   flags |= Qt::MSWindowsFixedSizeDialogHint;
   setWindowFlags(flags);
+
+  QString versionLabelText = QString("%1 Version %2").arg(Versioning::updateChannel()).arg(Versioning::versionNumber());
+  ui->versionLabel->setText(versionLabelText);
 }
 
 AboutDialog::~AboutDialog()
 {
-  delete ui;
 }

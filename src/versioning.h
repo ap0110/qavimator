@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Zi Ree   *
- *   Zi Ree @ SecondLife   *
+ *   Copyright (C) 2006 by Zi Ree                                          *
+ *   Zi Ree @ SecondLife                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,25 +18,31 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef ABOUTDIALOG_H
-#define ABOUTDIALOG_H
+#ifndef VERSIONING_H
+#define VERSIONING_H
 
-#include <QDialog>
+class QString;
 
-namespace Ui {
-class AboutDialog;
-}
-
-class AboutDialog : public QDialog
+class Versioning
 {
-  Q_OBJECT
-
   public:
-    explicit AboutDialog(QWidget* parent = nullptr);
-    ~AboutDialog();
+    Versioning();
+    ~Versioning();
+
+    static QString versionNumber();
+    static QString updateChannel();
+    static QString updateChannelSuffix();
 
   private:
-    QScopedPointer<Ui::AboutDialog> ui;
+    typedef enum class
+    {
+      Development = 0,
+      Beta = 1,
+      Release = 2
+    } UpdateChannel;
+
+    static QString m_versionNumber;
+    static UpdateChannel m_updateChannel;
 };
 
 #endif

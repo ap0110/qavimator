@@ -24,7 +24,8 @@ SET (QAVI_SRC aboutdialog.cpp
               slpartsmale.cpp
               timeline.cpp
               timelineview.cpp
-              updatechecker.cpp)
+              updatechecker.cpp
+              versioning.cpp)
 
 # Interfaces
 SET (QAVI_UI  aboutdialog.ui
