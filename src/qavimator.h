@@ -31,23 +31,34 @@
 #define KEY_IMAGE "data/key.png"
 #define NOKEY_IMAGE "data/nokey.png"
 
-#include "ui_mainapplicationform.h"
+#include <QMainWindow>
+#include <QTimer>
+
 #include "playstate.h"
+#include "prop.h"
 
 class QCloseEvent;
+class QFileInfo;
+class QLineEdit;
+class QSlider;
 
 class Animation;
-class Prop;
+class BVHNode;
+class RotationLimits;
 class Scene;
 class Timeline;
 
-class qavimator : public QMainWindow, Ui::MainWindow
+namespace Ui {
+class QAvimator;
+}
+
+class QAvimator : public QMainWindow
 {
   Q_OBJECT
 
   public:
-    qavimator();
-    ~qavimator();
+    QAvimator();
+    ~QAvimator();
 
   signals:
     void enableRotation(bool state);
@@ -286,6 +297,8 @@ class qavimator : public QMainWindow, Ui::MainWindow
     double longestRunningTime;
 
   private:
+    QScopedPointer<Ui::QAvimator> ui;
+
     Scene* scene;
 };
 

@@ -29,8 +29,8 @@ SET (QAVI_SRC aboutdialog.cpp
 
 # Interfaces
 SET (QAVI_UI  aboutdialog.ui
-              mainapplicationform.ui
-              settingsdialogform.ui)
+              qavimator.ui
+              settingsdialog.ui)
 
 # Resources
 SET (QAVI_RSC icons.qrc)

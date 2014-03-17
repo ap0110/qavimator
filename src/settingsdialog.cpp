@@ -19,23 +19,26 @@
  ***************************************************************************/
 
 #include "settings.h"
+
 #include "settingsdialog.h"
+#include "ui_settingsdialog.h"
 
 SettingsDialog::SettingsDialog(QWidget* parent) :
   QDialog(parent,
           Qt::WindowTitleHint
           | Qt::WindowSystemMenuHint
           | Qt::WindowCloseButtonHint
-          | Qt::MSWindowsFixedSizeDialogHint)
+          | Qt::MSWindowsFixedSizeDialogHint),
+  ui(new Ui::SettingsDialog)
 {
   qDebug("SettingsDialog::SettingsDialog()");
 
-  setupUi(this);
+  ui->setupUi(this);
 
-  useFogCheckbox->setChecked(Settings::fog());
-  floorTranslucencySpin->setValue(Settings::floorTranslucency());
-  easeInCheckbox->setChecked(Settings::easeIn());
-  easeOutCheckbox->setChecked(Settings::easeOut());
+  ui->useFogCheckbox->setChecked(Settings::fog());
+  ui->floorTranslucencySpin->setValue(Settings::floorTranslucency());
+  ui->easeInCheckbox->setChecked(Settings::easeIn());
+  ui->easeOutCheckbox->setChecked(Settings::easeOut());
 }
 
 SettingsDialog::~SettingsDialog()
@@ -84,10 +87,10 @@ void SettingsDialog::on_easeOutCheckbox_toggled(bool state)
 
 void SettingsDialog::apply()
 {
-  Settings::setFog(useFogCheckbox->isChecked());
-  Settings::setFloorTranslucency(floorTranslucencySpin->value());
-  Settings::setEaseIn(easeInCheckbox->isChecked());
-  Settings::setEaseOut(easeOutCheckbox->isChecked());
+  Settings::setFog(ui->useFogCheckbox->isChecked());
+  Settings::setFloorTranslucency(ui->floorTranslucencySpin->value());
+  Settings::setEaseIn(ui->easeInCheckbox->isChecked());
+  Settings::setEaseOut(ui->easeOutCheckbox->isChecked());
   emit configChanged();
   qApp->processEvents();
 }

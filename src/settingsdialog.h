@@ -21,15 +21,17 @@
 #ifndef SETTINGSDIALOG_H
 #define SETTINGSDIALOG_H
 
-#include "ui_settingsdialogform.h"
-
 /*
   @author Zi Ree <Zi Ree @ Second Life>
 */
 
-class SettingsDialog :
-    public QDialog,
-    Ui::SettingsDialogForm
+#include <QDialog>
+
+namespace Ui {
+class SettingsDialog;
+}
+
+class SettingsDialog : public QDialog
 {
   Q_OBJECT
 
@@ -53,6 +55,8 @@ class SettingsDialog :
 
   private:
     void apply();
+
+    QScopedPointer<Ui::SettingsDialog> ui;
 };
 
 #endif
