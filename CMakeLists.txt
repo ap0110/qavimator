@@ -8,6 +8,10 @@ SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -pedantic")
 
 PROJECT (qavimator)
 
+# Timestamp when program was built; pass the current timestamp to the compiler
+STRING (TIMESTAMP BUILD_TIMESTAMP_Z "%Y-%m-%d %H:%M:%S UTC" UTC)
+ADD_DEFINITIONS (-DBUILD_TIMESTAMP_Z="${BUILD_TIMESTAMP_Z}")
+
 # If update channel and version number were defined
 IF ((DEFINED UPDATE_CHANNEL) AND (DEFINED VERSION_NUMBER))
   # Pass them to the compiler

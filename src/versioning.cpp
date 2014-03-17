@@ -21,6 +21,12 @@
 
 #include "versioning.h"
 
+#ifdef BUILD_TIMESTAMP_Z
+  QString Versioning::m_buildTimestamp = BUILD_TIMESTAMP_Z;
+#else
+  QString Versioning::m_buildTimestamp = "";
+#endif
+
 #ifdef VERSION_NUMBER
   QString Versioning::m_versionNumber = VERSION_NUMBER;
 #else
@@ -35,16 +41,10 @@
   Versioning::UpdateChannel Versioning::m_updateChannel = UpdateChannel::Development;
 #endif
 
-Versioning::Versioning()
-{
-  // should never be accessed
-  qWarning("Constructor of static class \"Versioning\" was called");
-}
 
-Versioning::~Versioning()
+QString Versioning::buildTimestamp()
 {
-  // should never be accessed
-  qWarning("Deconstructor of static class \"Versioning\" was called");
+  return m_buildTimestamp;
 }
 
 QString Versioning::versionNumber()
@@ -76,10 +76,10 @@ QString Versioning::updateChannelSuffix()
       return "";
       break;
     case UpdateChannel::Beta:
-      return "-beta";
+      return "-Beta";
       break;
     default:
-      return "-development";
+      return "-Development";
       break;
   }
 }

@@ -24,18 +24,21 @@
 #include "ui_aboutdialog.h"
 
 AboutDialog::AboutDialog(QWidget* parent) :
-  QDialog(parent),
+  QDialog(parent,
+          Qt::WindowTitleHint
+          | Qt::WindowSystemMenuHint
+          | Qt::WindowCloseButtonHint
+          | Qt::MSWindowsFixedSizeDialogHint),
   ui(new Ui::AboutDialog)
 {
   ui->setupUi(this);
 
-  Qt::WindowFlags flags = windowFlags();
-  flags &= ~Qt::WindowContextHelpButtonHint;
-  flags |= Qt::MSWindowsFixedSizeDialogHint;
-  setWindowFlags(flags);
+  QString versionLabelText("%1 Version %2");
+  versionLabelText = versionLabelText.arg(Versioning::updateChannel());
+  versionLabelText = versionLabelText.arg(Versioning::versionNumber());
 
-  QString versionLabelText = QString("%1 Version %2").arg(Versioning::updateChannel()).arg(Versioning::versionNumber());
   ui->versionLabel->setText(versionLabelText);
+  ui->timestampLabel->setText(Versioning::buildTimestamp());
 }
 
 AboutDialog::~AboutDialog()

@@ -65,12 +65,12 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
-     <underline>true</underline>
+     <pointsize>10</pointsize>
+     <underline>false</underline>
     </font>
    </property>
    <property name="text">
-    <string>Version</string>
+    <string/>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -159,13 +159,13 @@
     </property>
    </widget>
   </widget>
-  <widget class="QLabel" name="descriptionLabel">
+  <widget class="QLabel" name="timestampLabel">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>60</y>
      <width>231</width>
-     <height>41</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="font">
@@ -174,8 +174,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Open Source Animation Editor
-for Virtual Worlds</string>
+    <string/>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>

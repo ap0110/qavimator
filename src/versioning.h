@@ -26,9 +26,9 @@ class QString;
 class Versioning
 {
   public:
-    Versioning();
-    ~Versioning();
+    Versioning() = delete;
 
+    static QString buildTimestamp();
     static QString versionNumber();
     static QString updateChannel();
     static QString updateChannelSuffix();
@@ -41,6 +41,7 @@ class Versioning
       Release = 2
     } UpdateChannel;
 
+    static QString m_buildTimestamp;
     static QString m_versionNumber;
     static UpdateChannel m_updateChannel;
 };

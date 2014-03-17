@@ -31,6 +31,7 @@
 #include "settingsdialog.h"
 #include "timeline.h"
 #include "timelineview.h"
+#include "versioning.h"
 
 #include "qavimator.h"
 
@@ -47,9 +48,9 @@ qavimator::qavimator() : QMainWindow(0)
               << 17 << 18 << 19
               << 21 << 22 << 23;
 
-  QCoreApplication::setOrganizationName("DeZiRee");
-  QCoreApplication::setOrganizationDomain("qavimator.org");
-  QCoreApplication::setApplicationName("QAvimator");
+  QApplication::setOrganizationName(Settings::organizationName());
+  QApplication::setOrganizationDomain(Settings::organizationDomain());
+  QApplication::setApplicationName(Settings::applicationName());
 
   setupUi(this);
 

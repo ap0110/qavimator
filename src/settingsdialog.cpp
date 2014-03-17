@@ -21,16 +21,16 @@
 #include "settings.h"
 #include "settingsdialog.h"
 
-SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent)
+SettingsDialog::SettingsDialog(QWidget* parent) :
+  QDialog(parent,
+          Qt::WindowTitleHint
+          | Qt::WindowSystemMenuHint
+          | Qt::WindowCloseButtonHint
+          | Qt::MSWindowsFixedSizeDialogHint)
 {
   qDebug("SettingsDialog::SettingsDialog()");
 
   setupUi(this);
-
-  Qt::WindowFlags flags = windowFlags();
-  flags &= ~Qt::WindowContextHelpButtonHint;
-  flags |= Qt::MSWindowsFixedSizeDialogHint;
-  setWindowFlags(flags);
 
   useFogCheckbox->setChecked(Settings::fog());
   floorTranslucencySpin->setValue(Settings::floorTranslucency());
