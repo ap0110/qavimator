@@ -38,7 +38,7 @@ AboutDialog::AboutDialog(QWidget* parent) :
   versionLabelText = versionLabelText.arg(Metadata::versionNumberString());
 
   ui->versionLabel->setText(versionLabelText);
-  ui->timestampLabel->setText(Metadata::buildTimestamp());
+  ui->timestampLabel->setText(Metadata::buildDateTimeString());
 }
 
 AboutDialog::~AboutDialog()

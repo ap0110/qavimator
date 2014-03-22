@@ -17,6 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include <QDateTime>
 #include <QString>
 #include <QStringList>
 
@@ -25,9 +26,13 @@
 #include "metadata.h"
 
 #ifdef BUILD_TIMESTAMP_Z
-  const QString Metadata::m_buildTimestamp = BUILD_TIMESTAMP_Z;
+  const QDateTime Metadata::m_buildDateTime =
+      QDateTime::fromString(
+        BUILD_TIMESTAMP_Z,
+        "yyyy-MM-dd hh:mm:ss 'UTC'"
+        );
 #else
-  const QString Metadata::m_buildTimestamp = "";
+  const QDateTime Metadata::m_buildDateTime = QDateTime();
 #endif
 
 #ifdef VERSION_NUMBER
@@ -45,9 +50,14 @@
 #endif
 
 
-const QString& Metadata::buildTimestamp()
+const QDateTime& Metadata::buildDateTime()
 {
-  return m_buildTimestamp;
+  return m_buildDateTime;
+}
+
+const QString Metadata::buildDateTimeString()
+{
+  return m_buildDateTime.toString("yyyy-MM-dd hh:mm:ss 'UTC'");
 }
 
 const VersionNumber& Metadata::versionNumber()
