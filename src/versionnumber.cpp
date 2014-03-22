@@ -18,36 +18,69 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef UPDATECHECKER_H
-#define UPDATECHECKER_H
+#include <QRegularExpression>
+#include <QString>
+#include <QStringList>
 
-#include <QNetworkAccessManager>
-#include <QObject>
+#include "versionnumber.h"
 
-class QXmlStreamReader;
-
-class UpdateChecker : public QObject
+VersionNumber::VersionNumber(const QString& versionNumber) :
+  m_versionNumber(versionNumber),
+  m_isValid(true)
 {
-  Q_OBJECT
+  QRegularExpression regularExpression("^(0|([1-9][0-9]*)).(0|([1-9][0-9]*))(.(0|([1-9][0-9]*)))*$");
+  auto matchResult = regularExpression.match(m_versionNumber);
+  if (!matchResult.hasMatch())
+  {
+    m_versionNumber = "0.0";
+    m_isValid = false;
+  }
+}
 
-  public:
-    UpdateChecker(QObject* parent = nullptr);
+const QString& VersionNumber::toString() const
+{
+  return m_versionNumber;
+}
 
-  public slots:
-    void checkUpdates();
+bool VersionNumber::isValid() const
+{
+  return m_isValid;
+}
 
-  private slots:
-    void replyFinished(QNetworkReply* reply);
+int VersionNumber::compare(const VersionNumber& rhs) const
+{
+  QStringList lhsTokens = m_versionNumber.split(".");
+  QStringList rhsTokens = rhs.toString().split(".");
+  auto lhsIter = lhsTokens.constBegin();
+  auto rhsIter = rhsTokens.constBegin();
 
-  private:
-    bool processUpdates(const QByteArray& updates);
-    bool readUpdates(QXmlStreamReader& xmlStreamReader);
-    bool readVersion(QXmlStreamReader& xmlStreamReader);
-
-    QScopedPointer<QNetworkAccessManager> m_networkAccessManager;
-
-    static const QString m_url;
-    static const QString m_updatesVersion;
-};
-
-#endif
+  while (lhsIter != lhsTokens.constEnd()
+         && rhsIter != rhsTokens.constEnd())
+  {
+    ushort lhsNumber = lhsIter->toUShort();
+    ushort rhsNumber = rhsIter->toUShort();
+    if (lhsNumber != rhsNumber)
+    {
+      return lhsNumber - rhsNumber;
+    }
+    lhsIter++;
+    rhsIter++;
+  }
+  while (lhsIter != lhsTokens.constEnd())
+  {
+    if (lhsIter->toUShort() != 0)
+    {
+      return 1;
+    }
+    lhsIter++;
+  }
+  while (rhsIter != rhsTokens.constEnd())
+  {
+    if (rhsIter->toUShort() != 0)
+    {
+      return -1;
+    }
+    rhsIter++;
+  }
+  return 0;
+}

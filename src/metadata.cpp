@@ -18,41 +18,49 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include <QString>
+#include <QStringList>
 
-#include "versioning.h"
+#include "versionnumber.h"
+
+#include "metadata.h"
 
 #ifdef BUILD_TIMESTAMP_Z
-  QString Versioning::m_buildTimestamp = BUILD_TIMESTAMP_Z;
+  const QString Metadata::m_buildTimestamp = BUILD_TIMESTAMP_Z;
 #else
-  QString Versioning::m_buildTimestamp = "";
+  const QString Metadata::m_buildTimestamp = "";
 #endif
 
 #ifdef VERSION_NUMBER
-  QString Versioning::m_versionNumber = VERSION_NUMBER;
+  const VersionNumber Metadata::m_versionNumber = VersionNumber(VERSION_NUMBER);
 #else
-  QString Versioning::m_versionNumber = "0";
+  const QString Metadata::m_versionNumber = "0";
 #endif
 
 #if UPDATE_CHANNEL == 2
-  Versioning::UpdateChannel Versioning::m_updateChannel = UpdateChannel::Release;
+  const Metadata::UpdateChannel Metadata::m_updateChannel = UpdateChannel::Release;
 #elif UPDATE_CHANNEL == 1
-  Versioning::UpdateChannel Versioning::m_updateChannel = UpdateChannel::Beta;
+  const Metadata::UpdateChannel Metadata::m_updateChannel = UpdateChannel::Beta;
 #else
-  Versioning::UpdateChannel Versioning::m_updateChannel = UpdateChannel::Development;
+  const Metadata::UpdateChannel Metadata::m_updateChannel = UpdateChannel::Development;
 #endif
 
 
-QString Versioning::buildTimestamp()
+const QString& Metadata::buildTimestamp()
 {
   return m_buildTimestamp;
 }
 
-QString Versioning::versionNumber()
+const VersionNumber& Metadata::versionNumber()
 {
   return m_versionNumber;
 }
 
-QString Versioning::updateChannel()
+const QString Metadata::versionNumberString()
+{
+  return m_versionNumber.toString();
+}
+
+const QString Metadata::updateChannel()
 {
   switch (m_updateChannel)
   {
@@ -68,7 +76,7 @@ QString Versioning::updateChannel()
   }
 }
 
-QString Versioning::updateChannelSuffix()
+const QString Metadata::updateChannelSuffix()
 {
   switch (m_updateChannel)
   {

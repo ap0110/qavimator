@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Zi Ree   *
- *   Zi Ree @ SecondLife   *
+ *   Copyright (C) 2006 by Zi Ree                                          *
+ *   Zi Ree @ SecondLife                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,29 +18,24 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "metadata.h"
+#ifndef VERSIONNUMBER_H
+#define VERSIONNUMBER_H
 
-#include "aboutdialog.h"
-#include "ui_aboutdialog.h"
+#include <QString>
 
-AboutDialog::AboutDialog(QWidget* parent) :
-  QDialog(parent,
-          Qt::WindowTitleHint
-          | Qt::WindowSystemMenuHint
-          | Qt::WindowCloseButtonHint
-          | Qt::MSWindowsFixedSizeDialogHint),
-  ui(new Ui::AboutDialog)
+class VersionNumber
 {
-  ui->setupUi(this);
+  public:
+    VersionNumber(const QString& versionNumber);
 
-  QString versionLabelText("%1 Version %2");
-  versionLabelText = versionLabelText.arg(Metadata::updateChannel());
-  versionLabelText = versionLabelText.arg(Metadata::versionNumberString());
+    const QString& toString() const;
+    bool isValid() const;
 
-  ui->versionLabel->setText(versionLabelText);
-  ui->timestampLabel->setText(Metadata::buildTimestamp());
-}
+    int compare(const VersionNumber& rhs) const;
 
-AboutDialog::~AboutDialog()
-{
-}
+  private:
+    QString m_versionNumber;
+    bool m_isValid;
+};
+
+#endif

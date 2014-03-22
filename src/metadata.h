@@ -18,20 +18,23 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef VERSIONING_H
-#define VERSIONING_H
+#ifndef METADATA_H
+#define METADATA_H
 
 class QString;
 
-class Versioning
+class VersionNumber;
+
+class Metadata
 {
   public:
-    Versioning() = delete;
+    Metadata() = delete;
 
-    static QString buildTimestamp();
-    static QString versionNumber();
-    static QString updateChannel();
-    static QString updateChannelSuffix();
+    static const QString& buildTimestamp();
+    static const VersionNumber& versionNumber();
+    static const QString versionNumberString();
+    static const QString updateChannel();
+    static const QString updateChannelSuffix();
 
   private:
     typedef enum class
@@ -41,9 +44,9 @@ class Versioning
       Release = 2
     } UpdateChannel;
 
-    static QString m_buildTimestamp;
-    static QString m_versionNumber;
-    static UpdateChannel m_updateChannel;
+    static const QString m_buildTimestamp;
+    static const VersionNumber m_versionNumber;
+    static const UpdateChannel m_updateChannel;
 };
 
 #endif

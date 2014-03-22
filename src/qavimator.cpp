@@ -31,7 +31,7 @@
 #include "settingsdialog.h"
 #include "timeline.h"
 #include "timelineview.h"
-#include "versioning.h"
+#include "metadata.h"
 
 #include "qavimator.h"
 #include "ui_qavimator.h"
@@ -54,6 +54,7 @@ QAvimator::QAvimator() :
   QApplication::setOrganizationName(Settings::organizationName());
   QApplication::setOrganizationDomain(Settings::organizationDomain());
   QApplication::setApplicationName(Settings::applicationName());
+  QApplication::setApplicationVersion(Metadata::versionNumberString());
 
   ui->setupUi(this);
 

@@ -20,16 +20,16 @@
 
 #include <iostream>
 
-#include "versioning.h"
+#include "metadata.h"
 
 #include "settings.h"
 
 QString Settings::m_organizationName = "QAvimator Team";
 QString Settings::m_organizationDomain = "qavimator.org";
-QString Settings::m_applicationName = QString("QAvimator%1").arg(Versioning::updateChannelSuffix());
+QString Settings::m_applicationName = QString("QAvimator%1").arg(Metadata::updateChannelSuffix());
 
 QString Settings::m_settingsGroup = "settings";
-QString Settings::m_versionGroup = "1";
+QString Settings::m_versionGroup = "1.0";
 
 bool Settings::m_loop = true;
 QString Settings::m_loopKey = "loop";

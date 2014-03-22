@@ -13,6 +13,7 @@ SET (QAVI_SRC aboutdialog.cpp
               floor.cpp
               joint.cpp
               main.cpp
+              metadata.cpp
               newanimation.cpp
               prop.cpp
               propmanager.cpp
@@ -25,7 +26,7 @@ SET (QAVI_SRC aboutdialog.cpp
               timeline.cpp
               timelineview.cpp
               updatechecker.cpp
-              versioning.cpp)
+              versionnumber.cpp)
 
 # Interfaces
 SET (QAVI_UI  aboutdialog.ui
@@ -44,7 +45,7 @@ INCLUDE_DIRECTORIES (${CMAKE_CURRENT_BINARY_DIR})
 
 # Compile and link
 ADD_EXECUTABLE (qavimator ${QAVI_RSC_SRC} ${QAVI_UI_HDR} ${QAVI_SRC})
-QT5_USE_MODULES (qavimator Core OpenGL Gui)
+QT5_USE_MODULES (qavimator Core OpenGL Gui Network)
 TARGET_LINK_LIBRARIES (qavimator ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
 # Install qavimator
