@@ -38,7 +38,7 @@
 #include "propmanager.h"
 #include "scene.h"
 
-#include "settings.h"
+#include "usersettings.h"
 
 #define SHIFT 1
 #define CTRL  2
@@ -206,7 +206,7 @@ void AnimationView::draw()
 {
   if(!isValid()) initializeGL();
 
-  if(Settings::fog())
+  if(UserSettings::fog())
   {
     glEnable(GL_FOG);
     {
@@ -669,7 +669,7 @@ void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,
       selectName++;
       motion=motion->child(0);
     }
-    if(mode==MODE_SKELETON && Settings::skeleton() && !selecting)
+    if(mode==MODE_SKELETON && UserSettings::skeleton() && !selecting)
     {
       glColor4f(0,1,1,1);
       glLineWidth(1);

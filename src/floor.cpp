@@ -20,7 +20,7 @@
 
 #include <QtOpenGL/QGLWidget>
 
-#include "settings.h"
+#include "usersettings.h"
 
 #include "floor.h"
 
@@ -36,7 +36,7 @@ Floor::~Floor()
 
 void Floor::draw()
 {
-  float alpha = (100 - Settings::floorTranslucency()) / 100.0;
+  float alpha = (100 - UserSettings::floorTranslucency()) / 100.0;
 
   glEnable(GL_DEPTH_TEST);
   glBegin(GL_QUADS);

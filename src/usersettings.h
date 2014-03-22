@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef USERSETTINGS_H
+#define USERSETTINGS_H
 
 /**
 	@author Zi Ree <Zi Ree @ Second Life>
@@ -27,10 +27,10 @@
 
 #include <QSettings>
 
-class Settings
+class UserSettings
 {
   public:
-    Settings() = delete;
+    UserSettings() = delete;
 
     static QString organizationName();
     static QString organizationDomain();

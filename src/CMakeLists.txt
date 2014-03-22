@@ -19,19 +19,19 @@ SET (QAVI_SRC aboutdialog.cpp
               propmanager.cpp
               qavimator.cpp
               scene.cpp
-              settings.cpp
-              settingsdialog.cpp
               slpartsfemale.cpp
               slpartsmale.cpp
               timeline.cpp
               timelineview.cpp
               updatechecker.cpp
+              usersettings.cpp
+              usersettingsdialog.cpp
               versionnumber.cpp)
 
 # Interfaces
 SET (QAVI_UI  aboutdialog.ui
               qavimator.ui
-              settingsdialog.ui)
+              usersettingsdialog.ui)
 
 # Resources
 SET (QAVI_RSC icons.qrc)

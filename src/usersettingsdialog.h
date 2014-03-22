@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef SETTINGSDIALOG_H
-#define SETTINGSDIALOG_H
+#ifndef USERSETTINGSDIALOG_H
+#define USERSETTINGSDIALOG_H
 
 /*
   @author Zi Ree <Zi Ree @ Second Life>
@@ -28,16 +28,16 @@
 #include <QDialog>
 
 namespace Ui {
-class SettingsDialog;
+class UserSettingsDialog;
 }
 
-class SettingsDialog : public QDialog
+class UserSettingsDialog : public QDialog
 {
   Q_OBJECT
 
   public:
-    SettingsDialog(QWidget* parent = nullptr);
-    ~SettingsDialog();
+    UserSettingsDialog(QWidget* parent = nullptr);
+    ~UserSettingsDialog();
 
   signals:
     void configChanged();
@@ -56,7 +56,7 @@ class SettingsDialog : public QDialog
   private:
     void apply();
 
-    QScopedPointer<Ui::SettingsDialog> ui;
+    QScopedPointer<Ui::UserSettingsDialog> ui;
 };
 
 #endif

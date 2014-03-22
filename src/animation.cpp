@@ -32,7 +32,7 @@
 
 #include "animation.h"
 #include "bvh.h"
-#include "settings.h"
+#include "usersettings.h"
 
 Animation::Animation(BVH* newBVH,const QString& bvhFile) :
   frame(0),totalFrames(0),mirrored(false)
@@ -301,8 +301,8 @@ void Animation::setRotation(BVHNode* node,double x,double y,double z)
     else
     {
       node->addKeyframe(frame,node->frameData(frame).position(), QVector3D(x, y, z));
-      setEaseIn(node,frame,Settings::easeIn());
-      setEaseOut(node,frame,Settings::easeOut());
+      setEaseIn(node,frame,UserSettings::easeIn());
+      setEaseOut(node,frame,UserSettings::easeOut());
     }
 
     //      node->dumpKeyframes();
@@ -315,8 +315,8 @@ void Animation::setRotation(BVHNode* node,double x,double y,double z)
       else
       {
         mirrorNode->addKeyframe(frame,node->frameData(frame).position(), QVector3D(x, -y, -z));
-        setEaseIn(mirrorNode,frame,Settings::easeIn());
-        setEaseOut(mirrorNode,frame,Settings::easeOut());
+        setEaseIn(mirrorNode,frame,UserSettings::easeIn());
+        setEaseOut(mirrorNode,frame,UserSettings::easeOut());
       }
 
       // tell timeline that this mirrored keyframe has changed (added or changed is the same here)
@@ -353,7 +353,7 @@ RotationLimits Animation::getRotationLimits(BVHNode* node)
     {
       xMin=yMin=zMin=xMax=yMax=zMax=0;
     }
-    else if(Settings::jointLimits())
+    else if(UserSettings::jointLimits())
     {
       bvh->bvhGetChannelLimits(node,BVH_XROT,&xMin,&xMax);
       bvh->bvhGetChannelLimits(node,BVH_YROT,&yMin,&yMax);
@@ -392,8 +392,8 @@ void Animation::setPosition(double x,double y,double z)
   else
   {
     positionNode->addKeyframe(frame, QVector3D(x, y, z), QVector3D());
-    setEaseIn(positionNode,frame,Settings::easeIn());
-    setEaseOut(positionNode,frame,Settings::easeOut());
+    setEaseIn(positionNode,frame,UserSettings::easeIn());
+    setEaseOut(positionNode,frame,UserSettings::easeOut());
   }
   setDirty(true);
   // tell timeline that this keyframe has changed (added or changed is the same here)
@@ -455,8 +455,8 @@ void Animation::addKeyFrame(BVHNode* joint)
 {
   joint->addKeyframe(frame,getPosition(),getRotation(joint));
 
-  setEaseIn(joint,frame,Settings::easeIn());
-  setEaseOut(joint,frame,Settings::easeOut());
+  setEaseIn(joint,frame,UserSettings::easeIn());
+  setEaseOut(joint,frame,UserSettings::easeOut());
 
   setDirty(true);
 

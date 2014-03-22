@@ -18,79 +18,79 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "settings.h"
+#include "usersettings.h"
 
-#include "settingsdialog.h"
-#include "ui_settingsdialog.h"
+#include "usersettingsdialog.h"
+#include "ui_usersettingsdialog.h"
 
-SettingsDialog::SettingsDialog(QWidget* parent) :
+UserSettingsDialog::UserSettingsDialog(QWidget* parent) :
   QDialog(parent,
           Qt::WindowTitleHint
           | Qt::WindowSystemMenuHint
           | Qt::WindowCloseButtonHint
           | Qt::MSWindowsFixedSizeDialogHint),
-  ui(new Ui::SettingsDialog)
+  ui(new Ui::UserSettingsDialog)
 {
-  qDebug("SettingsDialog::SettingsDialog()");
+  qDebug("UserSettingsDialog::UserSettingsDialog()");
 
   ui->setupUi(this);
 
-  ui->useFogCheckbox->setChecked(Settings::fog());
-  ui->floorTranslucencySpin->setValue(Settings::floorTranslucency());
-  ui->easeInCheckbox->setChecked(Settings::easeIn());
-  ui->easeOutCheckbox->setChecked(Settings::easeOut());
+  ui->useFogCheckbox->setChecked(UserSettings::fog());
+  ui->floorTranslucencySpin->setValue(UserSettings::floorTranslucency());
+  ui->easeInCheckbox->setChecked(UserSettings::easeIn());
+  ui->easeOutCheckbox->setChecked(UserSettings::easeOut());
 }
 
-SettingsDialog::~SettingsDialog()
+UserSettingsDialog::~UserSettingsDialog()
 {
-  qDebug("SettingsDialog::~SettingsDialog()");
+  qDebug("UserSettingsDialog::~UserSettingsDialog()");
 }
 
-void SettingsDialog::on_applyButton_clicked()
+void UserSettingsDialog::on_applyButton_clicked()
 {
   qDebug("accept()");
   apply();
 }
 
-void SettingsDialog::on_okButton_clicked()
+void UserSettingsDialog::on_okButton_clicked()
 {
   qDebug("acceptOk()");
   apply();
   accept();
 }
 
-void SettingsDialog::on_cancelButton_clicked()
+void UserSettingsDialog::on_cancelButton_clicked()
 {
   qDebug("reject()");
   reject();
 }
 
-void SettingsDialog::on_useFogCheckbox_toggled(bool state)
+void UserSettingsDialog::on_useFogCheckbox_toggled(bool state)
 {
   qDebug("useFogToggled(%d)",state);
 }
 
-void SettingsDialog::on_floorTranslucencySpin_valueChanged(int value)
+void UserSettingsDialog::on_floorTranslucencySpin_valueChanged(int value)
 {
   qDebug("floorTranslucencyChanged(%d)",value);
 }
 
-void SettingsDialog::on_easeInCheckbox_toggled(bool state)
+void UserSettingsDialog::on_easeInCheckbox_toggled(bool state)
 {
   qDebug("easeInToggled(%d)",state);
 }
 
-void SettingsDialog::on_easeOutCheckbox_toggled(bool state)
+void UserSettingsDialog::on_easeOutCheckbox_toggled(bool state)
 {
   qDebug("easeOutToggled(%d)",state);
 }
 
-void SettingsDialog::apply()
+void UserSettingsDialog::apply()
 {
-  Settings::setFog(ui->useFogCheckbox->isChecked());
-  Settings::setFloorTranslucency(ui->floorTranslucencySpin->value());
-  Settings::setEaseIn(ui->easeInCheckbox->isChecked());
-  Settings::setEaseOut(ui->easeOutCheckbox->isChecked());
+  UserSettings::setFog(ui->useFogCheckbox->isChecked());
+  UserSettings::setFloorTranslucency(ui->floorTranslucencySpin->value());
+  UserSettings::setEaseIn(ui->easeInCheckbox->isChecked());
+  UserSettings::setEaseOut(ui->easeOutCheckbox->isChecked());
   emit configChanged();
   qApp->processEvents();
 }
