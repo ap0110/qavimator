@@ -32,10 +32,6 @@ class UserSettings
   public:
     UserSettings() = delete;
 
-    static QString organizationName();
-    static QString organizationDomain();
-    static QString applicationName();
-
     static void setLoop(bool value);
     static bool loop();
     static void setSkeleton(bool value);
@@ -69,53 +65,37 @@ class UserSettings
     static void writeSettings();
 
 private:
-    static QString userSettingsGroup();
-    static QString versionGroup();
-
-    static QString loopKey();
-    static QString skeletonKey();
-    static QString jointLimitsKey();
-    static QString protectFirstFrameKey();
-    static QString showTimelinePanelKey();
-    static QString mainWindowWidthKey();
-    static QString mainWindowHeightKey();
-    static QString lastPathKey();
-    static QString fogKey();
-    static QString floorTranslucencyKey();
-    static QString easeInKey();
-    static QString easeOutKey();
-
-    static QString m_userSettingsGroup;
-    static QString m_versionGroup;
+    static const QString m_userSettingsGroup;
+    static const QString m_userSettingsVersionGroup;
 
     static bool m_loop;
-    static QString m_loopKey;
+    static const QString m_loopKey;
     static bool m_skeleton;
-    static QString m_skeletonKey;
+    static const QString m_skeletonKey;
     static bool m_jointLimits;
-    static QString m_jointLimitsKey;
+    static const QString m_jointLimitsKey;
     static bool m_protectFirstFrame;
-    static QString m_protectFirstFrameKey;
+    static const QString m_protectFirstFrameKey;
     static bool m_showTimelinePanel;
-    static QString m_showTimelinePanelKey;
+    static const QString m_showTimelinePanelKey;
 
     static int m_mainWindowWidth;
-    static QString m_mainWindowWidthKey;
+    static const QString m_mainWindowWidthKey;
     static int m_mainWindowHeight;
-    static QString m_mainWindowHeightKey;
+    static const QString m_mainWindowHeightKey;
 
     static QString m_lastPath;
-    static QString m_lastPathKey;
+    static const QString m_lastPathKey;
 
     static bool m_fog;
-    static QString m_fogKey;
+    static const QString m_fogKey;
     static int  m_floorTranslucency;
-    static QString  m_floorTranslucencyKey;
+    static const QString  m_floorTranslucencyKey;
 
     static bool m_easeIn;
-    static QString m_easeInKey;
+    static const QString m_easeInKey;
     static bool m_easeOut;
-    static QString m_easeOutKey;
+    static const QString m_easeOutKey;
 };
 
 #endif

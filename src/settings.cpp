@@ -29,6 +29,10 @@ Settings::Settings(QObject* parent) :
 {
 }
 
+Settings::~Settings()
+{
+}
+
 QStringList Settings::childGroups() const
 {
   return m_settings.childGroups();

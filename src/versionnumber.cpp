@@ -37,6 +37,10 @@ VersionNumber::VersionNumber(const QString& versionNumber) :
   }
 }
 
+VersionNumber::~VersionNumber()
+{
+}
+
 const QString& VersionNumber::toString() const
 {
   return m_versionNumber;

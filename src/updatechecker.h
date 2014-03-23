@@ -32,6 +32,7 @@ class UpdateChecker : public QObject
 
   public:
     UpdateChecker(QObject* parent = nullptr);
+    ~UpdateChecker();
 
   public slots:
     void checkUpdates();
@@ -40,6 +41,9 @@ class UpdateChecker : public QObject
     void replyFinished(QNetworkReply* reply);
 
   private:
+    void readSettings();
+    void writeSettings();
+
     bool processUpdates(const QByteArray& updates);
     bool readUpdates(QXmlStreamReader& xmlStreamReader);
     bool readVersion(QXmlStreamReader& xmlStreamReader);
@@ -48,6 +52,14 @@ class UpdateChecker : public QObject
 
     static const QString m_url;
     static const QString m_updatesVersion;
+
+    static const QString m_updateSettingsGroup;
+    static const QString m_updateSettingsVersionGroup;
+
+    static QDateTime m_lastSuccessfulCheck;
+    static const QString m_lastSuccessfulCheckKey;
+    static bool m_hasAutomaticUpdates;
+    static const QString m_hasAutomaticUpdatesKey;
 };
 
 #endif

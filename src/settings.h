@@ -29,6 +29,7 @@ class Settings : public QObject
 
   public:
     explicit Settings(QObject* parent = nullptr);
+    ~Settings();
 
     QStringList childGroups() const;
     void beginGroup(const QString& prefix);

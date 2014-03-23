@@ -22,37 +22,37 @@
 
 #include "usersettings.h"
 
-QString UserSettings::m_userSettingsGroup = "user_settings";
-QString UserSettings::m_versionGroup = "1.0";
+const QString UserSettings::m_userSettingsGroup = "user_settings";
+const QString UserSettings::m_userSettingsVersionGroup = "1.0";
 
 bool UserSettings::m_loop = true;
-QString UserSettings::m_loopKey = "loop";
+const QString UserSettings::m_loopKey = "loop";
 bool UserSettings::m_skeleton = false;
-QString UserSettings::m_skeletonKey = "skeleton";
+const QString UserSettings::m_skeletonKey = "skeleton";
 bool UserSettings::m_jointLimits = true;
-QString UserSettings::m_jointLimitsKey = "joint_limits";
+const QString UserSettings::m_jointLimitsKey = "joint_limits";
 bool UserSettings::m_protectFirstFrame = true;
-QString UserSettings::m_protectFirstFrameKey = "protect_first_frame";
+const QString UserSettings::m_protectFirstFrameKey = "protect_first_frame";
 bool UserSettings::m_showTimelinePanel = true;
-QString UserSettings::m_showTimelinePanelKey = "show_timeline_panel";
+const QString UserSettings::m_showTimelinePanelKey = "show_timeline_panel";
 
 int UserSettings::m_mainWindowWidth = 850;
-QString UserSettings::m_mainWindowWidthKey = "main_window_width";
+const QString UserSettings::m_mainWindowWidthKey = "main_window_width";
 int UserSettings::m_mainWindowHeight = 600;
-QString UserSettings::m_mainWindowHeightKey = "main_window_height";
+const QString UserSettings::m_mainWindowHeightKey = "main_window_height";
 
 QString UserSettings::m_lastPath = QString::null;
-QString UserSettings::m_lastPathKey = "last_path";
+const QString UserSettings::m_lastPathKey = "last_path";
 
 bool UserSettings::m_fog = true;
-QString UserSettings::m_fogKey = "fog";
+const QString UserSettings::m_fogKey = "fog";
 int  UserSettings::m_floorTranslucency = 33;
-QString  UserSettings::m_floorTranslucencyKey = "floor_translucency";
+const QString UserSettings::m_floorTranslucencyKey = "floor_translucency";
 
 bool UserSettings::m_easeIn = false;
-QString UserSettings::m_easeInKey = "ease_in";
+const QString UserSettings::m_easeInKey = "ease_in";
 bool UserSettings::m_easeOut = false;
-QString UserSettings::m_easeOutKey = "ease_out";
+const QString UserSettings::m_easeOutKey = "ease_out";
 
 
 void UserSettings::setLoop(bool on)               { m_loop = on; }
@@ -77,7 +77,7 @@ QString UserSettings::lastPath()                     { return m_lastPath; }
 void UserSettings::setFog(bool on)                { m_fog = on; }
 bool UserSettings::fog()                             { return m_fog; }
 void UserSettings::setFloorTranslucency(int on)   { m_floorTranslucency = on; }
-int  UserSettings::floorTranslucency()               { return m_floorTranslucency; }
+int UserSettings::floorTranslucency()               { return m_floorTranslucency; }
 
 void UserSettings::setEaseIn(bool on)             { m_easeIn = on; }
 bool UserSettings::easeIn()                          { return m_easeIn; }
@@ -87,30 +87,30 @@ bool UserSettings::easeOut()                         { return m_easeOut; }
 void UserSettings::readSettings()
 {
   Settings settings;
-  settings.beginGroup(userSettingsGroup());
+  settings.beginGroup(m_userSettingsGroup);
 
-  if (settings.childGroups().contains(versionGroup(), Qt::CaseInsensitive))
+  if (settings.childGroups().contains(m_userSettingsVersionGroup, Qt::CaseInsensitive))
   {
-    settings.beginGroup(versionGroup());
+    settings.beginGroup(m_userSettingsVersionGroup);
 
-    setLoop(settings.value(loopKey()).toBool());
-    setSkeleton(settings.value(skeletonKey()).toBool());
-    setJointLimits(settings.value(jointLimitsKey()).toBool());
-    setProtectFirstFrame(settings.value(protectFirstFrameKey()).toBool());
-    setShowTimelinePanel(settings.value(showTimelinePanelKey()).toBool());
+    setLoop(settings.value(m_loopKey).toBool());
+    setSkeleton(settings.value(m_skeletonKey).toBool());
+    setJointLimits(settings.value(m_jointLimitsKey).toBool());
+    setProtectFirstFrame(settings.value(m_protectFirstFrameKey).toBool());
+    setShowTimelinePanel(settings.value(m_showTimelinePanelKey).toBool());
 
-    setMainWindowWidth(settings.value(mainWindowWidthKey()).toInt());
-    setMainWindowHeight(settings.value(mainWindowHeightKey()).toInt());
+    setMainWindowWidth(settings.value(m_mainWindowWidthKey).toInt());
+    setMainWindowHeight(settings.value(m_mainWindowHeightKey).toInt());
 
-    setLastPath(settings.value(lastPathKey()).toString());
+    setLastPath(settings.value(m_lastPathKey).toString());
 
     // OpenGL settings
-    setFog(settings.value(fogKey()).toBool());
-    setFloorTranslucency(settings.value(floorTranslucencyKey()).toInt());
+    setFog(settings.value(m_fogKey).toBool());
+    setFloorTranslucency(settings.value(m_floorTranslucencyKey).toInt());
 
     // settings for ease in/ease outFrame
-    setEaseIn(settings.value(easeInKey()).toBool());
-    setEaseOut(settings.value(easeOutKey()).toBool());
+    setEaseIn(settings.value(m_easeInKey).toBool());
+    setEaseOut(settings.value(m_easeOutKey).toBool());
 
     settings.endGroup();
   }
@@ -121,98 +121,28 @@ void UserSettings::readSettings()
 void UserSettings::writeSettings()
 {
   Settings settings;
-  settings.beginGroup(userSettingsGroup());
-  settings.beginGroup(versionGroup());
+  settings.beginGroup(m_userSettingsGroup);
+  settings.beginGroup(m_userSettingsVersionGroup);
 
-  settings.setValue(loopKey(), loop());
-  settings.setValue(skeletonKey(), skeleton());
-  settings.setValue(jointLimitsKey(), jointLimits());
-  settings.setValue(protectFirstFrameKey(), protectFirstFrame());
-  settings.setValue(showTimelinePanelKey(), showTimelinePanel());
+  settings.setValue(m_loopKey, loop());
+  settings.setValue(m_skeletonKey, skeleton());
+  settings.setValue(m_jointLimitsKey, jointLimits());
+  settings.setValue(m_protectFirstFrameKey, protectFirstFrame());
+  settings.setValue(m_showTimelinePanelKey, showTimelinePanel());
 
-  settings.setValue(mainWindowWidthKey(), mainWindowWidth());
-  settings.setValue(mainWindowHeightKey(), mainWindowHeight());
+  settings.setValue(m_mainWindowWidthKey, mainWindowWidth());
+  settings.setValue(m_mainWindowHeightKey, mainWindowHeight());
 
-  settings.setValue(lastPathKey(), lastPath());
+  settings.setValue(m_lastPathKey, lastPath());
 
   // OpenGL settings
-  settings.setValue(fogKey(), fog());
-  settings.setValue(floorTranslucencyKey(), floorTranslucency());
+  settings.setValue(m_fogKey, fog());
+  settings.setValue(m_floorTranslucencyKey, floorTranslucency());
 
   // settings for ease in/ease outFrame
-  settings.setValue(easeInKey(), easeIn());
-  settings.setValue(easeOutKey(), easeOut());
+  settings.setValue(m_easeInKey, easeIn());
+  settings.setValue(m_easeOutKey, easeOut());
 
   settings.endGroup();
   settings.endGroup();
-}
-
-QString UserSettings::userSettingsGroup()
-{
-  return m_userSettingsGroup;
-}
-
-QString UserSettings::versionGroup()
-{
-  return m_versionGroup;
-}
-
-QString UserSettings::loopKey()
-{
-  return m_loopKey;
-}
-
-QString UserSettings::skeletonKey()
-{
-  return m_skeletonKey;
-}
-
-QString UserSettings::jointLimitsKey()
-{
-  return m_jointLimitsKey;
-}
-
-QString UserSettings::protectFirstFrameKey()
-{
-  return m_protectFirstFrameKey;
-}
-
-QString UserSettings::showTimelinePanelKey()
-{
-  return m_showTimelinePanelKey;
-}
-
-QString UserSettings::mainWindowWidthKey()
-{
-  return m_mainWindowWidthKey;
-}
-
-QString UserSettings::mainWindowHeightKey()
-{
-  return m_mainWindowHeightKey;
-}
-
-QString UserSettings::lastPathKey()
-{
-  return m_lastPathKey;
-}
-
-QString UserSettings::fogKey()
-{
-  return m_fogKey;
-}
-
-QString UserSettings::floorTranslucencyKey()
-{
-  return m_floorTranslucencyKey;
-}
-
-QString UserSettings::easeInKey()
-{
-  return m_easeInKey;
-}
-
-QString UserSettings::easeOutKey()
-{
-  return m_easeOutKey;
 }
