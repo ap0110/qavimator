@@ -40,10 +40,33 @@ AboutDialog::AboutDialog(QWidget* parent) :
         ).arg(Metadata::versionNumberString()
         ).arg(Metadata::buildNumber()));
   ui->dateTimeLabel->setText(Metadata::buildDateTime());
-  ui->lastUpdateCheckLabel->setText("Updates Last Checked: " +
-        UpdaterSettings::lastSuccessfulCheck());
+  setLastUpdateCheckLabel(UpdaterSettings::lastSuccessfulCheck());
+  ui->autoUpdatesCheckBox->setChecked(UpdaterSettings::hasAutomaticUpdates());
 }
 
 AboutDialog::~AboutDialog()
 {
+}
+
+void AboutDialog::updateCheckFinished()
+{
+  setLastUpdateCheckLabel(UpdaterSettings::lastSuccessfulCheck());
+  ui->checkUpdatesButton->setDisabled(false);
+}
+
+void AboutDialog::on_checkUpdatesButton_clicked()
+{
+  ui->checkUpdatesButton->setDisabled(true);
+  ui->lastUpdateCheckLabel->setText("Checking for updates...");
+  emit checkUpdates();
+}
+
+void AboutDialog::on_autoUpdatesCheckBox_stateChanged(int state)
+{
+  UpdaterSettings::setHasAutomaticUpdates(state == Qt::Checked);
+}
+
+void AboutDialog::setLastUpdateCheckLabel(const QString& lastChecked)
+{
+  ui->lastUpdateCheckLabel->setText("Last Checked: " + lastChecked);
 }

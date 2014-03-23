@@ -30,6 +30,7 @@
 #include "scene.h"
 #include "timeline.h"
 #include "timelineview.h"
+#include "updatersettings.h"
 #include "usersettings.h"
 #include "usersettingsdialog.h"
 
@@ -150,6 +151,15 @@ QAvimator::QAvimator() :
   ui->zPositionSlider->setPageStep(10*PRECISION);
 
   ui->currentFrameSlider->setPageStep(1);
+
+  if (UpdaterSettings::hasAutomaticUpdates() &&
+      (UpdaterSettings::lastSuccessfulCheck() == "Never" ||
+      QDateTime::fromString(
+        UpdaterSettings::lastSuccessfulCheck()
+        ).addDays(14) < QDateTime::currentDateTime()))
+  {
+    updateChecker.checkUpdates();
+  }
 
   QStringList args = QApplication::arguments();
   if(args.size()>1)
@@ -1255,6 +1265,10 @@ void QAvimator::configChanged()
 void QAvimator::helpAbout()
 {
   QScopedPointer<AboutDialog> dialog(new AboutDialog(this));
+  connect(dialog.data(), SIGNAL(checkUpdates()),
+          &updateChecker, SLOT(checkUpdates()));
+  connect(&updateChecker, SIGNAL(updateCheckFinished()),
+          dialog.data(), SLOT(updateCheckFinished()));
   dialog->exec();
 }
 

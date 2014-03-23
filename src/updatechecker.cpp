@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QDesktopServices>
+#include <QMessageBox>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QScopedPointer>
@@ -29,6 +31,43 @@
 #include "versionnumber.h"
 
 #include "updatechecker.h"
+
+UpdateCheckResults::UpdateCheckResults() :
+  m_hasUpdates(false),
+  m_hasSuccessfulUpdateCheck(false)
+{
+}
+
+UpdateCheckResults::UpdateCheckResults(bool hasUpdates, bool hasSuccessfulUpdateCheck) :
+  m_hasUpdates(hasUpdates),
+  m_hasSuccessfulUpdateCheck(hasSuccessfulUpdateCheck)
+{
+}
+
+UpdateCheckResults::~UpdateCheckResults()
+{
+}
+
+bool UpdateCheckResults::hasUpdates()
+{
+  return m_hasUpdates;
+}
+
+void UpdateCheckResults::setHasUpdates(bool hasUpdates)
+{
+  m_hasUpdates = hasUpdates;
+}
+
+bool UpdateCheckResults::hasSuccessfulUpdateCheck()
+{
+  return m_hasSuccessfulUpdateCheck;
+}
+
+void UpdateCheckResults::setHasSuccessfulUpdateCheck(bool hasSuccessfulUpdateCheck)
+{
+  m_hasSuccessfulUpdateCheck = hasSuccessfulUpdateCheck;
+}
+
 
 UpdateChecker::UpdateChecker(QObject* parent) :
   QObject(parent),
@@ -56,43 +95,51 @@ void UpdateChecker::checkUpdates()
 
 void UpdateChecker::replyFinished(QNetworkReply* reply)
 {
-  bool hasUpdated = processUpdates(reply->readAll());
-  if (hasUpdated)
+  UpdateCheckResults updateCheckResults = processUpdates(reply->readAll());
+  if (updateCheckResults.hasUpdates())
   {
-    qDebug("Update available!");
+    QMessageBox::StandardButton buttonPressed =
+        QMessageBox::question(nullptr, QString("Updates available"),
+                              QString("An update may be available!\n\nOpen the QAvimator website?"));
+    if (buttonPressed == QMessageBox::Yes)
+    {
+      QDesktopServices::openUrl(QUrl("http://qavimator.org/", QUrl::StrictMode));
+    }
   }
+  if (updateCheckResults.hasSuccessfulUpdateCheck())
+  {
+    UpdaterSettings::setLastSuccessfulCheck(QDateTime::currentDateTime().toString());
+  }
+  emit updateCheckFinished();
   reply->deleteLater();
 }
 
-bool UpdateChecker::processUpdates(const QByteArray& updates)
+UpdateCheckResults UpdateChecker::processUpdates(const QByteArray& updates)
 {
   QXmlStreamReader xmlStreamReader(updates);
 
-  bool hasUpdate = false;
   while (!xmlStreamReader.atEnd())
   {
     if (!xmlStreamReader.readNextStartElement()) break;
     if (xmlStreamReader.name() == "updates")
     {
-      hasUpdate = readUpdates(xmlStreamReader);
+      return readUpdates(xmlStreamReader);
     }
   }
 
   if (xmlStreamReader.hasError())
   {
     qDebug(QString("Error processing updates.xml: %1").arg(xmlStreamReader.errorString()).toStdString().c_str());
-    hasUpdate = false;
   }
   else
   {
     qDebug("Error processing updates.xml: End of document reached without finding version number");
-    hasUpdate = false;
   }
 
-  return hasUpdate;
+  return UpdateCheckResults();
 }
 
-bool UpdateChecker::readUpdates(QXmlStreamReader& xmlStreamReader)
+UpdateCheckResults UpdateChecker::readUpdates(QXmlStreamReader& xmlStreamReader)
 {
   QStringRef updatesVersion = xmlStreamReader.attributes().value("version");
   if (updatesVersion.isEmpty())
@@ -104,31 +151,34 @@ bool UpdateChecker::readUpdates(QXmlStreamReader& xmlStreamReader)
     VersionNumber versionNumber(updatesVersion.toString());
     if (versionNumber.compare(m_updatesVersion) > 0)
     {
-      return true;
+      return UpdateCheckResults(true, true);
     }
   }
 
   while (!xmlStreamReader.atEnd())
   {
-    if (!xmlStreamReader.readNextStartElement()) return false;
+    if (!xmlStreamReader.readNextStartElement()) break;
     if (xmlStreamReader.name() == "version")
     {
       return readVersion(xmlStreamReader);
     }
   }
 
-  return false;
+  return UpdateCheckResults();
 }
 
-bool UpdateChecker::readVersion(QXmlStreamReader& xmlStreamReader)
+UpdateCheckResults UpdateChecker::readVersion(QXmlStreamReader& xmlStreamReader)
 {
   VersionNumber versionNumber(xmlStreamReader.readElementText());
 
-  if (versionNumber.isValid()
-      && versionNumber.compare(Metadata::versionNumber()) > 0)
+  UpdateCheckResults results;
+  if (versionNumber.isValid())
   {
-    return true;
+    results.setHasSuccessfulUpdateCheck(true);
+    if (versionNumber.compare(Metadata::versionNumber()) > 0)
+    {
+      results.setHasUpdates(true);
+    }
   }
-
-  return false;
+  return results;
 }

@@ -35,7 +35,18 @@ class AboutDialog : public QDialog
     explicit AboutDialog(QWidget* parent = nullptr);
     ~AboutDialog();
 
+  signals:
+    void checkUpdates();
+
+  private slots:
+    void updateCheckFinished();
+
+    void on_checkUpdatesButton_clicked();
+    void on_autoUpdatesCheckBox_stateChanged(int state);
+
   private:
+    void setLastUpdateCheckLabel(const QString& lastChecked);
+
     QScopedPointer<Ui::AboutDialog> ui;
 };
 

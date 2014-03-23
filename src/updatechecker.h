@@ -26,6 +26,23 @@
 
 class QXmlStreamReader;
 
+class UpdateCheckResults
+{
+  public:
+    UpdateCheckResults();
+    UpdateCheckResults(bool hasUpdates, bool hasSuccessfulUpdateCheck);
+    ~UpdateCheckResults();
+
+    bool hasUpdates();
+    void setHasUpdates(bool hasUpdates);
+    bool hasSuccessfulUpdateCheck();
+    void setHasSuccessfulUpdateCheck(bool hasSuccessfulUpdateCheck);
+
+  private:
+    bool m_hasUpdates;
+    bool m_hasSuccessfulUpdateCheck;
+};
+
 class UpdateChecker : public QObject
 {
   Q_OBJECT
@@ -34,6 +51,9 @@ class UpdateChecker : public QObject
     UpdateChecker(QObject* parent = nullptr);
     ~UpdateChecker();
 
+  signals:
+    void updateCheckFinished();
+
   public slots:
     void checkUpdates();
 
@@ -41,9 +61,9 @@ class UpdateChecker : public QObject
     void replyFinished(QNetworkReply* reply);
 
   private:
-    bool processUpdates(const QByteArray& updates);
-    bool readUpdates(QXmlStreamReader& xmlStreamReader);
-    bool readVersion(QXmlStreamReader& xmlStreamReader);
+    UpdateCheckResults processUpdates(const QByteArray& updates);
+    UpdateCheckResults readUpdates(QXmlStreamReader& xmlStreamReader);
+    UpdateCheckResults readVersion(QXmlStreamReader& xmlStreamReader);
 
     QScopedPointer<QNetworkAccessManager> m_networkAccessManager;
 
