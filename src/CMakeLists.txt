@@ -25,6 +25,7 @@ SET (QAVI_SRC aboutdialog.cpp
               timeline.cpp
               timelineview.cpp
               updatechecker.cpp
+              updatersettings.cpp
               usersettings.cpp
               usersettingsdialog.cpp
               versionnumber.cpp)

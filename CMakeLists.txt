@@ -12,6 +12,12 @@ PROJECT (qavimator)
 STRING (TIMESTAMP BUILD_TIMESTAMP_Z "%Y-%m-%d %H:%M:%S UTC" UTC)
 ADD_DEFINITIONS (-DBUILD_TIMESTAMP_Z="${BUILD_TIMESTAMP_Z}")
 
+# Get the build number and pass to the compiler
+EXECUTE_PROCESS (COMMAND "hg" "id" "-n"
+                 OUTPUT_VARIABLE BUILD_NUMBER)
+STRING (STRIP "${BUILD_NUMBER}" BUILD_NUMBER)
+ADD_DEFINITIONS (-DBUILD_NUMBER="${BUILD_NUMBER}")
+
 # If update channel and version number were defined
 IF ((DEFINED UPDATE_CHANNEL) AND (DEFINED VERSION_NUMBER))
   # Pass them to the compiler

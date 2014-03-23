@@ -21,7 +21,6 @@
 #ifndef METADATA_H
 #define METADATA_H
 
-class QDateTime;
 class QString;
 
 class VersionNumber;
@@ -31,10 +30,10 @@ class Metadata
   public:
     Metadata() = delete;
 
-    static const QDateTime& buildDateTime();
-    static const QString buildDateTimeString();
+    static const QString& buildDateTime();
     static const VersionNumber& versionNumber();
     static const QString versionNumberString();
+    static const QString buildNumber();
     static const QString updateChannel();
     static const QString& organizationName();
     static const QString& organizationDomain();
@@ -48,8 +47,9 @@ class Metadata
       Release = 2
     } UpdateChannel;
 
-    static const QDateTime m_buildDateTime;
+    static const QString m_buildDateTime;
     static const VersionNumber m_versionNumber;
+    static const QString m_buildNumber;
     static const UpdateChannel m_updateChannel;
     static const QString m_organizationName;
     static const QString m_organizationDomain;

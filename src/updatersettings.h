@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Zi Ree                                          *
- *   Zi Ree @ SecondLife                                                   *
+ *   Copyright (C) 2006 by Zi Ree   *
+ *   Zi Ree @ SecondLife   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,37 +18,34 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef UPDATECHECKER_H
-#define UPDATECHECKER_H
+#ifndef UPDATERSETTINGS_H
+#define UPDATERSETTINGS_H
 
-#include <QNetworkAccessManager>
-#include <QObject>
+class QString;
 
-class QXmlStreamReader;
-
-class UpdateChecker : public QObject
+class UpdaterSettings
 {
-  Q_OBJECT
-
   public:
-    UpdateChecker(QObject* parent = nullptr);
-    ~UpdateChecker();
+    UpdaterSettings() = delete;
 
-  public slots:
-    void checkUpdates();
+    static const QString lastSuccessfulCheck();
+    static void setLastSuccessfulCheck(const QString& checkDateTime);
+    static const bool hasAutomaticUpdates();
+    static void setHasAutomaticUpdates(bool on);
 
-  private slots:
-    void replyFinished(QNetworkReply* reply);
+    static void readSettings();
+    static void writeSettings();
 
   private:
-    bool processUpdates(const QByteArray& updates);
-    bool readUpdates(QXmlStreamReader& xmlStreamReader);
-    bool readVersion(QXmlStreamReader& xmlStreamReader);
+    static const QString m_lastSuccessfulCheckFormat;
 
-    QScopedPointer<QNetworkAccessManager> m_networkAccessManager;
+    static const QString m_updaterSettingsGroup;
+    static const QString m_updaterSettingsVersionGroup;
 
-    const QString m_url;
-    const QString m_updatesVersion;
+    static QString m_lastSuccessfulCheck;
+    static const QString m_lastSuccessfulCheckKey;
+    static bool m_hasAutomaticUpdates;
+    static const QString m_hasAutomaticUpdatesKey;
 };
 
 #endif

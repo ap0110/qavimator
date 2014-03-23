@@ -25,29 +25,20 @@
 
 #include "metadata.h"
 #include "settings.h"
+#include "updatersettings.h"
 #include "versionnumber.h"
 
 #include "updatechecker.h"
 
-const QString UpdateChecker::m_url =
-    QString(
-      "http://qavimator.bitbucket.org/applications/qavimator/%1/updates.xml"
-      ).arg(Metadata::updateChannel().toLower());
-const QString UpdateChecker::m_updatesVersion = "1.0";
-
-const QString UpdateChecker::m_updateSettingsGroup = "update_settings";
-const QString UpdateChecker::m_updateSettingsVersionGroup = "1.0";
-
-QDateTime UpdateChecker::m_lastSuccessfulCheck = Metadata::buildDateTime();
-const QString UpdateChecker::m_lastSuccessfulCheckKey = "last_successful_check";
-bool UpdateChecker::m_hasAutomaticUpdates = true;
-const QString UpdateChecker::m_hasAutomaticUpdatesKey = "has_automatic_updates";
-
 UpdateChecker::UpdateChecker(QObject* parent) :
   QObject(parent),
-  m_networkAccessManager(new QNetworkAccessManager)
+  m_networkAccessManager(new QNetworkAccessManager),
+  m_url(QString(
+          "http://qavimator.bitbucket.org/applications/qavimator/%1/updates.xml"
+          ).arg(Metadata::updateChannel().toLower())),
+  m_updatesVersion("1.0")
 {
-  readSettings();
+  UpdaterSettings::readSettings();
 
   connect(m_networkAccessManager.data(), SIGNAL(finished(QNetworkReply*)),
           this, SLOT(replyFinished(QNetworkReply*)));
@@ -55,7 +46,7 @@ UpdateChecker::UpdateChecker(QObject* parent) :
 
 UpdateChecker::~UpdateChecker()
 {
-  writeSettings();
+  UpdaterSettings::writeSettings();
 }
 
 void UpdateChecker::checkUpdates()
@@ -71,36 +62,6 @@ void UpdateChecker::replyFinished(QNetworkReply* reply)
     qDebug("Update available!");
   }
   reply->deleteLater();
-}
-
-void UpdateChecker::readSettings()
-{
-  Settings settings;
-  settings.beginGroup(m_updateSettingsGroup);
-
-  if (settings.childGroups().contains(m_updateSettingsVersionGroup))
-  {
-    settings.beginGroup(m_updateSettingsVersionGroup);
-
-    m_lastSuccessfulCheck = settings.value(m_lastSuccessfulCheckKey).toDateTime();
-    m_hasAutomaticUpdates = settings.value(m_hasAutomaticUpdatesKey).toBool();
-
-    settings.endGroup();
-  }
-  settings.endGroup();
-}
-
-void UpdateChecker::writeSettings()
-{
-  Settings settings;
-  settings.beginGroup(m_updateSettingsGroup);
-  settings.beginGroup(m_updateSettingsVersionGroup);
-
-  settings.setValue(m_lastSuccessfulCheckKey, m_lastSuccessfulCheck);
-  settings.setValue(m_hasAutomaticUpdatesKey, m_hasAutomaticUpdates);
-
-  settings.endGroup();
-  settings.endGroup();
 }
 
 bool UpdateChecker::processUpdates(const QByteArray& updates)

@@ -25,13 +25,13 @@
 
 #include "aboutdialog.h"
 #include "animationview.h"
+#include "metadata.h"
 #include "prop.h"
 #include "scene.h"
-#include "usersettings.h"
-#include "usersettingsdialog.h"
 #include "timeline.h"
 #include "timelineview.h"
-#include "metadata.h"
+#include "usersettings.h"
+#include "usersettingsdialog.h"
 
 #include "qavimator.h"
 #include "ui_qavimator.h"

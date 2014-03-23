@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "metadata.h"
+#include "updatersettings.h"
 
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
@@ -33,12 +34,14 @@ AboutDialog::AboutDialog(QWidget* parent) :
 {
   ui->setupUi(this);
 
-  QString versionLabelText("%1 Version %2");
-  versionLabelText = versionLabelText.arg(Metadata::updateChannel());
-  versionLabelText = versionLabelText.arg(Metadata::versionNumberString());
-
-  ui->versionLabel->setText(versionLabelText);
-  ui->timestampLabel->setText(Metadata::buildDateTimeString());
+  ui->versionLabel->setText(
+        QString("%1 Version %2 (%3)"
+        ).arg(Metadata::updateChannel()
+        ).arg(Metadata::versionNumberString()
+        ).arg(Metadata::buildNumber()));
+  ui->dateTimeLabel->setText(Metadata::buildDateTime());
+  ui->lastUpdateCheckLabel->setText("Updates Last Checked: " +
+        UpdaterSettings::lastSuccessfulCheck());
 }
 
 AboutDialog::~AboutDialog()

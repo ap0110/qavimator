@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include <QDateTime>
+
 #include <QString>
 #include <QStringList>
 
@@ -26,19 +26,21 @@
 #include "metadata.h"
 
 #ifdef BUILD_TIMESTAMP_Z
-  const QDateTime Metadata::m_buildDateTime =
-      QDateTime::fromString(
-        BUILD_TIMESTAMP_Z,
-        "yyyy-MM-dd hh:mm:ss 'UTC'"
-        );
+  const QString Metadata::m_buildDateTime = BUILD_TIMESTAMP_Z;
 #else
-  const QDateTime Metadata::m_buildDateTime = QDateTime();
+  const QString Metadata::m_buildDateTime = QString();
 #endif
 
 #ifdef VERSION_NUMBER
   const VersionNumber Metadata::m_versionNumber = VersionNumber(VERSION_NUMBER);
 #else
-  const QString Metadata::m_versionNumber = "0";
+  const QString Metadata::m_versionNumber = VersionNumber();
+#endif
+
+#ifdef BUILD_NUMBER
+  const QString Metadata::m_buildNumber = QString(BUILD_NUMBER);
+#else
+  const QString Metadata::m_buildNumber = QString("-1");
 #endif
 
 #if UPDATE_CHANNEL == 2
@@ -59,14 +61,9 @@ const QString Metadata::m_organizationName = "QAvimator Team";
 const QString Metadata::m_organizationDomain = "qavimator.org";
 
 
-const QDateTime& Metadata::buildDateTime()
+const QString& Metadata::buildDateTime()
 {
   return m_buildDateTime;
-}
-
-const QString Metadata::buildDateTimeString()
-{
-  return m_buildDateTime.toString("yyyy-MM-dd hh:mm:ss 'UTC'");
 }
 
 const VersionNumber& Metadata::versionNumber()
@@ -77,6 +74,11 @@ const VersionNumber& Metadata::versionNumber()
 const QString Metadata::versionNumberString()
 {
   return m_versionNumber.toString();
+}
+
+const QString Metadata::buildNumber()
+{
+  return m_buildNumber;
 }
 
 const QString Metadata::updateChannel()

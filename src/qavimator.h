@@ -36,6 +36,7 @@
 
 #include "playstate.h"
 #include "prop.h"
+#include "updatechecker.h"
 
 class QCloseEvent;
 class QFileInfo;
@@ -300,6 +301,8 @@ class QAvimator : public QMainWindow
     QScopedPointer<Ui::QAvimator> ui;
 
     Scene* scene;
+
+    UpdateChecker updateChecker;
 };
 
 #endif
