@@ -51,9 +51,9 @@ QAvimator::QAvimator() :
               << 17 << 18 << 19
               << 21 << 22 << 23;
 
-  QApplication::setOrganizationName(UserSettings::organizationName());
-  QApplication::setOrganizationDomain(UserSettings::organizationDomain());
-  QApplication::setApplicationName(UserSettings::applicationName());
+  QApplication::setOrganizationName(Metadata::organizationName());
+  QApplication::setOrganizationDomain(Metadata::organizationDomain());
+  QApplication::setApplicationName(Metadata::applicationName());
   QApplication::setApplicationVersion(Metadata::versionNumberString());
 
   ui->setupUi(this);

@@ -18,17 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <iostream>
-
-#include "metadata.h"
+#include "settings.h"
 
 #include "usersettings.h"
 
-QString UserSettings::m_organizationName = "QAvimator Team";
-QString UserSettings::m_organizationDomain = "qavimator.org";
-QString UserSettings::m_applicationName = QString("QAvimator%1").arg(Metadata::updateChannelSuffix());
-
-QString UserSettings::m_settingsGroup = "settings";
+QString UserSettings::m_userSettingsGroup = "user_settings";
 QString UserSettings::m_versionGroup = "1.0";
 
 bool UserSettings::m_loop = true;
@@ -61,21 +55,6 @@ bool UserSettings::m_easeOut = false;
 QString UserSettings::m_easeOutKey = "ease_out";
 
 
-QString UserSettings::organizationName()
-{
-  return m_organizationName;
-}
-
-QString UserSettings::organizationDomain()
-{
-  return m_organizationDomain;
-}
-
-QString UserSettings::applicationName()
-{
-  return m_applicationName;
-}
-
 void UserSettings::setLoop(bool on)               { m_loop = on; }
 bool UserSettings::loop()                            { return m_loop; }
 void UserSettings::setSkeleton(bool on)           { m_skeleton = on; }
@@ -107,9 +86,8 @@ bool UserSettings::easeOut()                         { return m_easeOut; }
 
 void UserSettings::readSettings()
 {
-  QSettings settings(QSettings::IniFormat, QSettings::UserScope,
-                     organizationName(), applicationName());
-  settings.beginGroup(settingsGroup());
+  Settings settings;
+  settings.beginGroup(userSettingsGroup());
 
   if (settings.childGroups().contains(versionGroup(), Qt::CaseInsensitive))
   {
@@ -142,9 +120,8 @@ void UserSettings::readSettings()
 
 void UserSettings::writeSettings()
 {
-  QSettings settings(QSettings::IniFormat, QSettings::UserScope,
-                     organizationName(), applicationName());
-  settings.beginGroup(settingsGroup());
+  Settings settings;
+  settings.beginGroup(userSettingsGroup());
   settings.beginGroup(versionGroup());
 
   settings.setValue(loopKey(), loop());
@@ -170,9 +147,9 @@ void UserSettings::writeSettings()
   settings.endGroup();
 }
 
-QString UserSettings::settingsGroup()
+QString UserSettings::userSettingsGroup()
 {
-  return m_settingsGroup;
+  return m_userSettingsGroup;
 }
 
 QString UserSettings::versionGroup()

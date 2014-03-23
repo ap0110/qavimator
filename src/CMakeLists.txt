@@ -19,6 +19,7 @@ SET (QAVI_SRC aboutdialog.cpp
               propmanager.cpp
               qavimator.cpp
               scene.cpp
+              settings.cpp
               slpartsfemale.cpp
               slpartsmale.cpp
               timeline.cpp

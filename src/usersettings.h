@@ -25,7 +25,7 @@
 	@author Zi Ree <Zi Ree @ Second Life>
 */
 
-#include <QSettings>
+class QString;
 
 class UserSettings
 {
@@ -69,7 +69,7 @@ class UserSettings
     static void writeSettings();
 
 private:
-    static QString settingsGroup();
+    static QString userSettingsGroup();
     static QString versionGroup();
 
     static QString loopKey();
@@ -85,11 +85,7 @@ private:
     static QString easeInKey();
     static QString easeOutKey();
 
-    static QString m_organizationName;
-    static QString m_organizationDomain;
-    static QString m_applicationName;
-
-    static QString m_settingsGroup;
+    static QString m_userSettingsGroup;
     static QString m_versionGroup;
 
     static bool m_loop;

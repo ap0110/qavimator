@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Zi Ree                                          *
- *   Zi Ree @ SecondLife                                                   *
+ *   Copyright (C) 2006 by Zi Ree   *
+ *   Zi Ree @ SecondLife   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,42 +18,27 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef METADATA_H
-#define METADATA_H
+#ifndef SETTINGS_H
+#define SETTINGS_H
 
-class QDateTime;
-class QString;
+#include <QSettings>
 
-class VersionNumber;
-
-class Metadata
+class Settings : public QObject
 {
-  public:
-    Metadata() = delete;
+  Q_OBJECT
 
-    static const QDateTime& buildDateTime();
-    static const QString buildDateTimeString();
-    static const VersionNumber& versionNumber();
-    static const QString versionNumberString();
-    static const QString updateChannel();
-    static const QString& organizationName();
-    static const QString& organizationDomain();
-    static const QString& applicationName();
+  public:
+    explicit Settings(QObject* parent = nullptr);
+
+    QStringList childGroups() const;
+    void beginGroup(const QString& prefix);
+    void endGroup();
+
+    QVariant value(const QString& key, const QVariant& defaultValue = QVariant());
+    void setValue(const QString& key, const QVariant& value);
 
   private:
-    typedef enum class
-    {
-      Development = 0,
-      Beta = 1,
-      Release = 2
-    } UpdateChannel;
-
-    static const QDateTime m_buildDateTime;
-    static const VersionNumber m_versionNumber;
-    static const UpdateChannel m_updateChannel;
-    static const QString m_organizationName;
-    static const QString m_organizationDomain;
-    static const QString m_applicationName;
+    QSettings m_settings;
 };
 
 #endif

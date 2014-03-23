@@ -42,12 +42,21 @@
 #endif
 
 #if UPDATE_CHANNEL == 2
-  const Metadata::UpdateChannel Metadata::m_updateChannel = UpdateChannel::Release;
+  const Metadata::UpdateChannel Metadata::m_updateChannel =
+      UpdateChannel::Release;
+  QString Metadata::m_applicationName = QString("QAvimator");
 #elif UPDATE_CHANNEL == 1
-  const Metadata::UpdateChannel Metadata::m_updateChannel = UpdateChannel::Beta;
+  const Metadata::UpdateChannel Metadata::m_updateChannel =
+      UpdateChannel::Beta;
+  QString Metadata::m_applicationName = QString("QAvimator-Beta");
 #else
-  const Metadata::UpdateChannel Metadata::m_updateChannel = UpdateChannel::Development;
+  const Metadata::UpdateChannel Metadata::m_updateChannel =
+      UpdateChannel::Development;
+  const QString Metadata::m_applicationName = QString("QAvimator-Development");
 #endif
+
+const QString Metadata::m_organizationName = "QAvimator Team";
+const QString Metadata::m_organizationDomain = "qavimator.org";
 
 
 const QDateTime& Metadata::buildDateTime()
@@ -86,18 +95,17 @@ const QString Metadata::updateChannel()
   }
 }
 
-const QString Metadata::updateChannelSuffix()
+const QString& Metadata::organizationName()
 {
-  switch (m_updateChannel)
-  {
-    case UpdateChannel::Release:
-      return "";
-      break;
-    case UpdateChannel::Beta:
-      return "-Beta";
-      break;
-    default:
-      return "-Development";
-      break;
-  }
+  return m_organizationName;
+}
+
+const QString& Metadata::organizationDomain()
+{
+  return m_organizationDomain;
+}
+
+const QString& Metadata::applicationName()
+{
+  return m_applicationName;
 }

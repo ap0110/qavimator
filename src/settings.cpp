@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Zi Ree                                          *
- *   Zi Ree @ SecondLife                                                   *
+ *   Copyright (C) 2006 by Zi Ree   *
+ *   Zi Ree @ SecondLife   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,42 +18,38 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef METADATA_H
-#define METADATA_H
+#include "metadata.h"
 
-class QDateTime;
-class QString;
+#include "settings.h"
 
-class VersionNumber;
-
-class Metadata
+Settings::Settings(QObject* parent) :
+  QObject(parent),
+  m_settings(QSettings::IniFormat, QSettings::UserScope,
+             Metadata::organizationName(), Metadata::applicationName())
 {
-  public:
-    Metadata() = delete;
+}
 
-    static const QDateTime& buildDateTime();
-    static const QString buildDateTimeString();
-    static const VersionNumber& versionNumber();
-    static const QString versionNumberString();
-    static const QString updateChannel();
-    static const QString& organizationName();
-    static const QString& organizationDomain();
-    static const QString& applicationName();
+QStringList Settings::childGroups() const
+{
+  return m_settings.childGroups();
+}
 
-  private:
-    typedef enum class
-    {
-      Development = 0,
-      Beta = 1,
-      Release = 2
-    } UpdateChannel;
+void Settings::beginGroup(const QString& prefix)
+{
+  m_settings.beginGroup(prefix);
+}
 
-    static const QDateTime m_buildDateTime;
-    static const VersionNumber m_versionNumber;
-    static const UpdateChannel m_updateChannel;
-    static const QString m_organizationName;
-    static const QString m_organizationDomain;
-    static const QString m_applicationName;
-};
+void Settings::endGroup()
+{
+  m_settings.endGroup();
+}
 
-#endif
+QVariant Settings::value(const QString& key, const QVariant& defaultValue)
+{
+  return m_settings.value(key, defaultValue);
+}
+
+void Settings::setValue(const QString& key, const QVariant& value)
+{
+  m_settings.setValue(key, value);
+}
