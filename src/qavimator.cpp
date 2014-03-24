@@ -156,7 +156,7 @@ QAvimator::QAvimator() :
       (UpdaterSettings::lastSuccessfulCheck() == "Never" ||
       QDateTime::fromString(
         UpdaterSettings::lastSuccessfulCheck()
-        ).addDays(14) < QDateTime::currentDateTime()))
+        ).addDays(1) < QDateTime::currentDateTime()))
   {
     updateChecker.checkUpdates();
   }
