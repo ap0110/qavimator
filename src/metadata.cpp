@@ -34,7 +34,7 @@
 #ifdef VERSION_NUMBER
   const VersionNumber Metadata::m_versionNumber = VersionNumber(VERSION_NUMBER);
 #else
-  const QString Metadata::m_versionNumber = VersionNumber();
+  const VersionNumber Metadata::m_versionNumber = VersionNumber();
 #endif
 
 #ifdef BUILD_NUMBER
@@ -46,11 +46,11 @@
 #if UPDATE_CHANNEL == 2
   const Metadata::UpdateChannel Metadata::m_updateChannel =
       UpdateChannel::Release;
-  QString Metadata::m_applicationName = QString("QAvimator");
+  const QString Metadata::m_applicationName = QString("QAvimator");
 #elif UPDATE_CHANNEL == 1
   const Metadata::UpdateChannel Metadata::m_updateChannel =
       UpdateChannel::Beta;
-  QString Metadata::m_applicationName = QString("QAvimator-Beta");
+  const QString Metadata::m_applicationName = QString("QAvimator-Beta");
 #else
   const Metadata::UpdateChannel Metadata::m_updateChannel =
       UpdateChannel::Development;
