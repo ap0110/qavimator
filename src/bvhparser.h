@@ -28,11 +28,11 @@ class Joint;
 class KeyframeData;
 class NewAnimation;
 
-typedef enum class
+enum class Channel
 {
   POSITION_X, POSITION_Y, POSITION_Z,
   ROTATION_X, ROTATION_Y, ROTATION_Z
-} Channel;
+};
 
 class BvhFrame
 {

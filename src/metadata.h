@@ -40,12 +40,12 @@ class Metadata
     static const QString& applicationName();
 
   private:
-    typedef enum class
+    enum class UpdateChannel
     {
       Development = 0,
       Beta = 1,
       Release = 2
-    } UpdateChannel;
+    };
 
     static const QString m_buildDateTime;
     static const VersionNumber m_versionNumber;

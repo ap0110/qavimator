@@ -26,12 +26,12 @@
 #include <QMap>
 #include <QVector3D>
 
-typedef enum class
+enum class RotationOrder
 {
   XYZ, XZY,
   YXZ, YZX,
   ZXY, ZYX
-} RotationOrder;
+};
 
 class KeyframeData
 {

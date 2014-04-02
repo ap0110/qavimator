@@ -41,13 +41,13 @@ class FileManager : public QObject
     QSharedPointer<NewAnimation> loadAnimationFromApplicationData(const QString& fileName);
 
   private:
-    typedef enum class
+    enum class FileType
     {
       UNKNOWN,
       BVH,
       ANIM,
       QAVM
-    } FileType;
+    };
 
     QDir getDataDirectoryByOperatingSystem() const;
     const FileType determineFileType(QFile& openedFile) const;

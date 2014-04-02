@@ -23,10 +23,10 @@
 
 #include <QObject>
 
-typedef enum class
+enum class FigureType
 {
   MALE, FEMALE
-} FigureType;
+};
 
 class Avatar : public QObject
 {
