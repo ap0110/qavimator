@@ -34,7 +34,7 @@
 #ifdef VERSION_NUMBER
   const VersionNumber Metadata::m_versionNumber = VersionNumber(VERSION_NUMBER);
 #else
-  const VersionNumber Metadata::m_versionNumber = VersionNumber();
+  const VersionNumber Metadata::m_versionNumber = VersionNumber("0.0.0");
 #endif
 
 #ifdef BUILD_NUMBER

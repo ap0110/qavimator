@@ -45,7 +45,7 @@ class QSlider;
 
 class Animation;
 class BVHNode;
-class RotationLimits;
+struct RotationLimits;
 class Scene;
 class Timeline;
 

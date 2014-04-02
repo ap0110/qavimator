@@ -5,6 +5,10 @@ CMAKE_POLICY (VERSION 2.8.11)
 SET (CMAKE_AUTOMOC ON)
 # Set the compiler standard to C++11 and enable warnings
 SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -pedantic")
+# OS X needs the stdlib flag set to LLVM's C++11 library
+IF (APPLE)
+  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+ENDIF (APPLE)
 
 PROJECT (qavimator)
 
