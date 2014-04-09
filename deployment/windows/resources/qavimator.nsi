@@ -31,6 +31,7 @@
 	!define FILE_NAME "${APPLICATION_NAME}_${APPLICATION_VERSION}_${APPLICATION_BUILD_NUMBER}_win32.exe"
 	
 	!define WEBSITE "qavimator.org"
+	!define ORGANIZATION "QAvimator Team"
 	
 	!define ENGLISH_US_CODE 1033
 	
@@ -63,7 +64,7 @@
 	VIAddVersionKey /LANG=${ENGLISH_US_CODE} "FileVersion" "${APPLICATION_VERSION}.0"
 	VIAddVersionKey /LANG=${ENGLISH_US_CODE} "ProductName" "${APPLICATION_NAME}"
 	VIAddVersionKey /LANG=${ENGLISH_US_CODE} "ProductVersion" "${APPLICATION_VERSION}"
-	VIAddVersionKey /LANG=${ENGLISH_US_CODE} "CompanyName" "QAvimator Team"
+	VIAddVersionKey /LANG=${ENGLISH_US_CODE} "CompanyName" "${ORGANIZATION}"
 	VIAddVersionKey /LANG=${ENGLISH_US_CODE} "LegalCopyright" ""
 	VIAddVersionKey /LANG=${ENGLISH_US_CODE} "OriginalFilename" "${FILE_NAME}"
 	VIProductVersion "${APPLICATION_VERSION}.0"
@@ -147,6 +148,8 @@ Section "Install"
 		"DisplayIcon" "$\"$INSTDIR\qavimator.exe$\""
 	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
 		"URLInfoAbout" "${WEBSITE}"
+	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
+		"Publisher" "${ORGANIZATION}"
 	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
 		"DisplayVersion" "${APPLICATION_VERSION}"
 	WriteRegDWORD ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
