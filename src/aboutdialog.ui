@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>256</width>
+    <width>320</width>
     <height>256</height>
    </rect>
   </property>
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>256</width>
+    <width>320</width>
     <height>256</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>256</width>
+    <width>320</width>
     <height>256</height>
    </size>
   </property>
@@ -36,7 +36,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>231</width>
+     <width>301</width>
      <height>31</height>
     </rect>
    </property>
@@ -59,7 +59,7 @@
     <rect>
      <x>10</x>
      <y>40</y>
-     <width>231</width>
+     <width>301</width>
      <height>21</height>
     </rect>
    </property>
@@ -81,7 +81,7 @@
     <rect>
      <x>10</x>
      <y>120</y>
-     <width>231</width>
+     <width>301</width>
      <height>121</height>
     </rect>
    </property>
@@ -97,7 +97,7 @@
    <widget class="QPushButton" name="checkUpdatesButton">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>70</x>
       <y>40</y>
       <width>151</width>
       <height>41</height>
@@ -119,7 +119,7 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>211</width>
+      <width>281</width>
       <height>21</height>
      </rect>
     </property>
@@ -141,7 +141,7 @@
      <rect>
       <x>10</x>
       <y>100</y>
-      <width>191</width>
+      <width>281</width>
       <height>17</height>
      </rect>
     </property>
@@ -164,7 +164,7 @@
     <rect>
      <x>10</x>
      <y>60</y>
-     <width>231</width>
+     <width>301</width>
      <height>20</height>
     </rect>
    </property>
@@ -185,7 +185,7 @@
     <rect>
      <x>10</x>
      <y>90</y>
-     <width>231</width>
+     <width>301</width>
      <height>20</height>
     </rect>
    </property>

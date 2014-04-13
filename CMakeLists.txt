@@ -10,6 +10,11 @@ IF (APPLE)
   SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 ENDIF (APPLE)
 
+# Release mode build should not generate debug messages
+IF ("${CMAKE_BUILD_TYPE}" MATCHES "Release")
+  ADD_DEFINITIONS (-DQT_NO_DEBUG_OUTPUT="")
+ENDIF ("${CMAKE_BUILD_TYPE}" MATCHES "Release")
+
 PROJECT (qavimator)
 
 # Timestamp when program was built; pass the current timestamp to the compiler
