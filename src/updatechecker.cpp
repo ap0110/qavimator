@@ -27,6 +27,7 @@
 
 #include "metadata.h"
 #include "settings.h"
+#include "updatenotificationdialog.h"
 #include "updatersettings.h"
 #include "versionnumber.h"
 
@@ -69,9 +70,10 @@ void UpdateCheckResults::setHasSuccessfulUpdateCheck(bool hasSuccessfulUpdateChe
 }
 
 
-UpdateChecker::UpdateChecker(QObject* parent) :
+UpdateChecker::UpdateChecker(QObject* parent, QWidget* parentWidget) :
   QObject(parent),
   m_networkAccessManager(new QNetworkAccessManager),
+  m_parentWidget(parentWidget),
   m_url(QString(
           "http://qavimator.bitbucket.org/applications/qavimator/%1/updates.xml"
           ).arg(Metadata::updateChannel().toLower())),
@@ -98,13 +100,8 @@ void UpdateChecker::replyFinished(QNetworkReply* reply)
   UpdateCheckResults updateCheckResults = processUpdates(reply->readAll());
   if (updateCheckResults.hasUpdates())
   {
-    QMessageBox::StandardButton buttonPressed =
-        QMessageBox::question(nullptr, QString("Updates available"),
-                              QString("An update may be available!\n\nOpen the QAvimator website?"));
-    if (buttonPressed == QMessageBox::Yes)
-    {
-      QDesktopServices::openUrl(QUrl("http://qavimator.org/", QUrl::StrictMode));
-    }
+    QScopedPointer<UpdateNotificationDialog> dialog(new UpdateNotificationDialog(m_parentWidget));
+    dialog->exec();
   }
   if (updateCheckResults.hasSuccessfulUpdateCheck())
   {

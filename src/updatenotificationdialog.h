@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Zi Ree                                          *
- *   Zi Ree @ SecondLife                                                   *
+ *   Copyright (C) 2006 by Zi Ree   *
+ *   Zi Ree @ SecondLife   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,60 +18,29 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef UPDATECHECKER_H
-#define UPDATECHECKER_H
+#ifndef UPDATENOTIFICATIONDIALOG_H
+#define UPDATENOTIFICATIONDIALOG_H
 
-#include <QNetworkAccessManager>
-#include <QObject>
+#include <QDialog>
+#include <QScopedPointer>
 
-class QXmlStreamReader;
+namespace Ui {
+class UpdateNotificationDialog;
+}
 
-class UpdateCheckResults
-{
-  public:
-    UpdateCheckResults();
-    UpdateCheckResults(bool hasUpdates, bool hasSuccessfulUpdateCheck);
-    ~UpdateCheckResults();
-
-    bool hasUpdates();
-    void setHasUpdates(bool hasUpdates);
-    bool hasSuccessfulUpdateCheck();
-    void setHasSuccessfulUpdateCheck(bool hasSuccessfulUpdateCheck);
-
-  private:
-    bool m_hasUpdates;
-    bool m_hasSuccessfulUpdateCheck;
-};
-
-class UpdateChecker : public QObject
+class UpdateNotificationDialog : public QDialog
 {
   Q_OBJECT
 
   public:
-    UpdateChecker(QObject* parent = nullptr,
-                  QWidget* parentWidget = nullptr);
-    ~UpdateChecker();
-
-  signals:
-    void updateCheckFinished();
-
-  public slots:
-    void checkUpdates();
+    explicit UpdateNotificationDialog(QWidget* parent = nullptr);
+    ~UpdateNotificationDialog();
 
   private slots:
-    void replyFinished(QNetworkReply* reply);
+    void on_autoUpdatesCheckBox_stateChanged(int state);
 
   private:
-    UpdateCheckResults processUpdates(const QByteArray& updates);
-    UpdateCheckResults readUpdates(QXmlStreamReader& xmlStreamReader);
-    UpdateCheckResults readVersion(QXmlStreamReader& xmlStreamReader);
-
-    QScopedPointer<QNetworkAccessManager> m_networkAccessManager;
-
-    QWidget* m_parentWidget;
-
-    const QString m_url;
-    const QString m_updatesVersion;
+    QScopedPointer<Ui::UpdateNotificationDialog> ui;
 };
 
 #endif

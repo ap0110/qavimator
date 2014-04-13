@@ -43,7 +43,8 @@
 
 QAvimator::QAvimator() :
   QMainWindow(nullptr),
-  ui(new Ui::QAvimator)
+  ui(new Ui::QAvimator),
+  updateChecker(nullptr, this)
 {
   nodeMapping <<  0
               <<  1 <<  2 <<  3 <<  4 << 5

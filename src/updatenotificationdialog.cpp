@@ -18,56 +18,29 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "metadata.h"
 #include "updatersettings.h"
 
-#include "aboutdialog.h"
-#include "ui_aboutdialog.h"
+#include "updatenotificationdialog.h"
+#include "ui_updatenotificationdialog.h"
 
-AboutDialog::AboutDialog(QWidget* parent) :
+UpdateNotificationDialog::UpdateNotificationDialog(QWidget *parent) :
   QDialog(parent,
           Qt::WindowTitleHint
           | Qt::WindowSystemMenuHint
           | Qt::WindowCloseButtonHint
           | Qt::MSWindowsFixedSizeDialogHint),
-  ui(new Ui::AboutDialog)
+  ui(new Ui::UpdateNotificationDialog)
 {
   ui->setupUi(this);
 
-  ui->versionLabel->setText(
-        QString("%1 Version %2 (%3)"
-        ).arg(Metadata::updateChannel()
-        ).arg(Metadata::versionNumberString()
-        ).arg(Metadata::buildNumber()));
-  ui->dateTimeLabel->setText(Metadata::buildDateTime());
-  setLastUpdateCheckLabel(UpdaterSettings::lastSuccessfulCheck());
   ui->autoUpdatesCheckBox->setChecked(UpdaterSettings::hasAutomaticUpdates());
 }
 
-AboutDialog::~AboutDialog()
+UpdateNotificationDialog::~UpdateNotificationDialog()
 {
 }
 
-void AboutDialog::updateCheckFinished()
-{
-  setLastUpdateCheckLabel(UpdaterSettings::lastSuccessfulCheck());
-  ui->checkUpdatesButton->setDisabled(false);
-  ui->autoUpdatesCheckBox->setChecked(UpdaterSettings::hasAutomaticUpdates());
-}
-
-void AboutDialog::on_checkUpdatesButton_clicked()
-{
-  ui->checkUpdatesButton->setDisabled(true);
-  ui->lastUpdateCheckLabel->setText("Checking for updates...");
-  emit checkUpdates();
-}
-
-void AboutDialog::on_autoUpdatesCheckBox_stateChanged(int state)
+void UpdateNotificationDialog::on_autoUpdatesCheckBox_stateChanged(int state)
 {
   UpdaterSettings::setHasAutomaticUpdates(state == Qt::Checked);
-}
-
-void AboutDialog::setLastUpdateCheckLabel(const QString& lastChecked)
-{
-  ui->lastUpdateCheckLabel->setText("Last Checked: " + lastChecked);
 }

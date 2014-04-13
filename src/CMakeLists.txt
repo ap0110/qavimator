@@ -25,6 +25,7 @@ SET (QAVI_SRC aboutdialog.cpp
               timeline.cpp
               timelineview.cpp
               updatechecker.cpp
+              updatenotificationdialog.cpp
               updatersettings.cpp
               usersettings.cpp
               usersettingsdialog.cpp
@@ -33,6 +34,7 @@ SET (QAVI_SRC aboutdialog.cpp
 # Interfaces
 SET (QAVI_UI  aboutdialog.ui
               qavimator.ui
+              updatenotificationdialog.ui
               usersettingsdialog.ui)
 
 # Resources
