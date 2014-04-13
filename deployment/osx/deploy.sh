@@ -3,6 +3,16 @@
 
 VERSION_NUMBER=0.1.0
 
+echo ""
+
+echo Update channels:
+echo 0 = Development
+echo 1 = Beta
+echo 2 = Release
+read -p "Which channel (0, 1, or 2)? " UPDATE_CHANNEL
+
+echo ""
+
 pushd ../..
 
 # get the architecture of this machine
@@ -24,12 +34,6 @@ if [ -z ${BUILD_NUMBER+x} ]
 then
   BUILD_NUMBER=0
 fi
-
-echo Update channels:
-echo 0 = Development
-echo 1 = Beta
-echo 2 = Release
-read -p "Which channel (0, 1, or 2)? " UPDATE_CHANNEL
 
 if [ "$UPDATE_CHANNEL" == "2" ]
 then
@@ -59,8 +63,8 @@ then
 fi
 cd _build
 
-cmake .. -DINSTALL_BIN=../deployment/osx/staging/QAvimator.app/Contents/MacOS -DINSTALL_DATA=../deployment/osx/staging/QAvimator.app/Contents/Resources -DCMAKE_OSX_ARCHITECTURES="$MACHINE_ARCH" -DCMAKE_BUILD_TYPE=MinSizeRel -DQt5Widgets_DIR="$QT_LIB_DIR/cmake/Qt5Widgets" -DUPDATE_CHANNEL="$UPDATE_CHANNEL" -DVERSION_NUMBER="$VERSION_NUMBER"
-cmake .. -DINSTALL_BIN=../deployment/osx/staging/QAvimator.app/Contents/MacOS -DINSTALL_DATA=../deployment/osx/staging/QAvimator.app/Contents/Resources -DCMAKE_OSX_ARCHITECTURES="$MACHINE_ARCH" -DCMAKE_BUILD_TYPE=MinSizeRel -DQt5Widgets_DIR="$QT_LIB_DIR/cmake/Qt5Widgets" -DUPDATE_CHANNEL="$UPDATE_CHANNEL" -DVERSION_NUMBER="$VERSION_NUMBER"
+cmake .. -DINSTALL_BIN=../deployment/osx/staging/QAvimator.app/Contents/MacOS -DINSTALL_DATA=../deployment/osx/staging/QAvimator.app/Contents/Resources -DCMAKE_OSX_ARCHITECTURES="$MACHINE_ARCH" -DCMAKE_BUILD_TYPE="Release" -DQt5Widgets_DIR="$QT_LIB_DIR/cmake/Qt5Widgets" -DUPDATE_CHANNEL="$UPDATE_CHANNEL" -DVERSION_NUMBER="$VERSION_NUMBER"
+cmake .. -DINSTALL_BIN=../deployment/osx/staging/QAvimator.app/Contents/MacOS -DINSTALL_DATA=../deployment/osx/staging/QAvimator.app/Contents/Resources -DCMAKE_OSX_ARCHITECTURES="$MACHINE_ARCH" -DCMAKE_BUILD_TYPE="Release" -DQt5Widgets_DIR="$QT_LIB_DIR/cmake/Qt5Widgets" -DUPDATE_CHANNEL="$UPDATE_CHANNEL" -DVERSION_NUMBER="$VERSION_NUMBER"
 make install
 
 popd
