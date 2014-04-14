@@ -13,6 +13,17 @@ read -p "Which channel (0, 1, or 2)? " UPDATE_CHANNEL
 
 echo ""
 
+if [ "$UPDATE_CHANNEL" == "2" ]
+then
+  APPLICATION_NAME=QAvimator
+elif [ "$UPDATE_CHANNEL" == "1" ]
+then
+  APPLICATION_NAME=QAvimator-Beta
+else
+  UPDATE_CHANNEL=0
+  APPLICATION_NAME=QAvimator-Development
+fi
+
 pushd ../..
 
 # get the architecture of this machine
@@ -33,17 +44,6 @@ BUILD_NUMBER=`hg id -n`
 if [ -z ${BUILD_NUMBER+x} ]
 then
   BUILD_NUMBER=0
-fi
-
-if [ "$UPDATE_CHANNEL" == "2" ]
-then
-  APPLICATION_NAME=QAvimator
-elif [ "$UPDATE_CHANNEL" == "1" ]
-then
-  APPLICATION_NAME=QAvimator-Beta
-else
-  UPDATE_CHANNEL=0
-  APPLICATION_NAME=QAvimator-Development
 fi
 
 # prepare a staging folder

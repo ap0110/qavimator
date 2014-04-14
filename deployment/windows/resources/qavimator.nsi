@@ -75,7 +75,7 @@
 ;Pages
 	
 	;Installer pages
-	!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of ${APPLICATION_NAME}. \r\n \r\n Click Next to continue."
+	!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of ${APPLICATION_NAME}. $\r$\n $\r$\n Click Next to continue."
 	!insertmacro MUI_PAGE_WELCOME
 	
 	!insertmacro MUI_PAGE_LICENSE "${PROJECT_ROOT_DIR}\COPYING"
@@ -96,7 +96,6 @@
 	!insertmacro MUI_UNPAGE_CONFIRM
 	
 	!insertmacro MUI_UNPAGE_INSTFILES
-	!insertmacro MUI_UNPAGE_FINISH
 
 ;--------------------------------
 ;Languages
