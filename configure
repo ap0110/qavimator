@@ -1,0 +1,145 @@
+#!/bin/bash
+
+if [ ! -n "$VERSION_NUMBER" ]
+then
+  VERSION_NUMBER=0.1.0
+fi
+echo "VERSION_NUMBER = $VERSION_NUMBER"
+
+if [ ! -n "$UPDATE_CHANNEL" ]
+then
+  echo ""
+
+  echo Update channels:
+  echo 0 = Development
+  echo 1 = Beta
+  echo 2 = Release
+  read -p "Which channel (0, 1, or 2)? " UPDATE_CHANNEL
+
+  echo ""
+fi
+
+if [[ "$UPDATE_CHANNEL" == "2" ]]
+then
+  APPLICATION_NAME=QAvimator
+  UPDATE_CHANNEL_NAME=Release
+elif [[ "$UPDATE_CHANNEL" == "1" ]]
+then
+  APPLICATION_NAME=QAvimator-Beta
+  UPDATE_CHANNEL_NAME=Beta
+else
+  UPDATE_CHANNEL=0
+  APPLICATION_NAME=QAvimator-Development
+  UPDATE_CHANNEL_NAME=Development
+fi
+echo "UPDATE_CHANNEL = $UPDATE_CHANNEL"
+echo "Update Channel is \"$UPDATE_CHANNEL_NAME\""
+
+PROJECT_ROOT_DIR=`pwd`
+BUILD_DIR=$PROJECT_ROOT_DIR/_build
+INSTALL_DIR=$PROJECT_ROOT_DIR/_install
+
+# get the lib path for Qt
+QT_LIB_DIR=`qtpaths --install-prefix`
+if [ $? -ne 0 ]
+then
+  echo "Could not get path to Qt lib directory"
+  exit $?
+fi
+QT_LIB_DIR="${QT_LIB_DIR}/lib"
+
+# get the current build number of the repository
+BUILD_NUMBER=`hg id -n`
+# If BUILD_NUMBER is unset, then set it to 0
+if [ ! -n "$BUILD_NUMBER" ]
+then
+  BUILD_NUMBER=0
+fi
+echo "BUILD_NUMBER = $BUILD_NUMBER"
+
+if [ ! -e "$BUILD_DIR" ]
+then
+  mkdir "$BUILD_DIR"
+fi
+
+if [ ! -e "$INSTALL_DIR" ]
+then
+  mkdir "$INSTALL_DIR"
+fi
+
+cd "$BUILD_DIR"
+
+OPERATING_SYSTEM=`uname -s`
+
+if [[ "$OPERATING_SYSTEM" == "Darwin" ]]
+then
+##################################
+#   Darwin-only configuration    #
+##################################
+  echo ""
+  echo "Configuring for OS X..."
+
+  DEPLOY_OSX_DIR="$PROJECT_ROOT_DIR/deployment/osx"
+  MACHINE_ARCH=`uname -m`
+  
+  cp -R "$DEPLOY_OSX_DIR/resources/QAvimator.app" "$INSTALL_DIR"
+  
+  cmake .. \
+        -G "Unix Makefiles" \
+        -DINSTALL_BIN="$INSTALL_DIR/QAvimator.app/Contents/MacOS" \
+        -DINSTALL_DATA="$INSTALL_DIR/QAvimator.app/Contents/Resources" \
+        -DCMAKE_OSX_ARCHITECTURES="$MACHINE_ARCH" \
+        -DCMAKE_BUILD_TYPE="Release" \
+        -DQt5Widgets_DIR="$QT_LIB_DIR/cmake/Qt5Widgets" \
+        -DUPDATE_CHANNEL="$UPDATE_CHANNEL" \
+        -DVERSION_NUMBER="$VERSION_NUMBER"
+    
+  if [ $? -ne 0 ]
+  then
+    echo "CMake failed"
+    exit $?
+  fi
+
+  cmake .. \
+        -G "Unix Makefiles" \
+        -DINSTALL_BIN="$INSTALL_DIR/QAvimator.app/Contents/MacOS" \
+        -DINSTALL_DATA="$INSTALL_DIR/QAvimator.app/Contents/Resources" \
+        -DCMAKE_OSX_ARCHITECTURES="$MACHINE_ARCH" \
+        -DCMAKE_BUILD_TYPE="Release" \
+        -DQt5Widgets_DIR="$QT_LIB_DIR/cmake/Qt5Widgets" \
+        -DUPDATE_CHANNEL="$UPDATE_CHANNEL" \
+        -DVERSION_NUMBER="$VERSION_NUMBER"
+
+else
+###########################
+#   Linux configuration   #
+###########################
+  echo ""
+  echo "Configuring for Linux..."
+
+  cmake .. \
+        -G "Unix Makefiles" \
+        -DCMAKE_BUILD_TYPE="Release" \
+        -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+        -DUPDATE_CHANNEL="$UPDATE_CHANNEL" \
+        -DVERSION_NUMBER="$VERSION_NUMBER" \
+        -DQt5Widgets_DIR="$QT_LIB_DIR/cmake/Qt5Widgets"
+  
+  if [ $? -ne 0 ]
+  then
+    echo "CMake failed"
+    end $?
+  fi
+
+  cmake .. \
+        -G "Unix Makefiles" \
+        -DCMAKE_BUILD_TYPE="Release" \
+        -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+        -DUPDATE_CHANNEL="$UPDATE_CHANNEL" \
+        -DVERSION_NUMBER="$VERSION_NUMBER" \
+        -DQt5Widgets_DIR="$QT_LIB_DIR/cmake/Qt5Widgets"
+
+fi
+
+echo ""
+echo "Done"
