@@ -8,8 +8,21 @@ PROJECT_ROOT_DIR=`pwd`
 INSTALL_DIR="$PROJECT_ROOT_DIR/_install"
 ZIPPABLE_DIR="$PROJECT_ROOT_DIR/QAvimator"
 
+rm -rf _build _install
+
 ./configure
+if [ $? -ne 0 ]
+then
+  echo "configure did not run successfully"
+  exit $?
+fi
+
 make
+if [ $? -ne 0 ]
+then
+  echo "make did not run successfully"
+  exit $?
+fi
 
 echo "Copying dependencies..."
 cp "$QT_LIB_DIR/libQt5Core.so.5" \
@@ -32,6 +45,7 @@ cd "$DEPLOYMENT_DIR"
 FILE_NAME="${APPLICATION_NAME}"
 FILE_NAME="${FILE_NAME}_${VERSION_NUMBER}"
 FILE_NAME="${FILE_NAME}_${BUILD_NUMBER}"
+FILE_NAME="${FILE_NAME}_linux"
 FILE_NAME="${FILE_NAME}_${MACHINE_ARCH}"
 
 echo "Archiving and compressing..."
@@ -42,3 +56,5 @@ gzip -9 "${FILE_NAME}.tar"
 mv "$ZIPPABLE_DIR" "$INSTALL_DIR"
 
 echo "Done"
+
+exit 0

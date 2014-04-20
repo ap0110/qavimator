@@ -96,7 +96,7 @@ then
     
   if [ $? -ne 0 ]
   then
-    echo "CMake failed"
+    echo "CMake did not run successfully"
     exit $?
   fi
 
@@ -127,7 +127,7 @@ else
   
   if [ $? -ne 0 ]
   then
-    echo "CMake failed"
+    echo "CMake did not run successfully"
     end $?
   fi
 
@@ -143,3 +143,5 @@ fi
 
 echo ""
 echo "Done"
+
+exit 0

@@ -2,40 +2,40 @@
 
 Linux/X11:
 
-	- Install CMake 2.8.9+ and add bin to PATH
-	- Install Qt5 and add bin to PATH
-	- Install GLUT (or install package "freeglut3-dev")
-	
-	- If using a package manager such as Debian package management,
-	  install the following packages (sudo apt-get install <PACKAGE>):
-	-- freeglut3-dev
-	-- g++
-	-- libdrm-dev
-	-- libgl1-mesa-dev
-	-- libxi-dev
-	-- libxmu-dev
-	- (this list may not be complete)
-	
-	./configure
-	make
+    - Install CMake 2.8.9+ and add bin to PATH
+    - Install Qt5 and add bin to PATH
+    - Install GLUT (or install package "freeglut3-dev")
+    
+    - If using a package manager such as Debian package management,
+      install the following packages (sudo apt-get install <PACKAGE>):
+    -- freeglut3-dev
+    -- g++
+    -- libdrm-dev
+    -- libgl1-mesa-dev
+    -- libxi-dev
+    -- libxmu-dev
+    - (this list may not include all needed packages)
+    
+    ./configure
+    make
 
 OS X:
 
-	- Install CMake 2.8.9+ and add bin to PATH
-	- Install Qt5 and add bin to PATH
-	- Install XCode and its command line tools
-	
-	./configure
-	make
+    - Install CMake 2.8.9+ and add bin to PATH
+    - Install Qt5 and add bin to PATH
+    - Install XCode and its command line tools
+    
+    ./configure
+    make
 
 Windows:
-	
-	- Install CMake 2.8.9+ and add bin to PATH
-	- Install Qt5 and add bin to PATH
-	- Install MinGW and add bin to PATH (some Qt5 installations come with MinGW)
-	- Download GLUT and make sure its header is in [glut package]\GL\glut.h
-	
-	configure
-	make
-	
-	- Copy [glut package]/glut32.dll into _install directory
+    
+    - Install CMake 2.8.9+ and add bin to PATH
+    - Install Qt5 and add bin to PATH
+    - Install MinGW and add bin to PATH (some Qt5 installations come with MinGW)
+    - Download GLUT
+    -- ensure the header is at [glut package]\GL\glut.h
+    -- ensure the dll is at [glut package]\glut32.dll
+    
+    configure
+    make

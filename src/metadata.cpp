@@ -40,7 +40,7 @@
 #ifdef BUILD_NUMBER
   const QString Metadata::m_buildNumber = QString(BUILD_NUMBER);
 #else
-  const QString Metadata::m_buildNumber = QString("-1");
+  const QString Metadata::m_buildNumber = QString("0");
 #endif
 
 #if UPDATE_CHANNEL == 2

@@ -52,8 +52,7 @@
 ;--------------------------------
 ;General
 	
-	SetCompressor /SOLID /FINAL lzma
-	SetCompressorDictSize 32
+	SetCompressor /SOLID /FINAL zlib
 	
 	Name "${APPLICATION_NAME}"
 	OutFile "${FILE_NAME}"

@@ -16,8 +16,21 @@ then
 fi
 QT_LIB_DIR="$QT_LIB_DIR/lib"
 
+rm -rf _build _install
+
 ./configure
+if [ $? -ne 0 ]
+then
+  echo "configure did not run successfully"
+  exit $?
+fi
+
 make
+if [ $? -ne 0 ]
+then
+  echo "make did not run successfully"
+  exit $?
+fi
 
 cd "$INSTALL_DIR"
 
@@ -105,6 +118,7 @@ hdiutil detach $DEVICE
 FILE_NAME="${APPLICATION_NAME}"
 FILE_NAME="${FILE_NAME}_${VERSION_NUMBER}"
 FILE_NAME="${FILE_NAME}_${BUILD_NUMBER}"
+FILE_NAME="${FILE_NAME}_darwin"
 FILE_NAME="${FILE_NAME}_${MACHINE_ARCH}"
 
 echo "Compressing disk image..."
@@ -115,3 +129,5 @@ echo "Cleaning temporary files..."
 rm -rf temp.dmg
 
 echo "Done"
+
+exit 0
