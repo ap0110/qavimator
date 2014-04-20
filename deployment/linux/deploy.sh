@@ -6,7 +6,15 @@ cd ../..
 
 PROJECT_ROOT_DIR=`pwd`
 INSTALL_DIR="$PROJECT_ROOT_DIR/_install"
-ZIPPABLE_DIR="$PROJECT_ROOT_DIR/QAvimator"
+RENAMED_INSTALL_DIR="$PROJECT_ROOT_DIR/QAvimator"
+
+QT_LIB_DIR=`qtpaths --install-prefix`
+if [ $? -ne 0 ]
+then
+  echo "Could not get path to Qt lib directory"
+  exit $?
+fi
+QT_LIB_DIR="$QT_LIB_DIR/lib"
 
 rm -rf _build _install
 
@@ -42,15 +50,16 @@ mv "$INSTALL_DIR/qavimator" \
 # Return to original deployment directory
 cd "$DEPLOYMENT_DIR"
 
-read FILE_NAME < file_name.tmp
-rm file_name.tmp
+read FILE_NAME < .file_name.tmp
 
 echo "Archiving and compressing..."
 
-mv "$INSTALL_DIR" "$ZIPPABLE_DIR"
-tar -cf "${FILE_NAME}.tar" "$ZIPPABLE_DIR"
+mv "$INSTALL_DIR" "$RENAMED_INSTALL_DIR"
+tar --transform='s/.*\(QAvimator.*\)/\1/' \
+    -cf "${FILE_NAME}.tar" \
+    "$RENAMED_INSTALL_DIR"
 gzip -9 "${FILE_NAME}.tar"
-mv "$ZIPPABLE_DIR" "$INSTALL_DIR"
+mv "$RENAMED_INSTALL_DIR" "$INSTALL_DIR"
 
 echo "Done"
 

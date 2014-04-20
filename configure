@@ -46,7 +46,7 @@ then
   echo "Could not get path to Qt lib directory"
   exit $?
 fi
-QT_LIB_DIR="${QT_LIB_DIR}/lib"
+QT_LIB_DIR="$QT_LIB_DIR/lib"
 
 # get the current build number of the repository
 BUILD_NUMBER=`hg id -n`
@@ -70,6 +70,7 @@ fi
 cd "$BUILD_DIR"
 
 OPERATING_SYSTEM=`uname -s`
+MACHINE_ARCH=`uname -m`
 
 if [[ "$OPERATING_SYSTEM" == "Darwin" ]]
 then
@@ -80,7 +81,6 @@ then
   echo "Configuring for OS X..."
 
   DEPLOY_OSX_DIR="$PROJECT_ROOT_DIR/deployment/osx"
-  MACHINE_ARCH=`uname -m`
   
   cp -R "$DEPLOY_OSX_DIR/resources/QAvimator.app" "$INSTALL_DIR"
   
@@ -116,7 +116,7 @@ then
   FILE_NAME="${FILE_NAME}_darwin"
   FILE_NAME="${FILE_NAME}_${MACHINE_ARCH}"
 
-  echo $FILE_NAME > $DEPLOY_OSX_DIR/file_name.tmp
+  echo $FILE_NAME > $DEPLOY_OSX_DIR/.file_name.tmp
 
 else
 ###########################
@@ -155,7 +155,7 @@ FILE_NAME="${FILE_NAME}_${BUILD_NUMBER}"
 FILE_NAME="${FILE_NAME}_linux"
 FILE_NAME="${FILE_NAME}_${MACHINE_ARCH}"
 
-echo $FILE_NAME > $DEPLOY_LINUX_DIR/file_name.tmp
+echo $FILE_NAME > $DEPLOY_LINUX_DIR/.file_name.tmp
 
 fi
 
