@@ -115,11 +115,8 @@ popd
 echo "Detaching disk image..."
 hdiutil detach $DEVICE
 
-FILE_NAME="${APPLICATION_NAME}"
-FILE_NAME="${FILE_NAME}_${VERSION_NUMBER}"
-FILE_NAME="${FILE_NAME}_${BUILD_NUMBER}"
-FILE_NAME="${FILE_NAME}_darwin"
-FILE_NAME="${FILE_NAME}_${MACHINE_ARCH}"
+read FILE_NAME < file_name.tmp
+rm file_name.tmp
 
 echo "Compressing disk image..."
 hdiutil convert -format UDZO -imagekey zlib-level=9 -o "${FILE_NAME}.dmg" temp.dmg

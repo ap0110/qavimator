@@ -42,11 +42,8 @@ mv "$INSTALL_DIR/qavimator" \
 # Return to original deployment directory
 cd "$DEPLOYMENT_DIR"
 
-FILE_NAME="${APPLICATION_NAME}"
-FILE_NAME="${FILE_NAME}_${VERSION_NUMBER}"
-FILE_NAME="${FILE_NAME}_${BUILD_NUMBER}"
-FILE_NAME="${FILE_NAME}_linux"
-FILE_NAME="${FILE_NAME}_${MACHINE_ARCH}"
+read FILE_NAME < file_name.tmp
+rm file_name.tmp
 
 echo "Archiving and compressing..."
 

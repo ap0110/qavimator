@@ -110,12 +110,22 @@ then
         -DUPDATE_CHANNEL="$UPDATE_CHANNEL" \
         -DVERSION_NUMBER="$VERSION_NUMBER"
 
+  FILE_NAME="${APPLICATION_NAME}"
+  FILE_NAME="${FILE_NAME}_${VERSION_NUMBER}"
+  FILE_NAME="${FILE_NAME}_${BUILD_NUMBER}"
+  FILE_NAME="${FILE_NAME}_darwin"
+  FILE_NAME="${FILE_NAME}_${MACHINE_ARCH}"
+
+  echo $FILE_NAME > $DEPLOY_OSX_DIR/file_name.tmp
+
 else
 ###########################
 #   Linux configuration   #
 ###########################
   echo ""
   echo "Configuring for Linux..."
+
+  DEPLOY_LINUX_DIR=$PROJECT_ROOT_DIR/deployment/linux
 
   cmake .. \
         -G "Unix Makefiles" \
@@ -138,6 +148,14 @@ else
         -DUPDATE_CHANNEL="$UPDATE_CHANNEL" \
         -DVERSION_NUMBER="$VERSION_NUMBER" \
         -DQt5Widgets_DIR="$QT_LIB_DIR/cmake/Qt5Widgets"
+
+FILE_NAME="${APPLICATION_NAME}"
+FILE_NAME="${FILE_NAME}_${VERSION_NUMBER}"
+FILE_NAME="${FILE_NAME}_${BUILD_NUMBER}"
+FILE_NAME="${FILE_NAME}_linux"
+FILE_NAME="${FILE_NAME}_${MACHINE_ARCH}"
+
+echo $FILE_NAME > $DEPLOY_LINUX_DIR/file_name.tmp
 
 fi
 
