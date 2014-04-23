@@ -44,6 +44,11 @@ SET (QAVI_RSC icons.qrc)
 QT5_ADD_RESOURCES (QAVI_RSC_SRC ${QAVI_RSC})
 QT5_WRAP_UI (QAVI_UI_HDR ${QAVI_UI})
 
+# Add the Windows resource file if applicable
+IF (WIN32)
+  SET (QAVI_SRC ${QAVI_SRC} qavimator.rc)
+ENDIF (WIN32)
+
 # Include path to the generated header files
 INCLUDE_DIRECTORIES (${CMAKE_CURRENT_BINARY_DIR})
 

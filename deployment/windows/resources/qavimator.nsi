@@ -102,10 +102,84 @@
 	!insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
+;Function run on initialization of installer
+
+Function .onInit
+
+	;If the user did not uninstall the previous version, then
+	; ask before running its uninstaller
+	ReadRegStr $INSTDIR ${REGISTRY_ROOTKEY} "${REGISTRY_INSTALLKEY}" ""
+	StrCmp "$INSTDIR" "" continueInstallation
+	
+	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+		"A version of QAvimator is already installed! \
+		$\nThis version must be removed before installation can continue. \
+		$\n$\nRemove current installation of QAvimator?" \
+		/SD IDCANCEL \
+		IDOK runUninstaller
+		Abort
+		
+	runUninstaller:
+	
+	;Get the Start Menu Folder name in case of version 20100106
+	ReadRegStr $R0 ${REGISTRY_ROOTKEY} "${REGISTRY_INSTALLKEY}" "Start Menu Folder"
+	
+	;Run the installer and wait for it to return
+	ClearErrors
+	ExecWait '"$INSTDIR\uninstall.exe" _?=$INSTDIR'
+	
+	IfErrors abortInstallation
+	
+	;Test if the uninstaller ran by re-checking the registry
+	ReadRegStr $R1 ${REGISTRY_ROOTKEY} "${REGISTRY_INSTALLKEY}" ""
+	;If registry value still exists, then abort, otherwise remove uninstaller
+	StrCmp "$R1" "" 0 abortInstallation
+	
+	;Remove the uninstaller
+	Delete "$INSTDIR\uninstall.exe"
+	RMDir "$INSTDIR"
+	
+	StrCmp "$R0" "" continueInstallation
+	
+	;20100106 installer incorrectly leaves a shortcut folder in
+	; the "All Users" Start Menu, so explicitly delete it
+	SetShellVarContext all
+	
+	Delete "$SMPROGRAMS\$StartMenuFolder\QAvimator.lnk"
+	Delete "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk"
+	RMDir "$SMPROGRAMS\$StartMenuFolder"
+	
+	SetShellVarContext current
+	
+	Goto continueInstallation
+	
+	abortInstallation:
+	
+	Abort
+	
+	continueInstallation:
+
+FunctionEnd
+
+;--------------------------------
 ;Installer section
 
 Section "Install"
+	
+	SetOutPath "$INSTDIR\data"
+	
+	File "${PROJECT_ROOT_DIR}\_install\data\Relaxed.avm"
+	File "${PROJECT_ROOT_DIR}\_install\data\Relaxed.bvh"
+	File "${PROJECT_ROOT_DIR}\_install\data\Relaxed_2.bvh"
+	File "${PROJECT_ROOT_DIR}\_install\data\SL.lim"
+	File "${PROJECT_ROOT_DIR}\_install\data\SLFemale.bvh"
+	File "${PROJECT_ROOT_DIR}\_install\data\SLMale.bvh"
+	File "${PROJECT_ROOT_DIR}\_install\data\TPose.avm"
+	File "${PROJECT_ROOT_DIR}\_install\data\TPose.bvh"
 
+	;IMPORTANT: The directory containing the executable must be the
+	; last outpath set before any shortcuts are created because this
+	; will be the shortcuts' starting directory
 	SetOutPath "$INSTDIR"
 	
 	File "${PROJECT_ROOT_DIR}\_install\qavimator.exe"
@@ -123,17 +197,6 @@ Section "Install"
 		File "${QT_BIN}\Qt5OpenGL.dll"
 		File "${QT_BIN}\Qt5Widgets.dll"
 	!endif
-	
-	SetOutPath "$INSTDIR\data"
-	
-	File "${PROJECT_ROOT_DIR}\_install\data\Relaxed.avm"
-	File "${PROJECT_ROOT_DIR}\_install\data\Relaxed.bvh"
-	File "${PROJECT_ROOT_DIR}\_install\data\Relaxed_2.bvh"
-	File "${PROJECT_ROOT_DIR}\_install\data\SL.lim"
-	File "${PROJECT_ROOT_DIR}\_install\data\SLFemale.bvh"
-	File "${PROJECT_ROOT_DIR}\_install\data\SLMale.bvh"
-	File "${PROJECT_ROOT_DIR}\_install\data\TPose.avm"
-	File "${PROJECT_ROOT_DIR}\_install\data\TPose.bvh"
 	
 	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_INSTALLKEY}" "" "$INSTDIR"
 	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
@@ -161,6 +224,7 @@ Section "Install"
 		"EstimatedSize" "$0"
 	
 	!insertmacro MUI_STARTMENU_WRITE_BEGIN "${APPLICATION_NAME}"
+		SetShellVarContext current
 		CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
 		CreateShortCut "$SMPROGRAMS\$StartMenuFolder\QAvimator.lnk" "$INSTDIR\qavimator.exe"
 		CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\uninstall.exe"
