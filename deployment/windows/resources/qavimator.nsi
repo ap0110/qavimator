@@ -35,9 +35,9 @@
 	
 	!define ENGLISH_US_CODE 1033
 	
-	!define REGISTRY_ROOTKEY HKCU
-	!define REGISTRY_INSTALLKEY "Software\${APPLICATION_NAME}"
-	!define REGISTRY_UNINSTALLKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPLICATION_NAME}"
+	!define REGISTRY_ROOT_KEY HKCU
+	!define REGISTRY_INSTALL_KEY "Software\${APPLICATION_NAME}"
+	!define REGISTRY_UNINSTALL_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPLICATION_NAME}"
 	
 	Var StartMenuFolder
 	
@@ -57,7 +57,6 @@
 	Name "${APPLICATION_NAME}"
 	OutFile "${FILE_NAME}"
 	InstallDir "$PROGRAMFILES\${APPLICATION_NAME}"
-	InstallDirRegKey ${REGISTRY_ROOTKEY} "${REGISTRY_INSTALLKEY}" ""
 	
 	VIAddVersionKey /LANG=${ENGLISH_US_CODE} "FileDescription" "QAvimator Windows installer"
 	VIAddVersionKey /LANG=${ENGLISH_US_CODE} "FileVersion" "${APPLICATION_VERSION}.0"
@@ -80,6 +79,10 @@
 	!insertmacro MUI_PAGE_LICENSE "${PROJECT_ROOT_DIR}\COPYING"
 	
 	!insertmacro MUI_PAGE_DIRECTORY
+	
+	!define MUI_STARTMENUPAGE_REGISTRY_ROOT "${REGISTRY_ROOT_KEY}"
+	!define MUI_STARTMENUPAGE_REGISTRY_KEY "${REGISTRY_INSTALL_KEY}"
+	!define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "StartMenuFolder"
 	
 	!insertmacro MUI_PAGE_STARTMENU "${APPLICATION_NAME}" $StartMenuFolder
 	
@@ -104,12 +107,15 @@
 ;--------------------------------
 ;Function run on initialization of installer
 
+Var OldInstallationDir
+Var OldStartMenuFolder
+
 Function .onInit
 
 	;If the user did not uninstall the previous version, then
 	; ask before running its uninstaller
-	ReadRegStr $INSTDIR ${REGISTRY_ROOTKEY} "${REGISTRY_INSTALLKEY}" ""
-	StrCmp "$INSTDIR" "" continueInstallation
+	ReadRegStr $OldInstallationDir ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" ""
+	StrCmp "$OldInstallationDir" "" continueInstallation
 	
 	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
 		"A version of QAvimator is already installed! \
@@ -121,33 +127,34 @@ Function .onInit
 		
 	runUninstaller:
 	
-	;Get the Start Menu Folder name in case of version 20100106
-	ReadRegStr $R0 ${REGISTRY_ROOTKEY} "${REGISTRY_INSTALLKEY}" "Start Menu Folder"
+	;Get the "Start Menu Folder" name in case of version 20100106
+	ReadRegStr $OldStartMenuFolder ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" "Start Menu Folder"
 	
 	;Run the installer and wait for it to return
 	ClearErrors
-	ExecWait '"$INSTDIR\uninstall.exe" _?=$INSTDIR'
+	ExecWait '"$OldInstallationDir\uninstall.exe" _?=$OldInstallationDir'
 	
 	IfErrors abortInstallation
 	
 	;Test if the uninstaller ran by re-checking the registry
-	ReadRegStr $R1 ${REGISTRY_ROOTKEY} "${REGISTRY_INSTALLKEY}" ""
+	ReadRegStr $R0 ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" ""
 	;If registry value still exists, then abort, otherwise remove uninstaller
-	StrCmp "$R1" "" 0 abortInstallation
+	StrCmp "$R0" "" 0 abortInstallation
 	
 	;Remove the uninstaller
-	Delete "$INSTDIR\uninstall.exe"
-	RMDir "$INSTDIR"
+	Delete "$OldInstallationDir\uninstall.exe"
+	RMDir "$OldInstallationDir"
 	
-	StrCmp "$R0" "" continueInstallation
+	;If "Start Menu Folder" was in registry, 20100106 was previously installed
+	StrCmp "$OldStartMenuFolder" "" continueInstallation
 	
 	;20100106 installer incorrectly leaves a shortcut folder in
 	; the "All Users" Start Menu, so explicitly delete it
 	SetShellVarContext all
 	
-	Delete "$SMPROGRAMS\$StartMenuFolder\QAvimator.lnk"
-	Delete "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk"
-	RMDir "$SMPROGRAMS\$StartMenuFolder"
+	Delete "$SMPROGRAMS\$OldStartMenuFolder\QAvimator.lnk"
+	Delete "$SMPROGRAMS\$OldStartMenuFolder\Uninstall.lnk"
+	RMDir "$SMPROGRAMS\$OldStartMenuFolder"
 	
 	SetShellVarContext current
 	
@@ -198,29 +205,32 @@ Section "Install"
 		File "${QT_BIN}\Qt5Widgets.dll"
 	!endif
 	
-	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_INSTALLKEY}" "" "$INSTDIR"
-	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
+	WriteRegStr ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" "" "$INSTDIR"
+	WriteRegStr ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" \
+		"Version" "${APPLICATION_VERSION}"
+	
+	WriteRegStr ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}" \
 		"DisplayName" "${APPLICATION_NAME}"
-	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
+	WriteRegStr ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}" \
 		"UninstallString" "$\"$INSTDIR\uninstall.exe$\""
-	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
+	WriteRegStr ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}" \
 		"InstallLocation" "$\"$INSTDIR$\""
-	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
+	WriteRegStr ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}" \
 		"DisplayIcon" "$\"$INSTDIR\qavimator.exe$\""
-	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
+	WriteRegStr ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}" \
 		"URLInfoAbout" "${WEBSITE}"
-	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
+	WriteRegStr ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}" \
 		"Publisher" "${ORGANIZATION}"
-	WriteRegStr ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
+	WriteRegStr ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}" \
 		"DisplayVersion" "${APPLICATION_VERSION}"
-	WriteRegDWORD ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
+	WriteRegDWORD ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}" \
 		"NoModify" 1
-	WriteRegDWORD ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
+	WriteRegDWORD ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}" \
 		"NoRepair" 1
 		
 	${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
 	IntFmt $0 "0x%08X" $0
-	WriteRegDWORD ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}" \
+	WriteRegDWORD ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}" \
 		"EstimatedSize" "$0"
 	
 	!insertmacro MUI_STARTMENU_WRITE_BEGIN "${APPLICATION_NAME}"
@@ -274,7 +284,7 @@ Section "Uninstall"
 	Delete "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk"
 	RMDir "$SMPROGRAMS\$StartMenuFolder"
 	
-	DeleteRegKey ${REGISTRY_ROOTKEY} "${REGISTRY_INSTALLKEY}"
-	DeleteRegKey ${REGISTRY_ROOTKEY} "${REGISTRY_UNINSTALLKEY}"
+	DeleteRegKey ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}"
+	DeleteRegKey ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}"
 	
 SectionEnd

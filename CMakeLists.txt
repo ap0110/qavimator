@@ -13,6 +13,7 @@ ENDIF (APPLE)
 # Release mode build should not generate debug messages
 IF ("${CMAKE_BUILD_TYPE}" MATCHES "Release")
   ADD_DEFINITIONS (-DQT_NO_DEBUG_OUTPUT)
+  SET (CMAKE_WIN32_EXECUTABLE TRUE)
 ENDIF ("${CMAKE_BUILD_TYPE}" MATCHES "Release")
 
 PROJECT (qavimator)

@@ -1879,22 +1879,12 @@ void QAvimator::on_xRotationEdit_returnPressed()
   rotationValue();
 }
 
-void QAvimator::on_xRotationEdit_lostFocus()
-{
-  rotationValue();
-}
-
 void QAvimator::on_xRotationSlider_valueChanged(int)
 {
   rotationSlider(sender());
 }
 
 void QAvimator::on_yRotationEdit_returnPressed()
-{
-  rotationValue();
-}
-
-void QAvimator::on_yRotationEdit_lostFocus()
 {
   rotationValue();
 }
@@ -1909,22 +1899,12 @@ void QAvimator::on_zRotationEdit_returnPressed()
   rotationValue();
 }
 
-void QAvimator::on_zRotationEdit_lostFocus()
-{
-  rotationValue();
-}
-
 void QAvimator::on_zRotationSlider_valueChanged(int)
 {
   rotationSlider(sender());
 }
 
 void QAvimator::on_xPositionEdit_returnPressed()
-{
-  positionValue();
-}
-
-void QAvimator::on_xPositionEdit_lostFocus()
 {
   positionValue();
 }
@@ -1939,22 +1919,12 @@ void QAvimator::on_yPositionEdit_returnPressed()
   positionValue();
 }
 
-void QAvimator::on_yPositionEdit_lostFocus()
-{
-  positionValue();
-}
-
 void QAvimator::on_yPositionSlider_valueChanged(int)
 {
   positionSlider(sender());
 }
 
 void QAvimator::on_zPositionEdit_returnPressed()
-{
-  positionValue();
-}
-
-void QAvimator::on_zPositionEdit_lostFocus()
 {
   positionValue();
 }

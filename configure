@@ -35,6 +35,28 @@ fi
 echo "UPDATE_CHANNEL = $UPDATE_CHANNEL"
 echo "Update Channel is \"$UPDATE_CHANNEL_NAME\""
 
+if [ ! -n "$BUILD_TYPE" ]
+then
+  echo ""
+  
+  echo Build types:
+  echo 0 = Debug
+  echo 1 = Release
+  read -p "Which build type (0 or 1)? " BUILD_TYPE
+  
+  echo ""
+fi
+
+if [[ "$BUILD_TYPE" == "1" ]]
+then
+  BUILD_TYPE_NAME=Release
+else
+  BUILD_TYPE=0
+  BUILD_TYPE_NAME=Debug
+fi
+echo "BUILD_TYPE = $BUILD_TYPE"
+echo "Build type is \"$BUILD_TYPE_NAME\""
+
 PROJECT_ROOT_DIR=`pwd`
 BUILD_DIR=$PROJECT_ROOT_DIR/_build
 INSTALL_DIR=$PROJECT_ROOT_DIR/_install
@@ -89,7 +111,7 @@ then
         -DINSTALL_BIN="$INSTALL_DIR/QAvimator.app/Contents/MacOS" \
         -DINSTALL_DATA="$INSTALL_DIR/QAvimator.app/Contents/Resources" \
         -DCMAKE_OSX_ARCHITECTURES="$MACHINE_ARCH" \
-        -DCMAKE_BUILD_TYPE="Release" \
+        -DCMAKE_BUILD_TYPE="$BUILD_TYPE_NAME" \
         -DQt5Widgets_DIR="$QT_LIB_DIR/cmake/Qt5Widgets" \
         -DUPDATE_CHANNEL="$UPDATE_CHANNEL" \
         -DVERSION_NUMBER="$VERSION_NUMBER"
@@ -105,7 +127,7 @@ then
         -DINSTALL_BIN="$INSTALL_DIR/QAvimator.app/Contents/MacOS" \
         -DINSTALL_DATA="$INSTALL_DIR/QAvimator.app/Contents/Resources" \
         -DCMAKE_OSX_ARCHITECTURES="$MACHINE_ARCH" \
-        -DCMAKE_BUILD_TYPE="Release" \
+        -DCMAKE_BUILD_TYPE="$BUILD_TYPE_NAME" \
         -DQt5Widgets_DIR="$QT_LIB_DIR/cmake/Qt5Widgets" \
         -DUPDATE_CHANNEL="$UPDATE_CHANNEL" \
         -DVERSION_NUMBER="$VERSION_NUMBER"
@@ -129,7 +151,7 @@ else
 
   cmake .. \
         -G "Unix Makefiles" \
-        -DCMAKE_BUILD_TYPE="Release" \
+        -DCMAKE_BUILD_TYPE="$BUILD_TYPE_NAME" \
         -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
         -DUPDATE_CHANNEL="$UPDATE_CHANNEL" \
         -DVERSION_NUMBER="$VERSION_NUMBER" \
@@ -143,7 +165,7 @@ else
 
   cmake .. \
         -G "Unix Makefiles" \
-        -DCMAKE_BUILD_TYPE="Release" \
+        -DCMAKE_BUILD_TYPE="$BUILD_TYPE_NAME" \
         -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
         -DUPDATE_CHANNEL="$UPDATE_CHANNEL" \
         -DVERSION_NUMBER="$VERSION_NUMBER" \

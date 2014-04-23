@@ -33,6 +33,26 @@ if "%UPDATE_CHANNEL%" == "2" (
 echo UPDATE_CHANNEL = %UPDATE_CHANNEL%
 echo Update Channel is "%UPDATE_CHANNEL_NAME%"
 
+if not defined BUILD_TYPE (
+  echo.
+  
+  echo Build types:
+  echo 0 = Debug
+  echo 1 = Release
+  set /P BUILD_TYPE="Which build type (0 or 1)? "
+  
+  echo.
+)
+
+if "%BUILD_TYPE%" == "1" (
+  set BUILD_TYPE_NAME=Release
+) else (
+  set BUILD_TYPE=0
+  set BUILD_TYPE_NAME=Debug
+)
+echo BUILD_TYPE = %BUILD_TYPE%
+echo Build type is "%BUILD_TYPE_NAME%"
+
 set WAS_PROMPTED=
 set ERROR_MESSAGE=
 if not defined GLUT_PACKAGE_DIR (
@@ -117,7 +137,7 @@ cd "%BUILD_DIR%"
 
 cmake .. ^
       -G "MinGW Makefiles" ^
-      -DCMAKE_BUILD_TYPE="Release" ^
+      -DCMAKE_BUILD_TYPE="%BUILD_TYPE_NAME%" ^
       -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%" ^
       -DUPDATE_CHANNEL="%UPDATE_CHANNEL%" ^
       -DVERSION_NUMBER="%VERSION_NUMBER%" ^
@@ -132,7 +152,7 @@ if not %ERRORLEVEL% == 0 (
       
 cmake .. ^
       -G "MinGW Makefiles" ^
-      -DCMAKE_BUILD_TYPE="Release" ^
+      -DCMAKE_BUILD_TYPE="%BUILD_TYPE_NAME%" ^
       -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%" ^
       -DUPDATE_CHANNEL="%UPDATE_CHANNEL%" ^
       -DVERSION_NUMBER="%VERSION_NUMBER%" ^

@@ -26,8 +26,8 @@
 template<typename T> class Nullable
 {
   public:
-    Nullable() : m_hasValue(false) {}
-    Nullable(std::nullptr_t) : m_hasValue(false) {}
+    Nullable() : m_hasValue(false), m_value() {}
+    Nullable(std::nullptr_t) : m_hasValue(false), m_value() {}
     Nullable(const T& value) : m_hasValue(true), m_value(value) {}
     Nullable(const Nullable<T>& nullable) : m_hasValue(nullable.hasValue()), m_value(nullable.value()) {}
     ~Nullable() {}
