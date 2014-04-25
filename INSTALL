@@ -19,6 +19,9 @@ Linux/X11:
     ./configure
     make
 
+    - If QAvimator fails to run due to missing libraries,
+      then try adding Qt's lib directory to LD_LIBRARY_PATH
+
 OS X:
 
     - Install CMake 2.8.9+ and add bin to PATH

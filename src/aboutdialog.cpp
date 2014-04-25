@@ -26,7 +26,9 @@
 
 AboutDialog::AboutDialog(QWidget* parent) :
   QDialog(parent,
-          Qt::WindowTitleHint
+          Qt::Window
+          | Qt::CustomizeWindowHint
+          | Qt::WindowTitleHint
           | Qt::WindowSystemMenuHint
           | Qt::WindowCloseButtonHint
           | Qt::MSWindowsFixedSizeDialogHint),
