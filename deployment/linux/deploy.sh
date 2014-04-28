@@ -8,13 +8,12 @@ PROJECT_ROOT_DIR=`pwd`
 INSTALL_DIR="$PROJECT_ROOT_DIR/_install"
 RENAMED_INSTALL_DIR="$PROJECT_ROOT_DIR/QAvimator"
 
-QT_LIB_DIR=`qtpaths --install-prefix`
+QT_DIR=`qtpaths --install-prefix`
 if [ $? -ne 0 ]
 then
-  echo "Could not get path to Qt lib directory"
+  echo "Could not get path to Qt directory"
   exit $?
 fi
-QT_LIB_DIR="$QT_LIB_DIR/lib"
 
 rm -rf _build _install
 
@@ -33,14 +32,19 @@ then
 fi
 
 echo "Copying dependencies..."
-cp "$QT_LIB_DIR/libQt5Core.so.5" \
-   "$QT_LIB_DIR/libQt5Gui.so.5" \
-   "$QT_LIB_DIR/libQt5Network.so.5" \
-   "$QT_LIB_DIR/libQt5Widgets.so.5" \
-   "$QT_LIB_DIR/libQt5OpenGL.so.5" \
-   "$QT_LIB_DIR/libicudata.so.51" \
-   "$QT_LIB_DIR/libicui18n.so.51" \
-   "$QT_LIB_DIR/libicuuc.so.51" \
+
+mkdir "$INSTALL_DIR/platforms"
+cp "$QT_DIR/plugins/platforms/libqxcb.so" \
+   "$INSTALL_DIR/platforms"
+
+cp "$QT_DIR/lib/libQt5Core.so.5" \
+   "$QT_DIR/lib/libQt5Gui.so.5" \
+   "$QT_DIR/lib/libQt5Network.so.5" \
+   "$QT_DIR/lib/libQt5Widgets.so.5" \
+   "$QT_DIR/lib/libQt5OpenGL.so.5" \
+   "$QT_DIR/lib/libicudata.so.51" \
+   "$QT_DIR/lib/libicui18n.so.51" \
+   "$QT_DIR/lib/libicuuc.so.51" \
    "$DEPLOYMENT_DIR/resources/qavimator.sh" \
    "$INSTALL_DIR"
 

@@ -177,6 +177,11 @@ FunctionEnd
 
 Section "Install"
 
+	SetOutPath "$INSTDIR"
+
+	File "${PROJECT_ROOT_DIR}\_install\qavimator.exe"
+	File "${PROJECT_ROOT_DIR}\_install\glut32.dll"
+
 	SetOutPath "$INSTDIR\data"
 
 	File "${PROJECT_ROOT_DIR}\_install\data\Relaxed.avm"
@@ -187,26 +192,25 @@ Section "Install"
 	File "${PROJECT_ROOT_DIR}\_install\data\SLMale.bvh"
 	File "${PROJECT_ROOT_DIR}\_install\data\TPose.avm"
 	File "${PROJECT_ROOT_DIR}\_install\data\TPose.bvh"
-
-	;IMPORTANT: The directory containing the executable must be the
-	; last outpath set before any shortcuts are created because this
-	; will be the shortcuts' starting directory
-	SetOutPath "$INSTDIR"
-
-	File "${PROJECT_ROOT_DIR}\_install\qavimator.exe"
-	File "${PROJECT_ROOT_DIR}\_install\glut32.dll"
-	!ifdef QT_BIN
-		File "${QT_BIN}\icudt51.dll"
-		File "${QT_BIN}\icuin51.dll"
-		File "${QT_BIN}\icuuc51.dll"
-		File "${QT_BIN}\libgcc_s_dw2-1.dll"
-		File "${QT_BIN}\libstdc++-6.dll"
-		File "${QT_BIN}\libwinpthread-1.dll"
-		File "${QT_BIN}\Qt5Core.dll"
-		File "${QT_BIN}\Qt5Gui.dll"
-		File "${QT_BIN}\Qt5Network.dll"
-		File "${QT_BIN}\Qt5OpenGL.dll"
-		File "${QT_BIN}\Qt5Widgets.dll"
+	
+	!ifdef QT_DIR
+		SetOutPath "$INSTDIR"
+	
+		File "${QT_DIR}\bin\icudt51.dll"
+		File "${QT_DIR}\bin\icuin51.dll"
+		File "${QT_DIR}\bin\icuuc51.dll"
+		File "${QT_DIR}\bin\libgcc_s_dw2-1.dll"
+		File "${QT_DIR}\bin\libstdc++-6.dll"
+		File "${QT_DIR}\bin\libwinpthread-1.dll"
+		File "${QT_DIR}\bin\Qt5Core.dll"
+		File "${QT_DIR}\bin\Qt5Gui.dll"
+		File "${QT_DIR}\bin\Qt5Network.dll"
+		File "${QT_DIR}\bin\Qt5OpenGL.dll"
+		File "${QT_DIR}\bin\Qt5Widgets.dll"
+		
+		SetOutPath "$INSTDIR\platforms"
+		
+		File "${QT_DIR}\plugins\platforms\qwindows.dll"
 	!endif
 
 	WriteRegStr ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" "" "$INSTDIR"
@@ -237,6 +241,7 @@ Section "Install"
 	WriteRegDWORD ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}" \
 		"EstimatedSize" "$0"
 
+	SetOutPath "$INSTDIR"
 	!insertmacro MUI_STARTMENU_WRITE_BEGIN "${APPLICATION_NAME}"
 		;20100106 installer incorrectly leaves a shortcut folder in
 		; the "All Users" Start Menu. If it was already uninstalled, then the
@@ -274,7 +279,11 @@ Section "Uninstall"
 	RMDir "$INSTDIR\data"
 
 	Delete "$INSTDIR\glut32.dll"
-	!ifdef QT_BIN
+	
+	!ifdef QT_DIR
+		Delete "$INSTDIR\platforms\qwindows.dll"
+		RMDir "$INSTDIR\platforms"
+	
 		Delete "$INSTDIR\icudt51.dll"
 		Delete "$INSTDIR\icuin51.dll"
 		Delete "$INSTDIR\icuuc51.dll"
@@ -287,6 +296,7 @@ Section "Uninstall"
 		Delete "$INSTDIR\Qt5OpenGL.dll"
 		Delete "$INSTDIR\Qt5Widgets.dll"
 	!endif
+	
 	Delete "$INSTDIR\qavimator.exe"
 	Delete "$INSTDIR\uninstall.exe"
 	RMDir "$INSTDIR"

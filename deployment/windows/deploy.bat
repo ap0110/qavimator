@@ -22,18 +22,18 @@ if not %ERRORLEVEL% == 0 (
   exit /B %ERRORLEVEL%
 )
 
-qtpaths --binaries-dir > qt_bin.tmp
+qtpaths --install-prefix > qt_dir.tmp
 if not %ERRORLEVEL% == 0 (
-  del qt_bin.tmp
-  echo Could not get path to the Qt bin directory
+  del qt_dir.tmp
+  echo Could not get path to the Qt directory
   exit /B %ERRORLEVEL%
 )
-set /P QT_BIN= < qt_bin.tmp
-del qt_bin.tmp
+set /P QT_DIR= < qt_dir.tmp
+del qt_dir.tmp
 
 cd "%DEPLOYMENT_DIR%"
 makensis /V3 /NOCD ^
-  /DQT_BIN="%QT_BIN%" ^
+  /DQT_DIR="%QT_DIR%" ^
   /DPROJECT_ROOT_DIR="%PROJECT_ROOT_DIR%" ^
   /DRESOURCE_DIR="%RESOURCE_DIR%" ^
   /DAPPLICATION_NAME="%APPLICATION_NAME%" ^
