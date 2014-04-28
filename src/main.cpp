@@ -24,9 +24,9 @@
 
 int main( int argc, char ** argv )
 {
-    QApplication a(argc,argv);
-    QAvimator* mw=new QAvimator();
-    mw->show();
-    a.connect(&a,SIGNAL(lastWindowClosed()),&a,SLOT(quit()));
-    return a.exec();
+  QApplication a(argc,argv);
+  QAvimator* mw=new QAvimator();
+  mw->show();
+  a.connect(&a,SIGNAL(lastWindowClosed()),&a,SLOT(quit()));
+  return a.exec();
 }
