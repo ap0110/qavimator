@@ -67,7 +67,7 @@ install_name_tool -change "$QT_DIR/lib/QtGui.framework/Versions/5/QtGui" @execut
 install_name_tool -change "$QT_DIR/lib/QtWidgets.framework/Versions/5/QtWidgets" @executable_path/../Frameworks/QtWidgets QAvimator.app/Contents/Frameworks/QtOpenGL
 install_name_tool -change "$QT_DIR/lib/QtOpenGL.framework/Versions/5/QtOpenGL" @executable_path/../Frameworks/QtOpenGL QAvimator.app/Contents/MacOS/qavimator
 
-cp -R "$QT_DIR/lib/QtPrintSupport.framework" QAvimator.app/Contents/Frameworks/
+cp -R "$QT_DIR/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport" QAvimator.app/Contents/Frameworks/
 install_name_tool -id @executable_path/../Frameworks/QtPrintSupport QAvimator.app/Contents/Frameworks/QtPrintSupport
 install_name_tool -change "$QT_DIR/lib/QtCore.framework/Versions/5/QtCore" @executable_path/../Frameworks/QtCore QAvimator.app/Contents/Frameworks/QtPrintSupport
 install_name_tool -change "$QT_DIR/lib/QtGui.framework/Versions/5/QtGui" @executable_path/../Frameworks/QtGui QAvimator.app/Contents/Frameworks/QtPrintSupport
@@ -77,12 +77,10 @@ install_name_tool -change "$QT_DIR/lib/QtPrintSupport.framework/Versions/5/QtPri
 mkdir -p QAvimator.app/Contents/Plugins/platforms
 
 cp "$QT_DIR/plugins/platforms/libqcocoa.dylib" QAvimator.app/Contents/Plugins/platforms/
-install_name_tool -id @executable_path/../Plugins/platforms/libqcocoa.dylib QAvimator.app/Contents/Plugins/platforms/libqcocoa.dylib
 install_name_tool -change "$QT_DIR/lib/QtCore.framework/Versions/5/QtCore" @executable_path/../Frameworks/QtCore QAvimator.app/Contents/Plugins/platforms/libqcocoa.dylib
 install_name_tool -change "$QT_DIR/lib/QtGui.framework/Versions/5/QtGui" @executable_path/../Frameworks/QtGui QAvimator.app/Contents/Plugins/platforms/libqcocoa.dylib
 install_name_tool -change "$QT_DIR/lib/QtWidgets.framework/Versions/5/QtWidgets" @executable_path/../Frameworks/QtWidgets QAvimator.app/Contents/Plugins/platforms/libqcocoa.dylib
 install_name_tool -change "$QT_DIR/lib/QtPrintSupport.framework/Versions/5/QtPrintSupport" @executable_path/../Frameworks/QtPrintSupport QAvimator.app/Contents/Plugins/platforms/libqcocoa.dylib
-install_name_tool -change "$QT_DIR/plugins/platforms/libqcocoa.dylib" @executable_path/../Plugins/platforms/libqcocoa.dylib QAvimator.app/Contents/MacOS/qavimator
 
 # change back to the original directory (deployment/osx)
 cd "$DEPLOYMENT_DIR"
