@@ -28,6 +28,7 @@
 
 int main( int argc, char ** argv )
 {
+
 #ifdef __APPLE__
     char firstArg[] = "-platformpluginpath";
 
@@ -88,6 +89,9 @@ int main( int argc, char ** argv )
     // and append the new arguments
     newArgv[argc] = firstArg;
     newArgv[argc + 1] = secondArg;
+#else
+    int newArgc = argc;
+    char** newArgv = argv;
 #endif
 
     QApplication application(newArgc, newArgv);
@@ -96,8 +100,10 @@ int main( int argc, char ** argv )
     application.connect(&application,SIGNAL(lastWindowClosed()),&application,SLOT(quit()));
     int returnValue = application.exec();
 
+#ifdef __APPLE__
     delete[] secondArg;
     delete[] newArgv;
-    
+#endif
+
     return returnValue;
 }

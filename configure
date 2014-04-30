@@ -91,8 +91,14 @@ fi
 
 cd "$BUILD_DIR"
 
-OPERATING_SYSTEM=`uname -s`
 MACHINE_ARCH=`uname -m`
+
+if [[ "$MACHINE_ARCH" == "i686" ]]
+then
+  MACHINE_ARCH="x86"
+fi
+
+OPERATING_SYSTEM=`uname -s`
 
 if [[ "$OPERATING_SYSTEM" == "Darwin" ]]
 then
