@@ -95,7 +95,12 @@ MACHINE_ARCH=`uname -m`
 
 if [[ "$MACHINE_ARCH" == "i686" ]]
 then
-  MACHINE_ARCH="x86"
+  MACHINE_ARCH="32-bit"
+fi
+
+if [[ "$MACHINE_ARCH" == "x86_64" ]]
+then
+  MACHINE_ARCH="64-bit"
 fi
 
 OPERATING_SYSTEM=`uname -s`
@@ -141,7 +146,7 @@ then
   FILE_NAME="${APPLICATION_NAME}"
   FILE_NAME="${FILE_NAME}_${VERSION_NUMBER}"
   FILE_NAME="${FILE_NAME}_${BUILD_NUMBER}"
-  FILE_NAME="${FILE_NAME}_Darwin"
+  FILE_NAME="${FILE_NAME}_Mac"
   FILE_NAME="${FILE_NAME}_${MACHINE_ARCH}"
 
   echo $FILE_NAME > $DEPLOY_OSX_DIR/.file_name.tmp
