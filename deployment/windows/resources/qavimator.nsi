@@ -207,8 +207,9 @@ Section "Install"
 		File "${QT_DIR}\bin\Qt5Network.dll"
 		File "${QT_DIR}\bin\Qt5OpenGL.dll"
 		File "${QT_DIR}\bin\Qt5Widgets.dll"
+		File "${RESOURCE_DIR}\qt.conf"
 		
-		SetOutPath "$INSTDIR\platforms"
+		SetOutPath "$INSTDIR\plugins\platforms"
 		
 		File "${QT_DIR}\plugins\platforms\qwindows.dll"
 	!endif
@@ -281,8 +282,9 @@ Section "Uninstall"
 	Delete "$INSTDIR\glut32.dll"
 	
 	!ifdef QT_DIR
-		Delete "$INSTDIR\platforms\qwindows.dll"
-		RMDir "$INSTDIR\platforms"
+		Delete "$INSTDIR\plugins\platforms\qwindows.dll"
+		RMDir "$INSTDIR\plugins\platforms"
+		RMDir "$INSTDIR\plugins"
 	
 		Delete "$INSTDIR\icudt51.dll"
 		Delete "$INSTDIR\icuin51.dll"
@@ -295,6 +297,7 @@ Section "Uninstall"
 		Delete "$INSTDIR\Qt5Network.dll"
 		Delete "$INSTDIR\Qt5OpenGL.dll"
 		Delete "$INSTDIR\Qt5Widgets.dll"
+		Delete "$INSTDIR\qt.conf"
 	!endif
 	
 	Delete "$INSTDIR\qavimator.exe"

@@ -33,9 +33,10 @@ fi
 
 echo "Copying dependencies..."
 
-mkdir "$INSTALL_DIR/platforms"
+mkdir "$INSTALL_DIR/plugins"
+mkdir "$INSTALL_DIR/plugins/platforms"
 cp "$QT_DIR/plugins/platforms/libqxcb.so" \
-   "$INSTALL_DIR/platforms"
+   "$INSTALL_DIR/plugins/platforms"
 
 cp "$QT_DIR/lib/libQt5Core.so.5" \
    "$QT_DIR/lib/libQt5Gui.so.5" \
@@ -47,6 +48,7 @@ cp "$QT_DIR/lib/libQt5Core.so.5" \
    "$QT_DIR/lib/libicui18n.so.51" \
    "$QT_DIR/lib/libicuuc.so.51" \
    "$DEPLOYMENT_DIR/resources/qavimator.sh" \
+   "$DEPLOYMENT_DIR/resources/qt.conf" \
    "$INSTALL_DIR"
 
 mv "$INSTALL_DIR/qavimator" \
