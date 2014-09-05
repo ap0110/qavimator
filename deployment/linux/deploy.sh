@@ -49,10 +49,8 @@ cp "$QT_DIR/lib/libQt5Core.so.5" \
    "$QT_DIR/lib/libicuuc.so.51" \
    "$DEPLOYMENT_DIR/resources/qavimator.sh" \
    "$DEPLOYMENT_DIR/resources/qt.conf" \
+   "$DEPLOYMENT_DIR/resources/README" \
    "$INSTALL_DIR"
-
-mv "$INSTALL_DIR/qavimator" \
-   "$INSTALL_DIR/do_not_run_directly"
 
 # Return to original deployment directory
 cd "$DEPLOYMENT_DIR"
