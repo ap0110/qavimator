@@ -1,0 +1,21 @@
+
+Overview
+========
+
+QAvimator is an avatar animation editor for use with virtual worlds like Second
+Life.
+
+
+Running QAvimator
+-----------------
+
+To start QAvimator, execute file "qavimator".
+
+If it fails to run or cannot find a library file, then try executing shell
+script "qavimator.sh".
+
+
+Website
+-------
+
+qavimator.org
