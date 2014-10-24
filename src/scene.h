@@ -75,7 +75,7 @@ class Scene : public QObject
                         double x, double y, double z,
                         double xs, double ys, double zs,
                         double xr, double yr, double zr,
-                        int attach);
+                        int attach, QSharedPointer<Mesh> mesh);
     Prop* getPropByName(const QString& lookName);
     Prop* getPropById(unsigned int id);
     void deleteProp(Prop* prop);

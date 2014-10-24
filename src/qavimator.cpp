@@ -22,6 +22,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QScopedPointer>
+#include <QSharedPointer>
 
 #include "aboutdialog.h"
 #include "animationview.h"
@@ -44,7 +45,11 @@
 QAvimator::QAvimator() :
   QMainWindow(nullptr),
   ui(new Ui::QAvimator),
-  updateChecker(nullptr, this)
+  updateChecker(nullptr, this),
+  cubeMesh(new Mesh(CUBE_MESH)),
+  sphereMesh(new Mesh(SPHERE_MESH)),
+  coneMesh(new Mesh(CONE_MESH)),
+  torusMesh(new Mesh(TORUS_MESH))
 {
   nodeMapping <<  0
               <<  1 <<  2 <<  3 <<  4 << 5
@@ -67,6 +72,7 @@ QAvimator::QAvimator() :
   longestRunningTime=0.0;
   scene = new Scene(this);
   ui->animationView->setScene(scene);
+  ui->animationView->setModels(cubeMesh, sphereMesh, coneMesh);
 
   // prepare play button icons
   stopIcon=QIcon(":/icons/icons/stop.png");
@@ -1063,6 +1069,25 @@ void QAvimator::fileLoadProps()
             while(props.count()<11) props.append("0");
           }
 
+          // TODO Temporary hack for adding mesh as part of removing GLUT
+          QSharedPointer<Mesh> mesh;
+
+          switch (props[0].toInt())
+          {
+            case Prop::PropType::Box:
+              mesh.swap(cubeMesh);
+              break;
+            case Prop::PropType::Sphere:
+              mesh.swap(sphereMesh);
+              break;
+            case Prop::PropType::Cone:
+              mesh.swap(coneMesh);
+              break;
+            case Prop::PropType::Torus:
+              mesh.swap(torusMesh);
+              break;
+          }
+
           const Prop* prop=scene->addProp((Prop::PropType) props[0].toInt(),
                                             props[1].toDouble(),
                                             props[2].toDouble(),
@@ -1073,7 +1098,8 @@ void QAvimator::fileLoadProps()
                                             props[7].toDouble(),
                                             props[8].toDouble(),
                                             props[9].toDouble(),
-                                            props[10].toInt()
+                                            props[10].toInt(),
+                                            mesh
           );
           if(prop)
           {
@@ -1452,9 +1478,9 @@ void QAvimator::setCurrentFrame(int frame)
 }
 
 // this slot gets called when someone clicks one of the "New Prop" buttons
-void QAvimator::newProp(Prop::PropType type)
+void QAvimator::newProp(Prop::PropType type, QSharedPointer<Mesh> mesh)
 {
-  const Prop* prop=scene->addProp(type,10,40,10, 10,10,10, 0,0,0, 0);
+  const Prop* prop=scene->addProp(type,10,40,10, 10,10,10, 0,0,0, 0, mesh);
 
   if(prop)
   {
@@ -1946,22 +1972,22 @@ void QAvimator::on_easeOutCheck_stateChanged(int newState)
 
 void QAvimator::on_newBoxPropButton_clicked()
 {
-  newProp(Prop::Box);
+  newProp(Prop::Box, cubeMesh);
 }
 
 void QAvimator::on_newSpherePropButton_clicked()
 {
-  newProp(Prop::Sphere);
+  newProp(Prop::Sphere, sphereMesh);
 }
 
 void QAvimator::on_newConePropButton_clicked()
 {
-  newProp(Prop::Cone);
+  newProp(Prop::Cone, coneMesh);
 }
 
 void QAvimator::on_newTorusPropButton_clicked()
 {
-  newProp(Prop::Torus);
+  newProp(Prop::Torus, torusMesh);
 }
 
 void QAvimator::on_propNameCombo_activated(const QString& name)

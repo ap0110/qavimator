@@ -31,6 +31,11 @@
 #define KEY_IMAGE "data/key.png"
 #define NOKEY_IMAGE "data/nokey.png"
 
+#define CUBE_MESH "data/cube.obj"
+#define SPHERE_MESH "data/sphere.obj"
+#define CONE_MESH "data/cone.obj"
+#define TORUS_MESH "data/torus.obj"
+
 #include <QMainWindow>
 #include <QTimer>
 
@@ -211,7 +216,7 @@ class QAvimator : public QMainWindow
     void easeInChanged(int change);
     void easeOutChanged(int change);
 
-    void newProp(Prop::PropType);
+    void newProp(Prop::PropType, QSharedPointer<Mesh> mesh);
     void selectProp(const QString& name);
     void deleteProp();
     void attachProp(int attachmentPoint);
@@ -297,6 +302,11 @@ class QAvimator : public QMainWindow
     Scene* scene;
 
     UpdateChecker updateChecker;
+
+    QSharedPointer<Mesh> cubeMesh;
+    QSharedPointer<Mesh> sphereMesh;
+    QSharedPointer<Mesh> coneMesh;
+    QSharedPointer<Mesh> torusMesh;
 };
 
 #endif

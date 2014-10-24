@@ -74,7 +74,7 @@ Prop* PropManager::addProp(Prop::PropType type,
                     double x, double y, double z,
                     double xs, double ys, double zs,
                     double xr, double yr, double zr,
-                    int attach)
+                    int attach, QSharedPointer<Mesh> mesh)
 {
   QString name;
   QString baseName;
@@ -90,7 +90,7 @@ Prop* PropManager::addProp(Prop::PropType type,
     name=baseName+" "+QString::number(objectNum++);
   } while(getPropByName(name));
 
-  Prop* newProp=new Prop(nextPropId,type,name);
+  Prop* newProp=new Prop(nextPropId,type,name,mesh);
 
   nextPropId++;
 

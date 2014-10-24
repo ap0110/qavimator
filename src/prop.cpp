@@ -26,11 +26,13 @@
 #include <GL/glut.h>
 #endif
 
+#include <QSharedPointer>
 #include <QVector3D>
 
 #include "prop.h"
 
-Prop::Prop(unsigned int propId,PropType newType,const QString& newName)
+Prop::Prop(unsigned int propId, PropType newType, const QString& newName, QSharedPointer<Mesh> mesh) :
+  m_model(mesh)
 {
   m_id = propId;
   setType(newType);

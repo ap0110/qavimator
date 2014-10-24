@@ -46,7 +46,7 @@ class PropManager : public QObject
                         double x, double y, double z,
                         double xs, double ys, double zs,
                         double xr, double yr, double zr,
-                        int attach);
+                        int attach, QSharedPointer<Mesh> mesh);
     void deleteProp(Prop* prop);
     void clearProps();
 

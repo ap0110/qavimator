@@ -30,6 +30,7 @@
 #endif
 
 #include <QMouseEvent>
+#include <QScopedPointer>
 
 #include "animation.h"
 #include "animationview.h"
@@ -44,8 +45,11 @@
 #define CTRL  2
 #define ALT   4
 
-AnimationView::AnimationView(QWidget* parent,const char* /* name */,Animation* anim)
- : QGLWidget(parent)
+AnimationView::AnimationView(QWidget* parent, const char* /* name */, Animation* anim)
+ : QGLWidget(parent),
+   m_cubeModel(nullptr),
+   m_sphereModel(nullptr),
+   m_coneModel(nullptr)
 {
   figureFiles << MALE_BVH << FEMALE_BVH;
 
@@ -995,6 +999,18 @@ BVHNode* AnimationView::getSelectedPart()
 unsigned int AnimationView::getSelectedPartIndex()
 {
   return partSelected % ANIMATION_INCREMENT;
+}
+
+void AnimationView::setModels(QSharedPointer<Mesh> cubeMesh, QSharedPointer<Mesh> sphereMesh, QSharedPointer<Mesh> coneMesh)
+{
+  m_cubeModel.reset(new Model(cubeMesh));
+  m_sphereModel.reset(new Model(sphereMesh));
+  m_coneModel.reset(new Model(coneMesh));
+
+  // Scale cube to an edge length of 2 instead of 1
+  m_cubeModel->scale(2.0f, 2.0f, 2.0f);
+  // Scale cone to a height of 3 instead of 2
+  m_coneModel->scale(1.0f, 1.0f, 1.5f);
 }
 /*
 const QString AnimationView::getPartName(int index)
