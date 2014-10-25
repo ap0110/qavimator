@@ -33,39 +33,69 @@
 
 #include "mesh.h"
 
-Mesh::Mesh(const QString& fileName) :
+Mesh::Mesh(const QString& fileName, const Shape shape) :
   QObject(nullptr),
+  m_shape(shape),
+  m_quadric(nullptr),
   m_vertices(),
   m_normals(),
   m_triangleVertexIndices(),
   m_triangleNormalIndices()
 {
-  readFromFile(fileName);
+  if (m_shape == Shape::SPHERE
+      || m_shape == Shape::CONE)
+  {
+    m_quadric = gluNewQuadric();
+  }
+  else
+  {
+    readFromFile(fileName);
+  }
+}
+
+Mesh::~Mesh()
+{
+  gluDeleteQuadric(m_quadric);
 }
 
 void Mesh::draw() const
 {
-  if (!m_triangleVertexIndices.isEmpty())
+  switch (m_shape)
   {
-    int vertexSize = 3;
-    QVector<float> vertices(m_triangleVertexIndices.size() * vertexSize);
-    QVector<float> normals(m_triangleVertexIndices.size() * vertexSize);
-    for (int i = 0; i < m_triangleVertexIndices.size(); ++i)
-    {
-      for (int j = 0; j < vertexSize; ++j)
+    case Shape::SPHERE:
+      gluQuadricDrawStyle(m_quadric, GLU_FILL);
+      gluQuadricNormals(m_quadric, GLU_SMOOTH);
+      gluSphere(m_quadric, 1.0, 16, 16);
+      break;
+    case Shape::CONE:
+      gluQuadricDrawStyle(m_quadric, GLU_FILL);
+      gluQuadricNormals(m_quadric, GLU_SMOOTH);
+      gluCylinder(m_quadric, 1.0, 0.0, 2.0, 16, 16);
+      break;
+    default:
+      if (!m_triangleVertexIndices.isEmpty())
       {
-        vertices[(i * vertexSize) + j] = m_vertices[(m_triangleVertexIndices[i] * vertexSize) + j];
-        normals[(i * vertexSize) + j] = m_normals[(m_triangleNormalIndices[i] * vertexSize) + j];
-      }
-    }
+        int vertexSize = 3;
+        QVector<float> vertices(m_triangleVertexIndices.size() * vertexSize);
+        QVector<float> normals(m_triangleVertexIndices.size() * vertexSize);
+        for (int i = 0; i < m_triangleVertexIndices.size(); ++i)
+        {
+          for (int j = 0; j < vertexSize; ++j)
+          {
+            vertices[(i * vertexSize) + j] = m_vertices[(m_triangleVertexIndices[i] * vertexSize) + j];
+            normals[(i * vertexSize) + j] = m_normals[(m_triangleNormalIndices[i] * vertexSize) + j];
+          }
+        }
 
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, vertices.constData());
-    glNormalPointer(GL_FLOAT, 0, normals.constData());
-    glDrawArrays(GL_TRIANGLES, 0, m_triangleVertexIndices.size());
-    glDisableClientState(GL_NORMAL_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, vertices.constData());
+        glNormalPointer(GL_FLOAT, 0, normals.constData());
+        glDrawArrays(GL_TRIANGLES, 0, m_triangleVertexIndices.size());
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+      }
+      break;
   }
 }
 

@@ -26,13 +26,25 @@
 
 #include <QObject>
 
+class GLUquadric;
+
 class Mesh : public QObject
 {
   Q_OBJECT
 
   public:
+    enum class Shape
+    {
+        NONE = 0,
+        CUBE = 1,
+        SPHERE = 2,
+        CONE = 3,
+        TORUS = 4,
+        CUSTOM = 5
+    };
 
-    explicit Mesh(const QString& fileName);
+    explicit Mesh(const QString& fileName, const Shape shape);
+    ~Mesh();
 
     void draw() const;
 
@@ -40,6 +52,10 @@ class Mesh : public QObject
     void writeToFile(const QString& fileName);
 
   private:
+    Shape m_shape;
+
+    GLUquadric* m_quadric;
+
     QList<float> m_vertices;
     QList<float> m_normals;
 

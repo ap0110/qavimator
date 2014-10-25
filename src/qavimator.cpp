@@ -46,10 +46,10 @@ QAvimator::QAvimator() :
   QMainWindow(nullptr),
   ui(new Ui::QAvimator),
   updateChecker(nullptr, this),
-  cubeMesh(new Mesh(CUBE_MESH)),
-  sphereMesh(new Mesh(SPHERE_MESH)),
-  coneMesh(new Mesh(CONE_MESH)),
-  torusMesh(new Mesh(TORUS_MESH))
+  cubeMesh(new Mesh(CUBE_MESH, Mesh::Shape::CUBE)),
+  sphereMesh(new Mesh(SPHERE_MESH, Mesh::Shape::SPHERE)),
+  coneMesh(new Mesh(CONE_MESH, Mesh::Shape::CONE)),
+  torusMesh(new Mesh(TORUS_MESH, Mesh::Shape::TORUS))
 {
   nodeMapping <<  0
               <<  1 <<  2 <<  3 <<  4 << 5
