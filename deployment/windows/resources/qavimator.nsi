@@ -180,7 +180,6 @@ Section "Install"
 	SetOutPath "$INSTDIR"
 
 	File "${PROJECT_ROOT_DIR}\_install\qavimator.exe"
-	File "${PROJECT_ROOT_DIR}\_install\glut32.dll"
 
 	SetOutPath "$INSTDIR\data"
 
@@ -278,8 +277,6 @@ Section "Uninstall"
 	Delete "$INSTDIR\data\TPose.avm"
 	Delete "$INSTDIR\data\TPose.bvh"
 	RMDir "$INSTDIR\data"
-
-	Delete "$INSTDIR\glut32.dll"
 	
 	!ifdef QT_DIR
 		Delete "$INSTDIR\plugins\platforms\qwindows.dll"

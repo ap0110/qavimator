@@ -4,11 +4,9 @@ Linux/X11:
 
     - Install CMake 2.8.9+ and add bin to PATH
     - Install Qt5 and add bin to PATH
-    - Install GLUT (or install package "freeglut3-dev")
     
     - If using a package manager such as Debian package management,
       install the following packages (sudo apt-get install <PACKAGE>):
-    -- freeglut3-dev
     -- g++
     -- libdrm-dev
     -- libgl1-mesa-dev
@@ -36,9 +34,6 @@ Windows:
     - Install CMake 2.8.9+ and add bin to PATH
     - Install Qt5 and add bin to PATH
     - Install MinGW and add bin to PATH (some Qt5 installations come with MinGW)
-    - Download GLUT
-    -- ensure the header is at [glut package]\GL\glut.h
-    -- ensure the dll is at [glut package]\glut32.dll
     
     configure
     make
