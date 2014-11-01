@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <author>Zi Ree</author>
- <class>QAvimator</class>
- <widget class="QMainWindow" name="QAvimator">
+ <class>QAvimatorWindow</class>
+ <widget class="QMainWindow" name="QAvimatorWindow">
   <property name="geometry">
    <rect>
     <x>0</x>

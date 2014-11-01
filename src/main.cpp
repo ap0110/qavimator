@@ -20,13 +20,13 @@
 
 #include <QApplication>
 
-#include "qavimator.h"
+#include "qavimatorwindow.h"
 
 int main( int argc, char ** argv )
 {
     QApplication application(argc, argv);
-    QAvimator* qavimator = new QAvimator();
-    qavimator->show();
+    QAvimatorWindow* qavimatorWindow = new QAvimatorWindow();
+    qavimatorWindow->show();
     application.connect(&application,SIGNAL(lastWindowClosed()),&application,SLOT(quit()));
     return application.exec();
 }

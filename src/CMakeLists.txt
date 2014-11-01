@@ -20,7 +20,7 @@ SET (QAVI_SRC aboutdialog.cpp
               newanimation.cpp
               prop.cpp
               propmanager.cpp
-              qavimator.cpp
+              qavimatorwindow.cpp
               scene.cpp
               settings.cpp
               slpartsfemale.cpp
@@ -36,7 +36,7 @@ SET (QAVI_SRC aboutdialog.cpp
 
 # Interfaces
 SET (QAVI_UI  aboutdialog.ui
-              qavimator.ui
+              qavimatorwindow.ui
               updatenotificationdialog.ui
               usersettingsdialog.ui)
 

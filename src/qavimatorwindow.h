@@ -55,16 +55,16 @@ class Scene;
 class Timeline;
 
 namespace Ui {
-class QAvimator;
+  class QAvimatorWindow;
 }
 
-class QAvimator : public QMainWindow
+class QAvimatorWindow : public QMainWindow
 {
   Q_OBJECT
 
   public:
-    QAvimator();
-    ~QAvimator();
+    QAvimatorWindow();
+    ~QAvimatorWindow();
 
   signals:
     void enableRotation(bool state);
@@ -297,7 +297,7 @@ class QAvimator : public QMainWindow
     double longestRunningTime;
 
   private:
-    QScopedPointer<Ui::QAvimator> ui;
+    QScopedPointer<Ui::QAvimatorWindow> ui;
 
     Scene* scene;
 
