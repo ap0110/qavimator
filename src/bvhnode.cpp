@@ -260,7 +260,7 @@ const FrameData BVHNode::frameData(int frame) const
 
   iPosition.setX(interpolate(positionBefore.x(), positionAfter.x(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
   iPosition.setY(interpolate(positionBefore.y(), positionAfter.y(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
-  iPosition.setX(interpolate(positionBefore.z(), positionAfter.z(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
+  iPosition.setZ(interpolate(positionBefore.z(), positionAfter.z(), frameAfter - frameBefore, frame - frameBefore, before.easeOut(), after.easeIn()));
 
 // qDebug(QString("iRot.x %1 frame %2: %3").arg(rotBefore.bodyPart).arg(before.frameNumber()).arg(iRot.x));
 
