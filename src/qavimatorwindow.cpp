@@ -160,6 +160,11 @@ QAvimatorWindow::QAvimatorWindow() :
 
   ui->currentFrameSlider->setPageStep(1);
 
+  if (!updateChecker.hasNews())
+  {
+    ui->helpWhatsNewAction->setVisible(false);
+  }
+
   QStringList args = QApplication::arguments();
   if(args.size()>1)
   {

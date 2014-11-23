@@ -136,6 +136,11 @@ void UpdateChecker::onStartup()
   }
 }
 
+bool UpdateChecker::hasNews()
+{
+  return !m_news.isEmpty();
+}
+
 void UpdateChecker::checkUpdates()
 {
   m_networkAccessManager->get(QNetworkRequest(m_url));

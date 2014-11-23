@@ -54,6 +54,8 @@ class UpdateChecker : public QObject
 
     void onStartup();
 
+    bool hasNews();
+
   signals:
     void updateCheckFinished();
 

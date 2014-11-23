@@ -1491,7 +1491,6 @@
     <addaction name="editCutAction"/>
     <addaction name="editCopyAction"/>
     <addaction name="editPasteAction"/>
-    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -1508,8 +1507,8 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="helpAboutAction"/>
     <addaction name="helpWhatsNewAction"/>
+    <addaction name="helpAboutAction"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -1642,6 +1641,9 @@
    <property name="shortcut">
     <string>Ctrl+Z</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="editRedoAction">
    <property name="enabled">
@@ -1656,6 +1658,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+Z</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="editCutAction">
@@ -1742,25 +1747,6 @@
   <action name="optionsConfigureQAvimatorAction">
    <property name="text">
     <string>Configure QAvimator...</string>
-   </property>
-  </action>
-  <action name="helpContentsAction">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Contents...</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+?, Backspace, Backspace, Del</string>
-   </property>
-  </action>
-  <action name="helpIndexAction">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Index...</string>
    </property>
   </action>
   <action name="helpAboutAction">
