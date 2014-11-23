@@ -26,7 +26,11 @@ int main( int argc, char ** argv )
 {
     QApplication application(argc, argv);
     QAvimatorWindow* qavimatorWindow = new QAvimatorWindow();
+    // Queue an event to show the main window
     qavimatorWindow->show();
+    // Queue an event to execute a method after the main window shows
+    qavimatorWindow->queueAfterShow();
     application.connect(&application,SIGNAL(lastWindowClosed()),&application,SLOT(quit()));
+    // Start the event loop
     return application.exec();
 }

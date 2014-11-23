@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <QDesktopServices>
+#include <QFile>
 #include <QMessageBox>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -32,6 +33,7 @@
 #include "versionnumber.h"
 
 #include "updatechecker.h"
+#include "whatsnewdialog.h"
 
 UpdateCheckResults::UpdateCheckResults() :
   m_hasUpdates(false),
@@ -74,12 +76,15 @@ UpdateChecker::UpdateChecker(QObject* parent, QWidget* parentWidget) :
   QObject(parent),
   m_networkAccessManager(new QNetworkAccessManager),
   m_parentWidget(parentWidget),
+  m_news(""),
   m_url(QString(
           "http://qavimator.bitbucket.org/applications/qavimator/%1/updates.xml"
           ).arg(Metadata::updateChannel().toLower())),
-  m_updatesVersion("1.0")
+  m_updatesVersion("1.0"),
+  m_newsFilePath("NEWS")
 {
   UpdaterSettings::readSettings();
+  readNews();
 
   connect(m_networkAccessManager.data(), SIGNAL(finished(QNetworkReply*)),
           this, SLOT(replyFinished(QNetworkReply*)));
@@ -90,9 +95,62 @@ UpdateChecker::~UpdateChecker()
   UpdaterSettings::writeSettings();
 }
 
+void UpdateChecker::onStartup()
+{
+  VersionNumber greatestInstalledVersion(UpdaterSettings::greatestInstalledVersion());
+
+  bool wasNewsShown = false;
+  // Check validity
+  if (greatestInstalledVersion.isValid())
+  {
+    // If valid, compare with current version
+    if (greatestInstalledVersion.compare(Metadata::versionNumber()) < 0)
+    {
+      // If less, try to write the current version
+      // then show news if successful
+      if (tryWriteCurrentVersion())
+      {
+        wasNewsShown = showNews();
+      }
+    }
+  }
+  else
+  {
+    // If invalid, try to write the current version
+    // then show news if successful
+    if (tryWriteCurrentVersion())
+    {
+      wasNewsShown = showNews();
+    }
+  }
+
+  if (!wasNewsShown && UpdaterSettings::hasAutomaticUpdates())
+  {
+    if (UpdaterSettings::lastSuccessfulCheck() == "Never"
+        || QDateTime::fromString(
+          UpdaterSettings::lastSuccessfulCheck()
+          ).addDays(1) < QDateTime::currentDateTime())
+    {
+      checkUpdates();
+    }
+  }
+}
+
 void UpdateChecker::checkUpdates()
 {
   m_networkAccessManager->get(QNetworkRequest(m_url));
+}
+
+bool UpdateChecker::showNews()
+{
+  bool canShowNews = !m_news.isEmpty();
+
+  if (canShowNews)
+  {
+    execDialog(DialogType::WhatsNew);
+  }
+
+  return canShowNews;
 }
 
 void UpdateChecker::replyFinished(QNetworkReply* reply)
@@ -100,8 +158,7 @@ void UpdateChecker::replyFinished(QNetworkReply* reply)
   UpdateCheckResults updateCheckResults = processUpdates(reply->readAll());
   if (updateCheckResults.hasUpdates())
   {
-    QScopedPointer<UpdateNotificationDialog> dialog(new UpdateNotificationDialog(m_parentWidget));
-    dialog->exec();
+    execDialog(DialogType::UpdateNotification);
   }
   if (updateCheckResults.hasSuccessfulUpdateCheck())
   {
@@ -178,4 +235,54 @@ UpdateCheckResults UpdateChecker::readVersion(QXmlStreamReader& xmlStreamReader)
     }
   }
   return results;
+}
+
+void UpdateChecker::readNews()
+{
+  QFile file(m_newsFilePath);
+  if (file.exists()
+      && file.open(QIODevice::ReadOnly
+                 | QIODevice::Text))
+  {
+    m_news = static_cast<QString>(file.readAll());
+  }
+}
+
+bool UpdateChecker::tryWriteCurrentVersion()
+{
+  bool isSuccessful = false;
+
+  QString oldValue = UpdaterSettings::greatestInstalledVersion();
+
+  UpdaterSettings::setGreatestInstalledVersion(Metadata::versionNumberString());
+
+  UpdaterSettings::writeSettings();
+  UpdaterSettings::setGreatestInstalledVersion(oldValue);
+  UpdaterSettings::readSettings();
+
+  VersionNumber greatestInstalledVersion(UpdaterSettings::greatestInstalledVersion());
+  if (greatestInstalledVersion.isValid()
+      && greatestInstalledVersion.compare(Metadata::versionNumber()) == 0)
+  {
+    isSuccessful = true;
+  }
+
+  return isSuccessful;
+}
+
+bool UpdateChecker::execDialog(DialogType dialogType)
+{
+  QScopedPointer<QDialog> dialog;
+
+  switch (dialogType)
+  {
+    case DialogType::UpdateNotification:
+      dialog.reset(new UpdateNotificationDialog(m_parentWidget));
+      break;
+    case DialogType::WhatsNew:
+      dialog.reset(new WhatsNewDialog(m_news, m_parentWidget));
+      break;
+  }
+
+  return dialog->exec();
 }

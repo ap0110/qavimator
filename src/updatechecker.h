@@ -52,11 +52,14 @@ class UpdateChecker : public QObject
                   QWidget* parentWidget = nullptr);
     ~UpdateChecker();
 
+    void onStartup();
+
   signals:
     void updateCheckFinished();
 
   public slots:
     void checkUpdates();
+    bool showNews();
 
   private slots:
     void replyFinished(QNetworkReply* reply);
@@ -66,12 +69,26 @@ class UpdateChecker : public QObject
     UpdateCheckResults readUpdates(QXmlStreamReader& xmlStreamReader);
     UpdateCheckResults readVersion(QXmlStreamReader& xmlStreamReader);
 
+    enum class DialogType
+    {
+      UpdateNotification = 1,
+      WhatsNew = 2
+    };
+
+    void readNews();
+    bool tryWriteCurrentVersion();
+
+    bool execDialog(DialogType dialogType);
+
     QScopedPointer<QNetworkAccessManager> m_networkAccessManager;
 
     QWidget* m_parentWidget;
 
+    QString m_news;
+
     const QString m_url;
     const QString m_updatesVersion;
+    const QString m_newsFilePath;
 };
 
 #endif

@@ -66,6 +66,8 @@ class QAvimatorWindow : public QMainWindow
     QAvimatorWindow();
     ~QAvimatorWindow();
 
+    void queueAfterShow();
+
   signals:
     void enableRotation(bool state);
     void enablePosition(bool state);
@@ -75,6 +77,8 @@ class QAvimatorWindow : public QMainWindow
     void protectFrame(bool state);
 
   protected slots:
+    void afterShow();
+
     void configChanged();
 
     void partClicked(BVHNode* node, QVector3D rotation, RotationLimits rotLimits, QVector3D position);
@@ -120,6 +124,7 @@ class QAvimatorWindow : public QMainWindow
     void on_optionsConfigureQAvimatorAction_triggered();
 
     void on_helpAboutAction_triggered();
+    void on_helpWhatsNewAction_triggered();
 
     // ------- Additional Toolbar Element Slots -------
 
@@ -203,6 +208,7 @@ class QAvimatorWindow : public QMainWindow
     void configure();
 
     void helpAbout();
+    void helpWhatsNew();
 
     void animationChanged(int which);
     void setAvatarShape(int shape);

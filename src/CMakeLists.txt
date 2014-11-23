@@ -32,13 +32,15 @@ SET (QAVI_SRC aboutdialog.cpp
               updatersettings.cpp
               usersettings.cpp
               usersettingsdialog.cpp
-              versionnumber.cpp)
+              versionnumber.cpp
+              whatsnewdialog.cpp)
 
 # Interfaces
 SET (QAVI_UI  aboutdialog.ui
               qavimatorwindow.ui
               updatenotificationdialog.ui
-              usersettingsdialog.ui)
+              usersettingsdialog.ui
+              whatsnewdialog.ui)
 
 # Resources
 SET (QAVI_RSC icons.qrc)

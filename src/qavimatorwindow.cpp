@@ -37,6 +37,7 @@
 
 #include "qavimatorwindow.h"
 #include "ui_qavimatorwindow.h"
+#include "whatsnewdialog.h"
 
 #define ANIM_FILTER "Animation Files (*.avm *.bvh)"
 #define PROP_FILTER "Props (*.prp)"
@@ -159,15 +160,6 @@ QAvimatorWindow::QAvimatorWindow() :
 
   ui->currentFrameSlider->setPageStep(1);
 
-  if (UpdaterSettings::hasAutomaticUpdates() &&
-      (UpdaterSettings::lastSuccessfulCheck() == "Never" ||
-      QDateTime::fromString(
-        UpdaterSettings::lastSuccessfulCheck()
-        ).addDays(1) < QDateTime::currentDateTime()))
-  {
-    updateChecker.checkUpdates();
-  }
-
   QStringList args = QApplication::arguments();
   if(args.size()>1)
   {
@@ -184,6 +176,19 @@ QAvimatorWindow::QAvimatorWindow() :
 QAvimatorWindow::~QAvimatorWindow()
 {
   fileExit();
+}
+
+void QAvimatorWindow::queueAfterShow()
+{
+  // QTimer creates a timerEvent
+  // - This is a convenient way to queue "afterShow" to
+  //   run after the main window shows
+  QTimer::singleShot(0, this, SLOT(afterShow()));
+}
+
+void QAvimatorWindow::afterShow()
+{
+  updateChecker.onStartup();
 }
 
 // slot gets called by AnimationView::mousePressEvent()
@@ -1299,6 +1304,11 @@ void QAvimatorWindow::helpAbout()
   dialog->exec();
 }
 
+void QAvimatorWindow::helpWhatsNew()
+{
+  updateChecker.showNews();
+}
+
 // checks if a file already exists at the given path and displays a warning message
 // returns true if it's ok to save/overwrite, else returns false
 bool QAvimatorWindow::checkFileOverwrite(const QFileInfo& fileInfo)
@@ -1869,6 +1879,11 @@ void QAvimatorWindow::on_optionsConfigureQAvimatorAction_triggered()
 void QAvimatorWindow::on_helpAboutAction_triggered()
 {
   helpAbout();
+}
+
+void QAvimatorWindow::on_helpWhatsNewAction_triggered()
+{
+  helpWhatsNew();
 }
 
 // ------- Additional Toolbar Element Slots --------
