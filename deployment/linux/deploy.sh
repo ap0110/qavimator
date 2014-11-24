@@ -44,9 +44,9 @@ cp "$QT_DIR/lib/libQt5Core.so.5" \
    "$QT_DIR/lib/libQt5Widgets.so.5" \
    "$QT_DIR/lib/libQt5OpenGL.so.5" \
    "$QT_DIR/lib/libQt5DBus.so.5" \
-   "$QT_DIR/lib/libicudata.so.51" \
-   "$QT_DIR/lib/libicui18n.so.51" \
-   "$QT_DIR/lib/libicuuc.so.51" \
+   "$QT_DIR/lib/libicudata.so.52" \
+   "$QT_DIR/lib/libicui18n.so.52" \
+   "$QT_DIR/lib/libicuuc.so.52" \
    "$DEPLOYMENT_DIR/resources/qavimator.sh" \
    "$DEPLOYMENT_DIR/resources/qt.conf" \
    "$DEPLOYMENT_DIR/resources/README" \
