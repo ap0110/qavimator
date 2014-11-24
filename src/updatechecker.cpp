@@ -129,7 +129,7 @@ void UpdateChecker::onStartup()
     if (UpdaterSettings::lastSuccessfulCheck() == "Never"
         || QDateTime::fromString(
           UpdaterSettings::lastSuccessfulCheck()
-          ).addDays(1) < QDateTime::currentDateTime())
+          ).addDays(7) < QDateTime::currentDateTime())
     {
       checkUpdates();
     }
