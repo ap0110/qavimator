@@ -34,6 +34,8 @@ QString UpdaterSettings::m_lastSuccessfulCheck = "Never";
 const QString UpdaterSettings::m_lastSuccessfulCheckKey = "last_successful_check";
 bool UpdaterSettings::m_hasAutomaticUpdates = true;
 const QString UpdaterSettings::m_hasAutomaticUpdatesKey = "has_automatic_updates";
+QString UpdaterSettings::m_greatestInstalledVersion = "";
+const QString UpdaterSettings::m_greatestInstalledVersionKey = "greatest_installed_version";
 
 const QString UpdaterSettings::lastSuccessfulCheck()
 {
@@ -55,6 +57,16 @@ void UpdaterSettings::setHasAutomaticUpdates(bool on)
   m_hasAutomaticUpdates = on;
 }
 
+const QString UpdaterSettings::greatestInstalledVersion()
+{
+  return m_greatestInstalledVersion;
+}
+
+void UpdaterSettings::setGreatestInstalledVersion(const QString& version)
+{
+  m_greatestInstalledVersion = version;
+}
+
 void UpdaterSettings::readSettings()
 {
   Settings settings;
@@ -66,6 +78,7 @@ void UpdaterSettings::readSettings()
 
     m_lastSuccessfulCheck = settings.value(m_lastSuccessfulCheckKey).toString();
     m_hasAutomaticUpdates = settings.value(m_hasAutomaticUpdatesKey).toBool();
+    m_greatestInstalledVersion = settings.value(m_greatestInstalledVersionKey).toString();
 
     settings.endGroup();
   }
@@ -79,7 +92,8 @@ void UpdaterSettings::writeSettings()
   settings.beginGroup(m_updaterSettingsVersionGroup);
 
   settings.setValue(m_lastSuccessfulCheckKey, lastSuccessfulCheck());
-  settings.setValue(m_hasAutomaticUpdatesKey, m_hasAutomaticUpdates);
+  settings.setValue(m_hasAutomaticUpdatesKey, hasAutomaticUpdates());
+  settings.setValue(m_greatestInstalledVersionKey, greatestInstalledVersion());
 
   settings.endGroup();
   settings.endGroup();

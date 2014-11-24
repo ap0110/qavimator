@@ -20,17 +20,17 @@
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
-#include <GLUT/glut.h>
 #else
 #include <GL/glu.h>
-#include <GL/glut.h>
 #endif
 
+#include <QSharedPointer>
 #include <QVector3D>
 
 #include "prop.h"
 
-Prop::Prop(unsigned int propId,PropType newType,const QString& newName)
+Prop::Prop(unsigned int propId, PropType newType, const QString& newName, QSharedPointer<Mesh> mesh) :
+  m_model(mesh)
 {
   m_id = propId;
   setType(newType);
@@ -170,23 +170,23 @@ void Prop::draw(State state) const
   if(m_type == Box)
   {
     glScalef(m_scale->x(), m_scale->y(), m_scale->z());
-    glutSolidCube(1);
+    m_model.draw();
   }
   else if(m_type == Sphere)
   {
     glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
-    glutSolidSphere(1,16,16);
+    m_model.draw();
   }
   else if(m_type == Cone)
   {
     glTranslatef(0,0,-5);
     glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
-    glutSolidCone(1,2,16,16);
+    m_model.draw();
   }
   else if(m_type == Torus)
   {
     glScalef(m_scale->x() / 4, m_scale->y() / 4, m_scale->z() / 2);
-    glutSolidTorus(1,1,16,16);
+    m_model.draw();
   }
 
   glPopMatrix();

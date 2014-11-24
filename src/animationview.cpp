@@ -22,14 +22,13 @@
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
-#include <GLUT/glut.h>
 #include <QApplication.h>
 #else
 #include <GL/glu.h>
-#include <GL/glut.h>
 #endif
 
 #include <QMouseEvent>
+#include <QScopedPointer>
 
 #include "animation.h"
 #include "animationview.h"
@@ -44,8 +43,11 @@
 #define CTRL  2
 #define ALT   4
 
-AnimationView::AnimationView(QWidget* parent,const char* /* name */,Animation* anim)
- : QGLWidget(parent)
+AnimationView::AnimationView(QWidget* parent, const char* /* name */, Animation* anim)
+ : QGLWidget(parent),
+   m_cubeModel(nullptr),
+   m_sphereModel(nullptr),
+   m_coneModel(nullptr)
 {
   figureFiles << MALE_BVH << FEMALE_BVH;
 
@@ -55,13 +57,6 @@ AnimationView::AnimationView(QWidget* parent,const char* /* name */,Animation* a
     qDebug("AnimationView::AnimationView(): BVH initialisation failed.");
     return;
   }
-
-  // fake glut initialization
-  int args=1;
-  // make sure the "qavimator" string is not const char*
-  char arg0[]="qavimator";
-  char* arg[]={arg0};
-  glutInit(&args,arg);
 
   // init
   selecting=false;
@@ -694,7 +689,7 @@ void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,
         else
           glColor4f(0,1,0,1);
 
-        glutSolidSphere(1,16,16);
+        m_sphereModel->draw();
       }
     }
 
@@ -834,23 +829,23 @@ void AnimationView::drawDragHandles(const Prop* prop) const
     glLoadName(SCALE_HANDLE_X);
     glColor4f(xRGB.redF(),xRGB.greenF(),xRGB.blueF(),1);
     glTranslatef(-xs,0,0);
-    glutSolidCube(2);
+    m_cubeModel->draw();
     glTranslatef(xs*2,0,0);
-    glutSolidCube(2);
+    m_cubeModel->draw();
 
     glLoadName(SCALE_HANDLE_Y);
     glColor4f(yRGB.redF(),yRGB.greenF(),yRGB.blueF(),1);
     glTranslatef(-xs,-ys,0);
-    glutSolidCube(2);
+    m_cubeModel->draw();
     glTranslatef(0,ys*2,0);
-    glutSolidCube(2);
+    m_cubeModel->draw();
 
     glLoadName(SCALE_HANDLE_Z);
     glColor4f(zRGB.redF(),zRGB.greenF(),zRGB.blueF(),1);
     glTranslatef(0,-ys,-zs);
-    glutSolidCube(2);
+    m_cubeModel->draw();
     glTranslatef(0,0,zs*2);
-    glutSolidCube(2);
+    m_cubeModel->draw();
   }
   else if(modifier & CTRL)
   {
@@ -860,23 +855,23 @@ void AnimationView::drawDragHandles(const Prop* prop) const
     glLoadName(ROTATE_HANDLE_X);
     glColor4f(xRGB.redF(),xRGB.greenF(),xRGB.blueF(),1);
     glTranslatef(-xs-5,0,0);
-    glutSolidSphere(1,16,16);
+    m_sphereModel->draw();
     glTranslatef(2*(xs+5),0,0);
-    glutSolidSphere(1,16,16);
+    m_sphereModel->draw();
 
     glLoadName(ROTATE_HANDLE_Y);
     glColor4f(yRGB.redF(),yRGB.greenF(),yRGB.blueF(),1);
     glTranslatef(-xs-5,-ys-5,0);
-    glutSolidSphere(1,16,16);
+    m_sphereModel->draw();
     glTranslatef(0,2*(ys+5),0);
-    glutSolidSphere(1,16,16);
+    m_sphereModel->draw();
 
     glLoadName(ROTATE_HANDLE_Z);
     glColor4f(zRGB.redF(),zRGB.greenF(),zRGB.blueF(),1);
     glTranslatef(0,-ys-5,-zs-5);
-    glutSolidSphere(1,16,16);
+    m_sphereModel->draw();
     glTranslatef(0,0,2*(zs+5));
-    glutSolidSphere(1,16,16);
+    m_sphereModel->draw();
   }
   else
   {
@@ -911,32 +906,32 @@ void AnimationView::drawDragHandles(const Prop* prop) const
     glColor4f(xRGB.redF(),xRGB.greenF(),xRGB.blueF(),1);
     glTranslatef(-xs-5,0,0);
     glRotatef(270,0,1,0);
-    glutSolidCone(1,3,16,16);
+    m_coneModel->draw();
     glRotatef(90,0,1,0);
     glTranslatef(2*(xs+5),0,0);
     glRotatef(90,0,1,0);
-    glutSolidCone(1,3,16,16);
+    m_coneModel->draw();
     glRotatef(270,0,1,0);
 
     glLoadName(DRAG_HANDLE_Y);
     glColor4f(yRGB.redF(),yRGB.greenF(),yRGB.blueF(),1);
     glTranslatef(-xs-5,-ys-5,0);
     glRotatef(90,1,0,0);
-    glutSolidCone(1,3,16,16);
+    m_coneModel->draw();
     glRotatef(270,1,0,0);
     glTranslatef(0,2*(ys+5),0);
     glRotatef(270,1,0,0);
-    glutSolidCone(1,3,16,16);
+    m_coneModel->draw();
     glRotatef(90,1,0,0);
 
     glLoadName(DRAG_HANDLE_Z);
     glColor4f(zRGB.redF(),zRGB.greenF(),zRGB.blueF(),1);
     glTranslatef(0,-ys-5,-zs-5);
     glRotatef(180,1,0,0);
-    glutSolidCone(1,3,16,16);
+    m_coneModel->draw();
     glRotatef(180,1,0,0);
     glTranslatef(0,0,2*(zs+5));
-    glutSolidCone(1,3,16,16);
+    m_coneModel->draw();
   }
   // restore drawing matrix
   glPopMatrix();
@@ -995,6 +990,18 @@ BVHNode* AnimationView::getSelectedPart()
 unsigned int AnimationView::getSelectedPartIndex()
 {
   return partSelected % ANIMATION_INCREMENT;
+}
+
+void AnimationView::setModels(QSharedPointer<Mesh> cubeMesh, QSharedPointer<Mesh> sphereMesh, QSharedPointer<Mesh> coneMesh)
+{
+  m_cubeModel.reset(new Model(cubeMesh));
+  m_sphereModel.reset(new Model(sphereMesh));
+  m_coneModel.reset(new Model(coneMesh));
+
+  // Scale cube to an edge length of 2 instead of 1
+  m_cubeModel->scale(2.0f, 2.0f, 2.0f);
+  // Scale cone to a height of 3 instead of 2
+  m_coneModel->scale(1.0f, 1.0f, 1.5f);
 }
 /*
 const QString AnimationView::getPartName(int index)

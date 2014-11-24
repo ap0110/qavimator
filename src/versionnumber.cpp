@@ -61,8 +61,8 @@ int VersionNumber::compare(const VersionNumber& rhs) const
   while (lhsIter != lhsTokens.constEnd()
          && rhsIter != rhsTokens.constEnd())
   {
-    ushort lhsNumber = lhsIter->toUShort();
-    ushort rhsNumber = rhsIter->toUShort();
+    int lhsNumber = static_cast<int>(lhsIter->toUShort());
+    int rhsNumber = static_cast<int>(rhsIter->toUShort());
     if (lhsNumber != rhsNumber)
     {
       return lhsNumber - rhsNumber;

@@ -25,6 +25,8 @@
   @author Zi Ree
 */
 
+#include "model.h"
+
 #include <QObject>
 
 class Prop : public QObject
@@ -47,7 +49,7 @@ class Prop : public QObject
       Selected=2
     } State;
 
-    Prop(unsigned int propId,PropType type,const QString& name);
+    Prop(unsigned int propId,PropType type,const QString& name, QSharedPointer<Mesh> mesh);
     ~Prop();
 
     PropType type() const;
@@ -88,6 +90,8 @@ class Prop : public QObject
     QScopedPointer<QVector3D> m_rotation;
 
     unsigned int m_attachmentPoint;
+
+    Model m_model;
 };
 
 #endif

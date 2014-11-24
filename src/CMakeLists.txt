@@ -14,11 +14,13 @@ SET (QAVI_SRC aboutdialog.cpp
               iktree.cpp
               joint.cpp
               main.cpp
+              mesh.cpp
               metadata.cpp
+              model.cpp
               newanimation.cpp
               prop.cpp
               propmanager.cpp
-              qavimator.cpp
+              qavimatorwindow.cpp
               scene.cpp
               settings.cpp
               slpartsfemale.cpp
@@ -30,13 +32,15 @@ SET (QAVI_SRC aboutdialog.cpp
               updatersettings.cpp
               usersettings.cpp
               usersettingsdialog.cpp
-              versionnumber.cpp)
+              versionnumber.cpp
+              whatsnewdialog.cpp)
 
 # Interfaces
 SET (QAVI_UI  aboutdialog.ui
-              qavimator.ui
+              qavimatorwindow.ui
               updatenotificationdialog.ui
-              usersettingsdialog.ui)
+              usersettingsdialog.ui
+              whatsnewdialog.ui)
 
 # Resources
 SET (QAVI_RSC icons.qrc)
@@ -56,7 +60,7 @@ INCLUDE_DIRECTORIES (${CMAKE_CURRENT_BINARY_DIR})
 # Compile and link
 ADD_EXECUTABLE (qavimator ${QAVI_RSC_SRC} ${QAVI_UI_HDR} ${QAVI_SRC})
 QT5_USE_MODULES (qavimator Core OpenGL Gui Network)
-TARGET_LINK_LIBRARIES (qavimator ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} quat)
+TARGET_LINK_LIBRARIES (qavimator ${OPENGL_LIBRARIES} quat)
 
 # Install qavimator
 INSTALL (TARGETS qavimator DESTINATION ${INSTALL_BIN})

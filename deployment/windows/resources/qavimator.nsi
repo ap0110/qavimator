@@ -28,7 +28,7 @@
 		!define APPLICATION_VERSION "0.0.0"
 		!define APPLICATION_BUILD_NUMBER "0"
 	!endif
-	!define FILE_NAME "${APPLICATION_NAME}_${APPLICATION_VERSION}_${APPLICATION_BUILD_NUMBER}_Windows_32-bit.exe"
+	!define FILE_NAME "${APPLICATION_NAME}_${APPLICATION_VERSION}.${APPLICATION_BUILD_NUMBER}_Windows_Setup.exe"
 
 	!define WEBSITE "qavimator.org"
 	!define ORGANIZATION "QAvimator Team"
@@ -180,7 +180,6 @@ Section "Install"
 	SetOutPath "$INSTDIR"
 
 	File "${PROJECT_ROOT_DIR}\_install\qavimator.exe"
-	File "${PROJECT_ROOT_DIR}\_install\glut32.dll"
 
 	SetOutPath "$INSTDIR\data"
 
@@ -278,8 +277,6 @@ Section "Uninstall"
 	Delete "$INSTDIR\data\TPose.avm"
 	Delete "$INSTDIR\data\TPose.bvh"
 	RMDir "$INSTDIR\data"
-
-	Delete "$INSTDIR\glut32.dll"
 	
 	!ifdef QT_DIR
 		Delete "$INSTDIR\plugins\platforms\qwindows.dll"
