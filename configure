@@ -2,7 +2,7 @@
 
 if [ ! -n "$VERSION_NUMBER" ]
 then
-  VERSION_NUMBER=0.1.0
+  VERSION_NUMBER=0.1.1
 fi
 echo "VERSION_NUMBER = $VERSION_NUMBER"
 
