@@ -185,7 +185,8 @@ else
   FILE_NAME="${FILE_NAME}_Linux"
   FILE_NAME="${FILE_NAME}_${MACHINE_ARCH_DISPLAY}"
 
-echo $FILE_NAME > $DEPLOY_LINUX_DIR/.file_name.tmp
+  echo $FILE_NAME > $DEPLOY_LINUX_DIR/.file_name.tmp
+  echo $APPLICATION_NAME > $DEPLOY_LINUX_DIR/.app_name.tmp
 
 fi
 

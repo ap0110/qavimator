@@ -137,7 +137,7 @@ hdiutil convert -format UDZO -imagekey zlib-level=9 -o "${FILE_NAME}.dmg" temp.d
 
 # clean temporary files
 echo "Cleaning temporary files..."
-rm -rf temp.dmg
+rm -rf .file_name.tmp temp.dmg
 
 echo "Done"
 

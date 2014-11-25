@@ -32,6 +32,18 @@ set /P QT_DIR= < qt_dir.tmp
 del qt_dir.tmp
 
 cd "%DEPLOYMENT_DIR%"
+
+if exist "%APPLICATION_NAME%" (
+  del /S /Q "%APPLICATION_NAME%"
+)
+mkdir "%APPLICATION_NAME%"
+xcopy /E /Y /B "%PROJECT_ROOT_DIR%\_install\*" "%APPLICATION_NAME%"
+
+set ZIP_FILE_NAME=%APPLICATION_NAME%_%VERSION_NUMBER%.%BUILD_NUMBER%_Windows.zip
+7z a -r "%ZIP_FILE_NAME%" "%APPLICATION_NAME%"
+
+rmdir /S /Q "%APPLICATION_NAME%"
+
 makensis /V3 /NOCD ^
   /DQT_DIR="%QT_DIR%" ^
   /DPROJECT_ROOT_DIR="%PROJECT_ROOT_DIR%" ^

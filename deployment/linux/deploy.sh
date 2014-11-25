@@ -6,7 +6,6 @@ cd ../..
 
 PROJECT_ROOT_DIR=`pwd`
 INSTALL_DIR="$PROJECT_ROOT_DIR/_install"
-RENAMED_INSTALL_DIR="$PROJECT_ROOT_DIR/QAvimator"
 
 QT_DIR=`qtpaths --install-prefix`
 if [ $? -ne 0 ]
@@ -56,15 +55,24 @@ cp "$QT_DIR/lib/libQt5Core.so.5" \
 cd "$DEPLOYMENT_DIR"
 
 read FILE_NAME < .file_name.tmp
+read APPLICATION_NAME < .app_name.tmp
+
+rm -rf "$APPLICATION_NAME"
+mkdir "$APPLICATION_NAME"
+cp -av "$INSTALL_DIR/*" "$APPLICATION_NAME"
 
 echo "Archiving and compressing..."
 
-mv "$INSTALL_DIR" "$RENAMED_INSTALL_DIR"
 tar --transform='s/.*\(QAvimator.*\)/\1/' \
     -cf "${FILE_NAME}.tar" \
-    "$RENAMED_INSTALL_DIR"
+    "$APPLICATION_NAME"
 gzip -9 "${FILE_NAME}.tar"
-mv "$RENAMED_INSTALL_DIR" "$INSTALL_DIR"
+
+rm -rf "$APPLICATION_NAME"
+
+echo "Cleaning temporary files..."
+
+rm -rf .file_name.tmp .app_name.tmp
 
 echo "Done"
 
