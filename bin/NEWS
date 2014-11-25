@@ -1,10 +1,11 @@
----------------------
 Version 0.1.1
----------------------
+----------------
 
   - BUG: Fixed avatar positioning
+  - BUG: Fixed avatar rotation/position ignoring edits
+    if return key was not pressed
 
-----------------
+
 Version 0.1.0
 ----------------
 

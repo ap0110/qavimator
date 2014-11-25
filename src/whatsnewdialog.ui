@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>300</width>
+    <height>260</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,15 +18,52 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>400</width>
-    <height>300</height>
+    <width>300</width>
+    <height>260</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>400</width>
-    <height>300</height>
+    <width>300</width>
+    <height>260</height>
    </size>
+  </property>
+  <property name="palette">
+   <palette>
+    <active>
+     <colorrole role="Base">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>240</red>
+        <green>240</green>
+        <blue>240</blue>
+       </color>
+      </brush>
+     </colorrole>
+    </active>
+    <inactive>
+     <colorrole role="Base">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>240</red>
+        <green>240</green>
+        <blue>240</blue>
+       </color>
+      </brush>
+     </colorrole>
+    </inactive>
+    <disabled>
+     <colorrole role="Base">
+      <brush brushstyle="SolidPattern">
+       <color alpha="255">
+        <red>240</red>
+        <green>240</green>
+        <blue>240</blue>
+       </color>
+      </brush>
+     </colorrole>
+    </disabled>
+   </palette>
   </property>
   <property name="windowTitle">
    <string>What's New</string>
@@ -34,9 +71,9 @@
   <widget class="QDialogButtonBox" name="okButtonBox">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>260</y>
-     <width>341</width>
+     <x>10</x>
+     <y>220</y>
+     <width>280</width>
      <height>32</height>
     </rect>
    </property>
@@ -55,9 +92,12 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>381</width>
-     <height>241</height>
+     <width>280</width>
+     <height>210</height>
     </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
    </property>
    <property name="readOnly">
     <bool>true</bool>
