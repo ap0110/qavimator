@@ -1920,7 +1920,7 @@ void QAvimatorWindow::on_editPartCombo_activated(int)
   partChoice();
 }
 
-void QAvimatorWindow::on_xRotationEdit_returnPressed()
+void QAvimatorWindow::on_xRotationEdit_editingFinished()
 {
   rotationValue();
 }
@@ -1930,7 +1930,7 @@ void QAvimatorWindow::on_xRotationSlider_valueChanged(int)
   rotationSlider(sender());
 }
 
-void QAvimatorWindow::on_yRotationEdit_returnPressed()
+void QAvimatorWindow::on_yRotationEdit_editingFinished()
 {
   rotationValue();
 }
@@ -1940,7 +1940,7 @@ void QAvimatorWindow::on_yRotationSlider_valueChanged(int)
   rotationSlider(sender());
 }
 
-void QAvimatorWindow::on_zRotationEdit_returnPressed()
+void QAvimatorWindow::on_zRotationEdit_editingFinished()
 {
   rotationValue();
 }
@@ -1950,7 +1950,7 @@ void QAvimatorWindow::on_zRotationSlider_valueChanged(int)
   rotationSlider(sender());
 }
 
-void QAvimatorWindow::on_xPositionEdit_returnPressed()
+void QAvimatorWindow::on_xPositionEdit_editingFinished()
 {
   positionValue();
 }
@@ -1960,7 +1960,7 @@ void QAvimatorWindow::on_xPositionSlider_valueChanged(int)
   positionSlider(sender());
 }
 
-void QAvimatorWindow::on_yPositionEdit_returnPressed()
+void QAvimatorWindow::on_yPositionEdit_editingFinished()
 {
   positionValue();
 }
@@ -1970,7 +1970,7 @@ void QAvimatorWindow::on_yPositionSlider_valueChanged(int)
   positionSlider(sender());
 }
 
-void QAvimatorWindow::on_zPositionEdit_returnPressed()
+void QAvimatorWindow::on_zPositionEdit_editingFinished()
 {
   positionValue();
 }
