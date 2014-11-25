@@ -184,12 +184,16 @@ Section "Install"
 
 	SetOutPath "$INSTDIR\data"
 
+	File "${PROJECT_ROOT_DIR}\_install\data\cone.obj"
+	File "${PROJECT_ROOT_DIR}\_install\data\cube.obj"
 	File "${PROJECT_ROOT_DIR}\_install\data\Relaxed.avm"
 	File "${PROJECT_ROOT_DIR}\_install\data\Relaxed.bvh"
 	File "${PROJECT_ROOT_DIR}\_install\data\Relaxed_2.bvh"
 	File "${PROJECT_ROOT_DIR}\_install\data\SL.lim"
 	File "${PROJECT_ROOT_DIR}\_install\data\SLFemale.bvh"
 	File "${PROJECT_ROOT_DIR}\_install\data\SLMale.bvh"
+	File "${PROJECT_ROOT_DIR}\_install\data\sphere.obj"
+	File "${PROJECT_ROOT_DIR}\_install\data\torus.obj"
 	File "${PROJECT_ROOT_DIR}\_install\data\TPose.avm"
 	File "${PROJECT_ROOT_DIR}\_install\data\TPose.bvh"
 	
@@ -269,12 +273,16 @@ SectionEnd
 
 Section "Uninstall"
 
+	Delete "$INSTDIR\data\cone.obj"
+	Delete "$INSTDIR\data\cube.obj"
 	Delete "$INSTDIR\data\Relaxed.avm"
 	Delete "$INSTDIR\data\Relaxed.bvh"
 	Delete "$INSTDIR\data\Relaxed_2.bvh"
 	Delete "$INSTDIR\data\SL.lim"
 	Delete "$INSTDIR\data\SLFemale.bvh"
 	Delete "$INSTDIR\data\SLMale.bvh"
+	Delete "$INSTDIR\data\sphere.obj"
+	Delete "$INSTDIR\data\torus.obj"
 	Delete "$INSTDIR\data\TPose.avm"
 	Delete "$INSTDIR\data\TPose.bvh"
 	RMDir "$INSTDIR\data"
