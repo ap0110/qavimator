@@ -148,7 +148,7 @@ void UpdateChecker::checkUpdates()
 
 bool UpdateChecker::showNews()
 {
-  bool canShowNews = !m_news.isEmpty();
+  bool canShowNews = hasNews();
 
   if (canShowNews)
   {
