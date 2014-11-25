@@ -180,6 +180,7 @@ Section "Install"
 	SetOutPath "$INSTDIR"
 
 	File "${PROJECT_ROOT_DIR}\_install\qavimator.exe"
+	File "${PROJECT_ROOT_DIR}\_install\NEWS"
 
 	SetOutPath "$INSTDIR\data"
 
@@ -297,6 +298,7 @@ Section "Uninstall"
 		Delete "$INSTDIR\qt.conf"
 	!endif
 	
+	Delete "$INSTDIR\NEWS"
 	Delete "$INSTDIR\qavimator.exe"
 	Delete "$INSTDIR\uninstall.exe"
 	RMDir "$INSTDIR"
