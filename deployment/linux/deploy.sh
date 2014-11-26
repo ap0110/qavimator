@@ -1,11 +1,11 @@
 #!/bin/bash
 
-DEPLOYMENT_DIR=`pwd`
-
-cd ../..
-
-PROJECT_ROOT_DIR=`pwd`
+PROJECT_ROOT_DIR=../..
+PROJECT_ROOT_DIR_ESCAPED=\\.\\.\\/\\.\\.
 INSTALL_DIR="$PROJECT_ROOT_DIR/_install"
+INSTALL_DIR_ESCAPED="$PROJECT_ROOT_DIR_ESCAPED\\/_install"
+
+pushd "$PROJECT_ROOT_DIR"
 
 QT_DIR=`qtpaths --install-prefix`
 if [ $? -ne 0 ]
@@ -30,6 +30,9 @@ then
   exit $?
 fi
 
+# Return to original deployment directory
+popd
+
 echo "Copying dependencies..."
 
 mkdir "$INSTALL_DIR/plugins"
@@ -46,23 +49,23 @@ cp "$QT_DIR/lib/libQt5Core.so.5" \
    "$QT_DIR/lib/libicudata.so.52" \
    "$QT_DIR/lib/libicui18n.so.52" \
    "$QT_DIR/lib/libicuuc.so.52" \
-   "$DEPLOYMENT_DIR/resources/qavimator.sh" \
-   "$DEPLOYMENT_DIR/resources/qt.conf" \
-   "$DEPLOYMENT_DIR/resources/README" \
+   "./resources/qavimator.sh" \
+   "./resources/qt.conf" \
+   "./resources/README" \
    "$INSTALL_DIR"
-
-# Return to original deployment directory
-cd "$DEPLOYMENT_DIR"
 
 read FILE_NAME < .file_name.tmp
 read APPLICATION_NAME < .app_name.tmp
 
 rm -rf "$APPLICATION_NAME"
 mkdir "$APPLICATION_NAME"
-cp -av "$INSTALL_DIR/*" "$APPLICATION_NAME"
+ls -1 "$INSTALL_DIR" \
+  | sed "s/\\(.*\\)/$INSTALL_DIR_ESCAPED\\/\\1/" \
+  | xargs cp -at "$APPLICATION_NAME"
 
 echo "Archiving and compressing..."
 
+rm -rf "${FILE_NAME}.tar" "${FILE_NAME}.tar.gz"
 tar --transform='s/.*\(QAvimator.*\)/\1/' \
     -cf "${FILE_NAME}.tar" \
     "$APPLICATION_NAME"

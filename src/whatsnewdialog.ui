@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>260</height>
+    <width>340</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,14 +18,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>300</width>
-    <height>260</height>
+    <width>340</width>
+    <height>300</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>300</width>
-    <height>260</height>
+    <width>340</width>
+    <height>300</height>
    </size>
   </property>
   <property name="palette">
@@ -72,8 +72,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>220</y>
-     <width>280</width>
+     <y>260</y>
+     <width>320</width>
      <height>32</height>
     </rect>
    </property>
@@ -92,8 +92,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>280</width>
-     <height>210</height>
+     <width>320</width>
+     <height>250</height>
     </rect>
    </property>
    <property name="frameShape">
