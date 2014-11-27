@@ -282,9 +282,15 @@ const FrameData BVHNode::getKeyframeBefore(int frame) const
 const FrameData BVHNode::getNextKeyframe(int frame) const
 {
   QMap<int,FrameData>::const_iterator itCurrent=keyframes.find(frame);
-  itCurrent++;
+  if(itCurrent != keyframes.cend())
+  {
+    ++itCurrent;
+  }
   // if we are asked for a keyframe past the last one, return the last one
-  if(itCurrent==keyframes.end()) --itCurrent;
+  if(itCurrent == keyframes.cend())
+  {
+    --itCurrent;
+  }
   return (*itCurrent);
 }
 
