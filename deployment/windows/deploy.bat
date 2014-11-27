@@ -46,17 +46,25 @@ if exist "%ZIP_DIR_NAME%" (
 mkdir "%ZIP_DIR_NAME%"
 xcopy /E /Y /B "%PROJECT_ROOT_DIR%\_install\*" "%ZIP_DIR_NAME%"
 
-copy "%QT_DIR%\bin\icudt52.dll" "%ZIP_DIR_NAME%"
-copy "%QT_DIR%\bin\icuin52.dll" "%ZIP_DIR_NAME%"
-copy "%QT_DIR%\bin\icuuc52.dll" "%ZIP_DIR_NAME%"
-copy "%QT_DIR%\bin\libgcc_s_dw2-1.dll" "%ZIP_DIR_NAME%"
-copy "%QT_DIR%\bin\libstdc++-6.dll" "%ZIP_DIR_NAME%"
-copy "%QT_DIR%\bin\libwinpthread-1.dll" "%ZIP_DIR_NAME%"
-copy "%QT_DIR%\bin\Qt5Core.dll" "%ZIP_DIR_NAME%"
-copy "%QT_DIR%\bin\Qt5Gui.dll" "%ZIP_DIR_NAME%"
-copy "%QT_DIR%\bin\Qt5Network.dll" "%ZIP_DIR_NAME%"
-copy "%QT_DIR%\bin\Qt5OpenGL.dll" "%ZIP_DIR_NAME%"
-copy "%QT_DIR%\bin\Qt5Widgets.dll" "%ZIP_DIR_NAME%"
+
+
+if defined QT_DIR (
+  copy "%QT_DIR%\bin\icudt52.dll" "%ZIP_DIR_NAME%"
+  copy "%QT_DIR%\bin\icuin52.dll" "%ZIP_DIR_NAME%"
+  copy "%QT_DIR%\bin\icuuc52.dll" "%ZIP_DIR_NAME%"
+  copy "%QT_DIR%\bin\libgcc_s_dw2-1.dll" "%ZIP_DIR_NAME%"
+  copy "%QT_DIR%\bin\libstdc++-6.dll" "%ZIP_DIR_NAME%"
+  copy "%QT_DIR%\bin\libwinpthread-1.dll" "%ZIP_DIR_NAME%"
+  copy "%QT_DIR%\bin\Qt5Core.dll" "%ZIP_DIR_NAME%"
+  copy "%QT_DIR%\bin\Qt5Gui.dll" "%ZIP_DIR_NAME%"
+  copy "%QT_DIR%\bin\Qt5Network.dll" "%ZIP_DIR_NAME%"
+  copy "%QT_DIR%\bin\Qt5OpenGL.dll" "%ZIP_DIR_NAME%"
+  copy "%QT_DIR%\bin\Qt5Widgets.dll" "%ZIP_DIR_NAME%"
+  
+  mkdir "%ZIP_DIR_NAME%\plugins\platforms"
+  copy "%QT_DIR%\plugins\platforms\qwindows.dll" "%ZIP_DIR_NAME%\plugins\platforms"
+  copy "%RESOURCE_DIR%\qt.conf" "%ZIP_DIR_NAME%"
+)
 
 set ZIP_FILE_NAME=%APPLICATION_NAME%_%VERSION_NUMBER%.%BUILD_NUMBER%_Windows.zip
 7z a -r "%ZIP_FILE_NAME%" "%ZIP_DIR_NAME%"
