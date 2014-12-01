@@ -30,7 +30,6 @@ int main( int argc, char ** argv )
     qavimatorWindow->show();
     // Queue an event to execute a method after the main window shows
     qavimatorWindow->queueAfterShow();
-    application.connect(&application,SIGNAL(lastWindowClosed()),&application,SLOT(quit()));
     // Start the event loop
     return application.exec();
 }
