@@ -10,6 +10,7 @@ Linux/X11:
     -- g++
     -- libdrm-dev
     -- libgl1-mesa-dev
+    -- libglu1-mesa-dev
     -- libxi-dev
     -- libxmu-dev
     - (this list may not include all needed packages)
