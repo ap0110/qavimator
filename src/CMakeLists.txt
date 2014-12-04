@@ -20,6 +20,7 @@ SET (QAVI_SRC aboutdialog.cpp
               newanimation.cpp
               prop.cpp
               propmanager.cpp
+              qavimator.cpp
               qavimatorwindow.cpp
               scene.cpp
               settings.cpp

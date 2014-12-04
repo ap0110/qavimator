@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Zi Ree                                          *
- *   Zi Ree @ SecondLife                                                   *
+ *   Copyright (C) 2006 by Zi Ree   *
+ *   Zi Ree @ SecondLife   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -18,24 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "whatsnewdialog.h"
-#include "ui_whatsnewdialog.h"
+#include "qavimator.h"
 
-WhatsNewDialog::WhatsNewDialog(QString news, QWidget* parent) :
-  QDialog(parent,
-          Qt::Dialog
-          | Qt::MSWindowsFixedSizeDialogHint
-          | Qt::CustomizeWindowHint
-          | Qt::WindowTitleHint
-          | Qt::WindowSystemMenuHint
-          | Qt::WindowCloseButtonHint),
-  ui(new Ui::WhatsNewDialog)
-{
-  ui->setupUi(this);
-
-  ui->plainTextEdit->setPlainText(news);
-}
-
-WhatsNewDialog::~WhatsNewDialog()
+QAvimator::QAvimator(QObject* parent) :
+  QObject(parent)
 {
 }

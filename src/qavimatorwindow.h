@@ -22,8 +22,8 @@
  * features added by Darkside Eldrich
  */
 
-#ifndef QAVIMATOR_H
-#define QAVIMATOR_H
+#ifndef QAVIMATORWINDOW_H
+#define QAVIMATORWINDOW_H
 
 #define UNTITLED_NAME "Untitled.avm"
 #define PLAY_IMAGE "data/play.png"
