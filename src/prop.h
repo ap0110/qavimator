@@ -25,14 +25,12 @@
   @author Zi Ree
 */
 
+#include <QStandardItem>
+
 #include "model.h"
 
-#include <QObject>
-
-class Prop : public QObject
+class Prop : public QStandardItem
 {
-  Q_OBJECT
-
   public:
     typedef enum
     {
@@ -49,11 +47,13 @@ class Prop : public QObject
       Selected=2
     } State;
 
-    Prop(unsigned int propId,PropType type,const QString& name, QSharedPointer<Mesh> mesh);
+    Prop(unsigned int propId,PropType propType,const QString& name, QSharedPointer<Mesh> mesh);
     ~Prop();
 
-    PropType type() const;
-    void setType(PropType type);
+    int type() const;
+
+    PropType propType() const;
+    void setPropType(PropType propType);
 
     unsigned int id() const;
     const QString& name() const;
@@ -80,7 +80,7 @@ class Prop : public QObject
     void attach(unsigned int where);
 
   private:
-    PropType m_type;
+    PropType m_propType;
     unsigned int m_id;
 
     QString m_name;

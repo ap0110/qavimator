@@ -1151,7 +1151,7 @@ void QAvimatorWindow::fileSaveProps()
       {
         Prop* prop=scene->getPropByName(ui->propNameCombo->itemText(index));
         QStringList properties;
-        properties.append(QString::number(prop->type()));
+        properties.append(QString::number(prop->propType()));
         properties.append(QString::number(prop->xPosition()));
         properties.append(QString::number(prop->yPosition()));
         properties.append(QString::number(prop->zPosition()));

@@ -27,14 +27,18 @@
 #include <QSharedPointer>
 #include <QVector3D>
 
+#include "constants.h"
+
 #include "prop.h"
 
-Prop::Prop(unsigned int propId, PropType newType, const QString& newName, QSharedPointer<Mesh> mesh) :
+Prop::Prop(unsigned int propId, PropType propType, const QString& newName, QSharedPointer<Mesh> mesh) :
   m_model(mesh)
 {
   m_id = propId;
-  setType(newType);
+  setPropType(propType);
+
   m_name = newName;
+  setText(m_name);
 
   m_position.reset(new QVector3D());
   m_scale.reset(new QVector3D());
@@ -47,14 +51,19 @@ Prop::~Prop()
 {
 }
 
-Prop::PropType Prop::type() const
+int Prop::type() const
 {
-  return m_type;
+  return static_cast<int>(Constants::ItemType::Prop);
 }
 
-void Prop::setType(PropType newType)
+Prop::PropType Prop::propType() const
 {
-  m_type = newType;
+  return m_propType;
+}
+
+void Prop::setPropType(PropType propType)
+{
+  m_propType = propType;
 }
 
 unsigned int Prop::id() const
@@ -167,23 +176,23 @@ void Prop::draw(State state) const
     glColor4f(0.6, 0.3, 0.3, 1);
 
   // each prop type has its own base sizes and positions
-  if(m_type == Box)
+  if(m_propType == Box)
   {
     glScalef(m_scale->x(), m_scale->y(), m_scale->z());
     m_model.draw();
   }
-  else if(m_type == Sphere)
+  else if(m_propType == Sphere)
   {
     glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
     m_model.draw();
   }
-  else if(m_type == Cone)
+  else if(m_propType == Cone)
   {
     glTranslatef(0,0,-5);
     glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
     m_model.draw();
   }
-  else if(m_type == Torus)
+  else if(m_propType == Torus)
   {
     glScalef(m_scale->x() / 4, m_scale->y() / 4, m_scale->z() / 2);
     m_model.draw();
