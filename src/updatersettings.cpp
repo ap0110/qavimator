@@ -20,7 +20,6 @@
 
 #include <QString>
 
-#include "metadata.h"
 #include "settings.h"
 
 #include "updatersettings.h"

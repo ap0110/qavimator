@@ -26,7 +26,7 @@
 #include <QScopedPointer>
 #include <QXmlStreamReader>
 
-#include "metadata.h"
+#include "constants.h"
 #include "settings.h"
 #include "updatenotificationdialog.h"
 #include "updatersettings.h"
@@ -79,7 +79,7 @@ UpdateChecker::UpdateChecker(QObject* parent, QWidget* parentWidget) :
   m_news(""),
   m_url(QString(
           "http://qavimator.bitbucket.org/applications/qavimator/%1/updates.xml"
-          ).arg(Metadata::updateChannel().toLower())),
+          ).arg(Constants::updateChannel().toLower())),
   m_updatesVersion("1.0"),
   m_newsFilePath("NEWS")
 {
@@ -104,7 +104,7 @@ void UpdateChecker::onStartup()
   if (greatestInstalledVersion.isValid())
   {
     // If valid, compare with current version
-    if (greatestInstalledVersion.compare(Metadata::versionNumber()) < 0)
+    if (greatestInstalledVersion.compare(Constants::versionNumber()) < 0)
     {
       // If less, try to write the current version
       // then show news if successful
@@ -234,7 +234,7 @@ UpdateCheckResults UpdateChecker::readVersion(QXmlStreamReader& xmlStreamReader)
   if (versionNumber.isValid())
   {
     results.setHasSuccessfulUpdateCheck(true);
-    if (versionNumber.compare(Metadata::versionNumber()) > 0)
+    if (versionNumber.compare(Constants::versionNumber()) > 0)
     {
       results.setHasUpdates(true);
     }
@@ -259,7 +259,7 @@ bool UpdateChecker::tryWriteCurrentVersion()
 
   QString oldValue = UpdaterSettings::greatestInstalledVersion();
 
-  UpdaterSettings::setGreatestInstalledVersion(Metadata::versionNumberString());
+  UpdaterSettings::setGreatestInstalledVersion(Constants::versionNumberString());
 
   UpdaterSettings::writeSettings();
   UpdaterSettings::setGreatestInstalledVersion(oldValue);
@@ -267,7 +267,7 @@ bool UpdateChecker::tryWriteCurrentVersion()
 
   VersionNumber greatestInstalledVersion(UpdaterSettings::greatestInstalledVersion());
   if (greatestInstalledVersion.isValid()
-      && greatestInstalledVersion.compare(Metadata::versionNumber()) == 0)
+      && greatestInstalledVersion.compare(Constants::versionNumber()) == 0)
   {
     isSuccessful = true;
   }

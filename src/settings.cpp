@@ -18,14 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "metadata.h"
+#include "constants.h"
 
 #include "settings.h"
 
 Settings::Settings(QObject* parent) :
   QObject(parent),
   m_settings(QSettings::IniFormat, QSettings::UserScope,
-             Metadata::organizationName(), Metadata::applicationName())
+             Constants::organizationName(), Constants::applicationName())
 {
 }
 

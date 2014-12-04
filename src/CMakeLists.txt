@@ -9,13 +9,13 @@ SET (QAVI_SRC aboutdialog.cpp
               bvhnode.cpp
               bvhparser.cpp
               camera.cpp
+              constants.cpp
               filemanager.cpp
               floor.cpp
               iktree.cpp
               joint.cpp
               main.cpp
               mesh.cpp
-              metadata.cpp
               model.cpp
               newanimation.cpp
               prop.cpp

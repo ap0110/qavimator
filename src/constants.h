@@ -18,26 +18,33 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef METADATA_H
-#define METADATA_H
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+#include <QStandardItem>
 
 class QString;
 
 class VersionNumber;
 
-class Metadata
+class Constants
 {
   public:
-    Metadata() = delete;
+    enum class ItemType
+    {
+      Prop = 1 + QStandardItem::UserType
+    };
 
-    static const QString& buildDateTime();
+    Constants() = delete;
+
+    static const QString buildDateTime();
     static const VersionNumber& versionNumber();
     static const QString versionNumberString();
     static const QString buildNumber();
     static const QString updateChannel();
-    static const QString& organizationName();
-    static const QString& organizationDomain();
-    static const QString& applicationName();
+    static const QString organizationName();
+    static const QString organizationDomain();
+    static const QString applicationName();
 
   private:
     enum class UpdateChannel

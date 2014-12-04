@@ -23,65 +23,65 @@
 
 #include "versionnumber.h"
 
-#include "metadata.h"
+#include "constants.h"
 
 #ifdef BUILD_TIMESTAMP_Z
-  const QString Metadata::m_buildDateTime = BUILD_TIMESTAMP_Z;
+  const QString Constants::m_buildDateTime = BUILD_TIMESTAMP_Z;
 #else
-  const QString Metadata::m_buildDateTime = QString();
+  const QString Constants::m_buildDateTime = QString();
 #endif
 
 #ifdef VERSION_NUMBER
-  const VersionNumber Metadata::m_versionNumber = VersionNumber(VERSION_NUMBER);
+  const VersionNumber Constants::m_versionNumber = VersionNumber(VERSION_NUMBER);
 #else
-  const VersionNumber Metadata::m_versionNumber = VersionNumber("0.0.0");
+  const VersionNumber Constants::m_versionNumber = VersionNumber("0.0.0");
 #endif
 
 #ifdef BUILD_NUMBER
-  const QString Metadata::m_buildNumber = QString(BUILD_NUMBER);
+  const QString Constants::m_buildNumber = QString(BUILD_NUMBER);
 #else
-  const QString Metadata::m_buildNumber = QString("0");
+  const QString Constants::m_buildNumber = QString("0");
 #endif
 
 #if UPDATE_CHANNEL == 2
-  const Metadata::UpdateChannel Metadata::m_updateChannel =
+  const Constants::UpdateChannel Constants::m_updateChannel =
       UpdateChannel::Release;
-  const QString Metadata::m_applicationName = QString("QAvimator");
+  const QString Constants::m_applicationName = QString("QAvimator");
 #elif UPDATE_CHANNEL == 1
-  const Metadata::UpdateChannel Metadata::m_updateChannel =
+  const Constants::UpdateChannel Constants::m_updateChannel =
       UpdateChannel::Beta;
-  const QString Metadata::m_applicationName = QString("QAvimator-Beta");
+  const QString Constants::m_applicationName = QString("QAvimator-Beta");
 #else
-  const Metadata::UpdateChannel Metadata::m_updateChannel =
+  const Constants::UpdateChannel Constants::m_updateChannel =
       UpdateChannel::Development;
-  const QString Metadata::m_applicationName = QString("QAvimator-Development");
+  const QString Constants::m_applicationName = QString("QAvimator-Development");
 #endif
 
-const QString Metadata::m_organizationName = "QAvimator Team";
-const QString Metadata::m_organizationDomain = "qavimator.org";
+const QString Constants::m_organizationName = "QAvimator Team";
+const QString Constants::m_organizationDomain = "qavimator.org";
 
 
-const QString& Metadata::buildDateTime()
+const QString Constants::buildDateTime()
 {
   return m_buildDateTime;
 }
 
-const VersionNumber& Metadata::versionNumber()
+const VersionNumber& Constants::versionNumber()
 {
   return m_versionNumber;
 }
 
-const QString Metadata::versionNumberString()
+const QString Constants::versionNumberString()
 {
   return m_versionNumber.toString();
 }
 
-const QString Metadata::buildNumber()
+const QString Constants::buildNumber()
 {
   return m_buildNumber;
 }
 
-const QString Metadata::updateChannel()
+const QString Constants::updateChannel()
 {
   switch (m_updateChannel)
   {
@@ -97,17 +97,17 @@ const QString Metadata::updateChannel()
   }
 }
 
-const QString& Metadata::organizationName()
+const QString Constants::organizationName()
 {
   return m_organizationName;
 }
 
-const QString& Metadata::organizationDomain()
+const QString Constants::organizationDomain()
 {
   return m_organizationDomain;
 }
 
-const QString& Metadata::applicationName()
+const QString Constants::applicationName()
 {
   return m_applicationName;
 }

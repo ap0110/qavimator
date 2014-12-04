@@ -26,7 +26,7 @@
 
 #include "aboutdialog.h"
 #include "animationview.h"
-#include "metadata.h"
+#include "constants.h"
 #include "prop.h"
 #include "scene.h"
 #include "timeline.h"
@@ -59,10 +59,10 @@ QAvimatorWindow::QAvimatorWindow() :
               << 17 << 18 << 19
               << 21 << 22 << 23;
 
-  QApplication::setOrganizationName(Metadata::organizationName());
-  QApplication::setOrganizationDomain(Metadata::organizationDomain());
-  QApplication::setApplicationName(Metadata::applicationName());
-  QApplication::setApplicationVersion(Metadata::versionNumberString());
+  QApplication::setOrganizationName(Constants::organizationName());
+  QApplication::setOrganizationDomain(Constants::organizationDomain());
+  QApplication::setApplicationName(Constants::applicationName());
+  QApplication::setApplicationVersion(Constants::versionNumberString());
 
   ui->setupUi(this);
 

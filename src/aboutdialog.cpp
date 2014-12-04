@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "metadata.h"
+#include "constants.h"
 #include "updatersettings.h"
 
 #include "aboutdialog.h"
@@ -38,10 +38,10 @@ AboutDialog::AboutDialog(QWidget* parent) :
 
   ui->versionLabel->setText(
         QString("%1 Version %2 (%3)"
-        ).arg(Metadata::updateChannel()
-        ).arg(Metadata::versionNumberString()
-        ).arg(Metadata::buildNumber()));
-  ui->dateTimeLabel->setText(Metadata::buildDateTime());
+        ).arg(Constants::updateChannel()
+        ).arg(Constants::versionNumberString()
+        ).arg(Constants::buildNumber()));
+  ui->dateTimeLabel->setText(Constants::buildDateTime());
   setLastUpdateCheckLabel(UpdaterSettings::lastSuccessfulCheck());
   ui->autoUpdatesCheckBox->setChecked(UpdaterSettings::hasAutomaticUpdates());
 }
