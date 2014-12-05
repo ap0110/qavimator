@@ -19,8 +19,6 @@
  *
  */
 
-#define QAVIMATOR_DATAPATH "."
-
 #ifdef __APPLE__
 #include <QApplication.h>
 #endif
@@ -28,14 +26,19 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
-// #include "main.h"
 
-#include "animation.h"
+// #include "main.h"
 #include "bvh.h"
+#include "constants.h"
 #include "usersettings.h"
 
-Animation::Animation(BVH* newBVH,const QString& bvhFile) :
-  frame(0),totalFrames(0),mirrored(false)
+#include "animation.h"
+
+Animation::Animation(BVH* newBVH, const QString& bvhFile)
+  : frame(0),
+    totalFrames(0),
+    mirrored(false),
+    m_playbackResolution(20.0)
 {
   qDebug("Animation::Animation(%lx)",(unsigned long) this);
 
@@ -48,19 +51,11 @@ Animation::Animation(BVH* newBVH,const QString& bvhFile) :
 
   QString fileName;
 
-  // pick up path from src.pro qmake file's DEFINES section, i.e. usr/share/qavimator
-  //dataPath=QAVIMATOR_DATAPATH;
-#ifdef __APPLE__
-  dataPath=QApplication::applicationDirPath() + "/../Resources";
-#else
-  dataPath=QAVIMATOR_DATAPATH;
-#endif
-
   // load BVH that defines motion
   if (!bvhFile.isEmpty())
     fileName=bvhFile;
   else
-    fileName=dataPath+"/"+DEFAULT_POSE;
+    fileName=Constants::defaultPosePath();
 
   loadBVH(fileName);
   calcPartMirrors();
@@ -102,8 +97,7 @@ Animation::~Animation()
 void Animation::loadBVH(const QString& bvhFile)
 {
   qDebug("Animation::loadBVH(%s)",bvhFile.toLatin1().constData());
-  QString limFile=dataPath+"/"+LIMITS_FILE;
-  frames=bvh->animRead(bvhFile,limFile);
+  frames=bvh->animRead(bvhFile ,Constants::limitsFilePath());
   setFrame(0);
 }
 
@@ -1076,7 +1070,7 @@ void Animation::setPlaystate(PlayState state)
   {
     case PLAYSTATE_LOOPING:
     case PLAYSTATE_PLAYING:
-      //timer.start(PLAYBACK_RESOLUTION);
+      //timer.start(m_playbackResolution);
       break;
     case PLAYSTATE_STOPPED:
       //timer.stop();
@@ -1093,7 +1087,7 @@ void Animation::playbackTimeout()
 {
 //  qDebug("Animation::playbackTimeout()");
 
-  currentPlayTime+=PLAYBACK_RESOLUTION/1000.0;
+  currentPlayTime += m_playbackResolution / 1000.0;
 
   while(currentPlayTime>=frameTime())
   {

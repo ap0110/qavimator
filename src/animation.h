@@ -28,14 +28,6 @@
 #include "iktree.h"
 #include "playstate.h"
 
-#define DEFAULT_POSE "data/TPose.avm"
-// #define DEFAULT_POSE "data/Relaxed.bvh"
-#define LIMITS_FILE "data/SL.lim"
-
-// playback resolution in milliseconds
-// this is the speed of the internal sync timer, not of the animation itself
-#define PLAYBACK_RESOLUTION     20.0
-
 class BVH;
 
 struct RotationLimits
@@ -207,10 +199,14 @@ class Animation : public QObject
     void applyIK(const QString& name);
     void solveIK();
 
-    QString dataPath;
     // FIXME: Timer disabled since playbackTimeout() is unused.
     //  Either remove it or start using it.
     //QTimer timer;
+
+  private:
+    // playback resolution in milliseconds
+    // this is the speed of the internal sync timer, not of the animation itself
+    const double m_playbackResolution;
 };
 
 #endif

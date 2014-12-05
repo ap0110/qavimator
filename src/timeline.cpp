@@ -21,10 +21,13 @@
 #include <QPainter>
 #include <QPaintEvent>
 
-#include "timeline.h"
 #include "animation.h"
+#include "constants.h"
 
-Timeline::Timeline(QWidget* parent,Qt::WindowFlags) : QFrame(parent)
+#include "timeline.h"
+
+Timeline::Timeline(QWidget* parent, Qt::WindowFlags)
+  : QFrame(parent)
 {
   qDebug("Timeline(0x%0lx)",(unsigned long) this);
 
@@ -60,7 +63,7 @@ void Timeline::paintEvent(QPaintEvent* /* e */)
 
   qDebug("Timeline::paintEvent(%d)",(int) fullRepaint);
 
-  QSize newSize=QSize(numOfFrames*KEY_WIDTH,(NUM_PARTS-1)*LINE_HEIGHT);
+  QSize newSize = QSize(numOfFrames * Constants::keyWidth(), (Constants::numParts() - 1) * Constants::lineHeight());
 
   if(newSize!=size())
   {
@@ -70,8 +73,8 @@ void Timeline::paintEvent(QPaintEvent* /* e */)
   }
 /*
   // clip keyframe drawing to "dirty" area of redraw
-  firstVisibleKeyX=e->rect().x()/KEY_WIDTH;
-  visibleKeysX=e->rect().width()/KEY_WIDTH;
+  firstVisibleKeyX = e->rect().x() / Constants::keyWidth();
+  visibleKeysX = e->rect().width() / Constants::keyWidth();
 */
   // clip keyframe drawing to "dirty" area of redraw
   firstVisibleKeyX=0;
@@ -84,7 +87,7 @@ void Timeline::paintEvent(QPaintEvent* /* e */)
     firstVisibleKeyX=0;
     visibleKeysX=numOfFrames;
 
-    for(int part=0;part<NUM_PARTS;part++)
+    for (int part = 0; part < Constants::numParts(); part++)
     {
       drawTrack(part);
     } // for
@@ -95,13 +98,13 @@ void Timeline::paintEvent(QPaintEvent* /* e */)
   firstVisibleKeyX=0;
   visibleKeysX=numOfFrames;
 
-  int xpos=frameSelected*KEY_WIDTH;
+  int xpos = frameSelected * Constants::keyWidth();
 
   QPainter p(this);
   p.drawPixmap(0,0,*offscreen);
 
   // draw current frame marker
-  p.fillRect(xpos+KEY_WIDTH/2-1,0,2,height(),QColor("#ff0000"));
+  p.fillRect(xpos + Constants::keyWidth() / 2 - 1, 0, 2, height(), QColor("#ff0000"));
 
   qDebug("Timeline::paintEvent(): done");
 }
@@ -112,7 +115,7 @@ void Timeline::setNumberOfFrames(int frames)
 
   numOfFrames=frames;
 
-  QPixmap* newOffscreen=new QPixmap(numOfFrames*KEY_WIDTH,LINE_HEIGHT*(NUM_PARTS+1));
+  QPixmap* newOffscreen = new QPixmap(numOfFrames * Constants::keyWidth(), Constants::lineHeight() * (Constants::numParts() + 1));
 
   // copy old offscreen pixmap to new pixmap, if there is one
   if(offscreen)
@@ -131,7 +134,7 @@ void Timeline::setNumberOfFrames(int frames)
 void Timeline::setCurrentFrame(int frame)
 {
   frameSelected=frame;
-  emit positionCenter(frameSelected*KEY_WIDTH);
+  emit positionCenter(frameSelected * Constants::keyWidth());
 }
 
 void Timeline::setAnimation(Animation* anim)
@@ -181,11 +184,11 @@ void Timeline::drawKeyframe(int track,int frame)
 
   if(track==-1) return;
 
-  int ypos=track*LINE_HEIGHT;
+  int ypos = track * Constants::lineHeight();
 
   QPainter p(offscreen);
   // calculate x position
-  int xpos=frame*KEY_WIDTH;
+  int xpos = frame * Constants::keyWidth();
 
   QPalette::ColorRole keyColor=QPalette::Foreground;
 
@@ -199,13 +202,13 @@ void Timeline::drawKeyframe(int track,int frame)
   // draw the key frame
   if(frame==0)
   {
-    p.fillRect(xpos,ypos,KEY_WIDTH/2,KEY_HEIGHT,QBrush(color));
-    p.fillRect(xpos,ypos+LINE_HEIGHT/2-2,KEY_WIDTH,4,QBrush(color));
+    p.fillRect(xpos, ypos, Constants::keyWidth() / 2, Constants::keyHeight(), QBrush(color));
+    p.fillRect(xpos, ypos + Constants::lineHeight() / 2 - 2, Constants::keyWidth(), 4, QBrush(color));
   }
   else if(frame==(numOfFrames-1))
   {
-    p.fillRect(xpos+KEY_WIDTH/2,ypos,KEY_WIDTH/2,KEY_HEIGHT,QBrush(color));
-    p.fillRect(xpos,ypos+LINE_HEIGHT/2-2,KEY_WIDTH,4,QBrush(color));
+    p.fillRect(xpos + Constants::keyWidth() / 2, ypos, Constants::keyWidth() / 2, Constants::keyHeight(), QBrush(color));
+    p.fillRect(xpos, ypos + Constants::lineHeight() / 2 - 2, Constants::keyWidth(), 4, QBrush(color));
   }
   else
   {
@@ -222,24 +225,24 @@ void Timeline::drawKeyframe(int track,int frame)
     p.setBrush(QBrush(color));
 
     if(ps && ns)
-      p.drawEllipse(xpos,ypos,KEY_WIDTH-1,LINE_HEIGHT-1);
+      p.drawEllipse(xpos, ypos, Constants::keyWidth() - 1, Constants::lineHeight() - 1);
 
     else if(ns)
     {
       QPolygon triangle(3);
-      triangle.putPoints(0,3, xpos,ypos+(LINE_HEIGHT-1)/2, xpos+KEY_WIDTH-1,ypos, xpos+KEY_WIDTH-1,ypos+LINE_HEIGHT-1);
+      triangle.putPoints(0, 3, xpos, ypos + (Constants::lineHeight() - 1) / 2, xpos + Constants::keyWidth() - 1, ypos, xpos + Constants::keyWidth() - 1, ypos + Constants::lineHeight() - 1);
 
       p.drawPolygon(triangle);
     }
     else if(ps)
     {
       QPolygon triangle(3);
-      triangle.putPoints(0,3, xpos+KEY_WIDTH-1,ypos+(LINE_HEIGHT-1)/2, xpos,ypos, xpos,ypos+LINE_HEIGHT-1);
+      triangle.putPoints(0, 3, xpos + Constants::keyWidth() - 1, ypos + (Constants::lineHeight() - 1) / 2, xpos, ypos, xpos, ypos + Constants::lineHeight() - 1);
 
       p.drawPolygon(triangle);
     }
     else
-      p.fillRect(xpos,ypos,KEY_WIDTH-1,KEY_HEIGHT,QBrush(color));
+      p.fillRect(xpos, ypos, Constants::keyWidth() - 1, Constants::keyHeight(), QBrush(color));
   }
 }
 
@@ -281,7 +284,7 @@ void Timeline::drawTrack(int track)
   }
 
   int light=0;
-  int y=track*LINE_HEIGHT;
+  int y = track * Constants::lineHeight();
 
   // temporary painter, must be destroyed before entering main keyframe loop,
   // or we clash with drawKeyframe() painter
@@ -290,13 +293,13 @@ void Timeline::drawTrack(int track)
   // find widget coordinates of clipped area and decide if we paint light or dark background
   int firstGreyShade=(firstVisibleKeyX/10);
   light=firstGreyShade % 2;
-  firstGreyShade*=KEY_WIDTH*10;
+  firstGreyShade *= Constants::keyWidth() * 10;
 
   // draw alternatingly light / dark background
-  for(int x=firstGreyShade;x<(firstGreyShade+visibleKeysX+10)*KEY_WIDTH;x+=10*KEY_WIDTH)
+  for(int x = firstGreyShade; x < (firstGreyShade + visibleKeysX + 10) * Constants::keyWidth(); x += 10 * Constants::keyWidth())
   {
     // draw a filled rectangle in background color, alternatingly darkened by 5 %
-    p->fillRect(x,y,x+10*KEY_WIDTH,LINE_HEIGHT,palette().color(QPalette::Active,baseColor).dark(100+5*light));
+    p->fillRect(x, y, x + 10 * Constants::keyWidth(), Constants::lineHeight(), palette().color(QPalette::Active, baseColor).dark(100 + 5 * light));
     light=1-light;
   }
 
@@ -308,8 +311,8 @@ void Timeline::drawTrack(int track)
   }
 
   // draw straight line as track marker within "dirty" redraw region
-  p->fillRect(firstVisibleKeyX*KEY_WIDTH,y+LINE_HEIGHT/2,(visibleKeysX+1)*KEY_WIDTH,1,palette().color(QPalette::Active,baseColor).dark(115));
-  p->fillRect(firstVisibleKeyX*KEY_WIDTH,y+LINE_HEIGHT/2+1,(visibleKeysX+1)*KEY_WIDTH,1,palette().color(QPalette::Active,baseColor).light(115));
+  p->fillRect(firstVisibleKeyX * Constants::keyWidth(), y + Constants::lineHeight() / 2, (visibleKeysX + 1) * Constants::keyWidth(), 1, palette().color(QPalette::Active, baseColor).dark(115));
+  p->fillRect(firstVisibleKeyX * Constants::keyWidth(), y + Constants::lineHeight() / 2 + 1, (visibleKeysX + 1) * Constants::keyWidth(), 1, palette().color(QPalette::Active, baseColor).light(115));
 
   delete p;
 
@@ -343,18 +346,18 @@ void Timeline::drawTrack(int track)
             )
           {
             const FrameData& oldFrameData=joint->keyframeDataByIndex(key-1);
-            int frameDiff=(frameNum-oldFrame+1)*KEY_WIDTH/2;
+            int frameDiff = (frameNum - oldFrame + 1) * Constants::keyWidth() / 2;
 
             QColor pen1(palette().color(QPalette::Active,lineColor));
             QColor pen2(palette().color(QPalette::Active,baseColor).light(115));
 
             if(oldFrameData.easeOut())
             {
-              QPoint oldPos(oldFrame*KEY_WIDTH+KEY_WIDTH-1,y+LINE_HEIGHT/2);
-              for(int x=0;x<frameDiff-KEY_WIDTH+1;x++)
+              QPoint oldPos(oldFrame * Constants::keyWidth() + Constants::keyWidth() - 1, y + Constants::lineHeight() / 2);
+              for (int x = 0; x < frameDiff - Constants::keyWidth() + 1; x++)
               {
-                QPoint newPos(x+oldFrame*KEY_WIDTH+KEY_WIDTH-1,
-                              (int)(y+sin(x*6.283/(frameDiff-KEY_WIDTH+1))*(LINE_HEIGHT/2-1)+LINE_HEIGHT/2)
+                QPoint newPos(x + oldFrame * Constants::keyWidth() + Constants::keyWidth() - 1,
+                              (int)(y + sin(x * 6.283 / (frameDiff - Constants::keyWidth() + 1)) * (Constants::lineHeight() / 2 - 1) + Constants::lineHeight() / 2)
                              );
                 p.setPen(pen1);
                 p.drawLine(oldPos,newPos);
@@ -367,23 +370,23 @@ void Timeline::drawTrack(int track)
             {
               // we use fillRect instead of drawLine because for some reason the windows
               // version did not draw properly
-              p.fillRect(oldFrame*KEY_WIDTH+KEY_WIDTH-1,
-                         y+KEY_HEIGHT/2,
-                         frameDiff-KEY_WIDTH,
-                         1,QBrush(pen1));
-              p.fillRect(oldFrame*KEY_WIDTH+KEY_WIDTH-1,
-                         y+KEY_HEIGHT/2+1,
+              p.fillRect(oldFrame * Constants::keyWidth() + Constants::keyWidth() - 1,
+                         y + Constants::keyHeight() / 2,
+                         frameDiff - Constants::keyWidth(),
+                         1, QBrush(pen1));
+              p.fillRect(oldFrame * Constants::keyWidth() + Constants::keyWidth() - 1,
+                         y + Constants::keyHeight() / 2 + 1,
                          frameDiff,
-                         1,QBrush(pen2));
+                         1, QBrush(pen2));
             }
 
             if(frameData.easeIn())
             {
-              QPoint oldPos(oldFrame*KEY_WIDTH+frameDiff,y+LINE_HEIGHT/2);
-              for(int x=0;x<frameDiff-KEY_WIDTH+1;x++)
+              QPoint oldPos(oldFrame * Constants::keyWidth() + frameDiff, y + Constants::lineHeight() / 2);
+              for (int x = 0; x < frameDiff - Constants::keyWidth() + 1; x++)
               {
-                QPoint newPos(x+oldFrame*KEY_WIDTH+frameDiff-1,
-                              (int)(y+sin(x*6.283/(frameDiff-KEY_WIDTH+1))*(LINE_HEIGHT/2-1)+LINE_HEIGHT/2)
+                QPoint newPos(x + oldFrame * Constants::keyWidth() + frameDiff - 1,
+                              (int)(y + sin(x * 6.283 / (frameDiff - Constants::keyWidth() + 1)) * (Constants::lineHeight() / 2 - 1) + Constants::lineHeight() / 2)
                              );
                 p.setPen(pen1);
                 p.drawLine(oldPos,newPos);
@@ -394,14 +397,14 @@ void Timeline::drawTrack(int track)
             }
             else
             {
-              p.fillRect(oldFrame*KEY_WIDTH+frameDiff-1,
-                         y+KEY_HEIGHT/2,
+              p.fillRect(oldFrame * Constants::keyWidth() + frameDiff - 1,
+                         y + Constants::keyHeight() / 2,
                          frameDiff,
-                         1,QBrush(pen1));
-              p.fillRect(oldFrame*KEY_WIDTH+frameDiff-1,
-                         y+KEY_HEIGHT/2+1,
+                         1, QBrush(pen1));
+              p.fillRect(oldFrame * Constants::keyWidth() + frameDiff - 1,
+                         y + Constants::keyHeight() / 2 + 1,
                          frameDiff,
-                         1,QBrush(pen2));
+                         1, QBrush(pen2));
             }
           }
         }
@@ -428,8 +431,8 @@ bool Timeline::isDirty(int frame)
 void Timeline::mousePressEvent(QMouseEvent* e)
 {
   // get track and frame based on mouse coordinates
-  selectTrack(e->y()/LINE_HEIGHT);
-  frameSelected=e->x()/KEY_WIDTH;
+  selectTrack(e->y() / Constants::lineHeight());
+  frameSelected = e->x() / Constants::keyWidth();
 
   // set animation frame to where we clicked
   animation->setFrame(frameSelected);
@@ -463,7 +466,7 @@ void Timeline::mouseReleaseEvent(QMouseEvent*)
 void Timeline::mouseMoveEvent(QMouseEvent* e)
 {
   // calculate new position (in frames)
-  int frame=e->x()/KEY_WIDTH;
+  int frame = e->x() / Constants::keyWidth();
 
   // if frame position has not changed, do nothing
   if(frame==frameSelected) return;

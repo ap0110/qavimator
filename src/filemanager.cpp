@@ -21,6 +21,7 @@
 #include <QApplication>
 #include <QDir>
 
+#include "constants.h"
 #include "newanimation.h"
 #include "bvhparser.h"
 
@@ -75,7 +76,7 @@ QSharedPointer<NewAnimation> FileManager::loadAnimationFromFile(const QString& f
 
 QSharedPointer<NewAnimation> FileManager::loadAnimationFromApplicationData(const QString& fileName)
 {
-  QDir dataDirectory = getDataDirectoryByOperatingSystem();
+  QDir dataDirectory(Constants::qavimatorDataPath());
 
   if (!dataDirectory.exists(fileName))
   {
@@ -83,15 +84,6 @@ QSharedPointer<NewAnimation> FileManager::loadAnimationFromApplicationData(const
   }
 
   return loadAnimationFromFile(dataDirectory.absoluteFilePath(fileName));
-}
-
-QDir FileManager::getDataDirectoryByOperatingSystem() const
-{
-#ifdef Q_OS_MAC
-  return QDir(QApplication::applicationDirPath() + "/../Resources");
-#else
-  return QDir(QDir::currentPath() + QString("/data"));
-#endif
 }
 
 const FileManager::FileType FileManager::determineFileType(QFile& openedFile) const

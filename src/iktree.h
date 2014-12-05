@@ -27,14 +27,11 @@
 
 #include "MT_Quaternion.h"
 
-#define MAX_BONES 50
-#define MAX_CHILDREN 4
-#define MAX_EFFECTORS 5
-
 struct IKEffectorList
 {
   int num;
-  int index[MAX_EFFECTORS];
+  // Size of the array is the maximum number of effectors
+  int index[5];
 };
 
 struct IKBone
@@ -46,7 +43,8 @@ struct IKBone
   MT_Quaternion lRot;  // local rotation
   MT_Quaternion gRot;  // global rotation
   int numChildren;
-  int child[MAX_CHILDREN];
+  // Size of the array is the maximum number of children
+  int child[4];
 };
 
 class IKTree
@@ -62,7 +60,8 @@ class IKTree
     enum {AXIS_X, AXIS_Y, AXIS_Z};
 
     int numBones;
-    IKBone bone[MAX_BONES];
+    // Size of the array is the maximum number of bones
+    IKBone bone[50];
 
     void reset(int frame);
     void addJoint(BVHNode *node);

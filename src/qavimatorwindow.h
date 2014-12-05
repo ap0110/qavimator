@@ -25,17 +25,6 @@
 #ifndef QAVIMATORWINDOW_H
 #define QAVIMATORWINDOW_H
 
-#define UNTITLED_NAME "Untitled.avm"
-#define PLAY_IMAGE "data/play.png"
-#define PAUSE_IMAGE "data/pause.png"
-#define KEY_IMAGE "data/key.png"
-#define NOKEY_IMAGE "data/nokey.png"
-
-#define CUBE_MESH "data/cube.obj"
-#define SPHERE_MESH "data/sphere.obj"
-#define CONE_MESH "data/cone.obj"
-#define TORUS_MESH "data/torus.obj"
-
 #include <QMainWindow>
 #include <QTimer>
 
@@ -313,6 +302,11 @@ class QAvimatorWindow : public QMainWindow
     QSharedPointer<Mesh> sphereMesh;
     QSharedPointer<Mesh> coneMesh;
     QSharedPointer<Mesh> torusMesh;
+
+    const QString m_animFilter;
+    const QString m_propFilter;
+    const QString m_untitledName;
+    const int m_precision;
 };
 
 #endif

@@ -23,14 +23,6 @@
 
 #include <QFrame>
 
-#define KEY_WIDTH   10
-#define KEY_HEIGHT  10
-#define LINE_HEIGHT 11
-#define LEFT_STRUT  55
-
-// FIXME: find out at runtime
-#define NUM_PARTS 25
-
 /**
   @author Zi Ree
 */
@@ -42,7 +34,7 @@ class Timeline : public QFrame
   Q_OBJECT
 
   public:
-    Timeline(QWidget* parent=0,Qt::WindowFlags f=0);
+    Timeline(QWidget* parent = nullptr, Qt::WindowFlags f = 0);
     ~Timeline();
 
     void setAnimation(Animation* anim);

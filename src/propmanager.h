@@ -25,14 +25,12 @@
 
 #include "prop.h"
 
-#define OBJECT_START      8000
-
 class PropManager : public QObject
 {
   Q_OBJECT
 
   public:
-    PropManager(QObject* parent = nullptr);
+    PropManager(int nextPropId, QObject* parent = nullptr);
     ~PropManager();
 
     unsigned int getSelectedPropId();
@@ -53,7 +51,7 @@ class PropManager : public QObject
     void selectProp(unsigned int id = 0);
 
   private:
-    unsigned int nextPropId;
+    unsigned int m_nextPropId;
 
     QList<Prop*> propList;
 

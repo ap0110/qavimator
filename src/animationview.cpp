@@ -18,8 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#define QAVIMATOR_DATAPATH "."
-
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #include <QApplication.h>
@@ -33,15 +31,12 @@
 #include "animation.h"
 #include "animationview.h"
 #include "bvh.h"
+#include "constants.h"
 #include "slparts.h"
 #include "propmanager.h"
 #include "scene.h"
 
 #include "usersettings.h"
-
-#define SHIFT 1
-#define CTRL  2
-#define ALT   4
 
 AnimationView::AnimationView(QWidget* parent, const char* /* name */, Animation* anim)
  : QGLWidget(parent),
@@ -49,7 +44,7 @@ AnimationView::AnimationView(QWidget* parent, const char* /* name */, Animation*
    m_sphereModel(nullptr),
    m_coneModel(nullptr)
 {
-  figureFiles << MALE_BVH << FEMALE_BVH;
+  figureFiles << Constants::maleBvhPath() << Constants::femaleBvhPath();
 
   bvh=new BVH();
   if(!bvh)
@@ -73,20 +68,14 @@ AnimationView::AnimationView(QWidget* parent, const char* /* name */, Animation*
   ySelect=false;
   zSelect=false;
 
-#ifdef __APPLE__
-  QString dataPath=QApplication::applicationDirPath() + "/../Resources";
-#else
-  QString dataPath=QAVIMATOR_DATAPATH;
-#endif
-
-  QString limFile=dataPath+"/"+LIMITS_FILE;
+  QString limFile = Constants::limitsFilePath();
   qDebug("AnimationView::AnimationView(): using limits file '%s'",limFile.toLatin1().constData());
 
   // read SL reference models to restore joint positions, in case another model has joints
   // we do not support (e.g. the SL example bvh files)
   for(int i=0;i<Animation::NUM_FIGURES;i++)
   {
-    QString model(dataPath+"/"+figureFiles[i]);
+    QString model(figureFiles[i]);
     qDebug("Reading reference model '%s'",model.toLatin1().constData());
     joints[i]=bvh->animRead(model,limFile);
   }
@@ -104,9 +93,9 @@ AnimationView::~AnimationView()
 {
 }
 
-void AnimationView::setScene(Scene* scene)
+Scene* AnimationView::initializeScene(QObject* parent)
 {
-  m_scene = scene;
+  return m_scene = new Scene(static_cast<int>(OpenGlIds::ObjectStart), parent);
 }
 
 BVH* AnimationView::getBVH() const
@@ -317,17 +306,26 @@ void AnimationView::mouseMoveEvent(QMouseEvent* event)
       QCursor::setPos(clickPos);
     }
 
-    if(partSelected)
+    if (partSelected)
     {
-      if(partSelected<OBJECT_START)
+      if (partSelected < static_cast<int>(OpenGlIds::ObjectStart))
       {
         changeX=0;
         changeY=0;
         changeZ=0;
 
-        if(modifier & SHIFT) changeX=dragY;
-        if(modifier & ALT)   changeY=dragX;
-        else if(modifier & CTRL) changeZ=-dragX;
+        if (modifier & static_cast<int>(ModifierKeys::Shift))
+        {
+          changeX = dragY;
+        }
+        if (modifier & static_cast<int>(ModifierKeys::Alt))
+        {
+          changeY = dragX;
+        }
+        else if (modifier & static_cast<int>(ModifierKeys::Ctrl))
+        {
+          changeZ = -dragX;
+        }
 
         emit partDragged(getSelectedPart(),changeX,changeY,changeZ);
         repaint();
@@ -338,43 +336,43 @@ void AnimationView::mouseMoveEvent(QMouseEvent* event)
       float rot=camera()->yRotation();
       Prop* prop=m_scene->getPropById(propManager()->getSelectedPropId());
 
-      if(propDragging==DRAG_HANDLE_X)
+      if (propDragging == static_cast<int>(OpenGlIds::DragHandleX))
       {
         if(rot>90 && rot<270) dragX=-dragX;
         emit propDragged(prop,(double) dragX/10.0,0,0);
       }
-      else if(propDragging==DRAG_HANDLE_Y)
+      else if (propDragging == static_cast<int>(OpenGlIds::DragHandleY))
       {
         emit propDragged(prop,0,(double) -dragY/10.0,0);
       }
-      else if(propDragging==DRAG_HANDLE_Z)
+      else if (propDragging == static_cast<int>(OpenGlIds::DragHandleZ))
       {
         if(rot>90 && rot<270) dragY=-dragY;
         emit propDragged(prop,0,0,(double) dragY/10.0);
       }
-      else if(propDragging==SCALE_HANDLE_X)
+      else if (propDragging == static_cast<int>(OpenGlIds::ScaleHandleX))
       {
         if(rot>90 && rot<270) dragX=-dragX;
         emit propScaled(prop,(double) dragX/10.0,0,0);
       }
-      else if(propDragging==SCALE_HANDLE_Y)
+      else if (propDragging == static_cast<int>(OpenGlIds::ScaleHandleY))
       {
         if(rot>90 && rot<270) dragY=-dragY;
         emit propScaled(prop,0,(double) -dragY/10.0,0);
       }
-      else if(propDragging==SCALE_HANDLE_Z)
+      else if (propDragging == static_cast<int>(OpenGlIds::ScaleHandleZ))
       {
         emit propScaled(prop,0,0,(double) dragY/10.0);
       }
-      else if(propDragging==ROTATE_HANDLE_X)
+      else if (propDragging == static_cast<int>(OpenGlIds::RotateHandleX))
       {
         emit propRotated(prop,(double) dragX/5.0,0,0);
       }
-      else if(propDragging==ROTATE_HANDLE_Y)
+      else if (propDragging == static_cast<int>(OpenGlIds::RotateHandleY))
       {
         emit propRotated(prop,0,(double) -dragY/5.0,0);
       }
-      else if(propDragging==ROTATE_HANDLE_Z)
+      else if (propDragging == static_cast<int>(OpenGlIds::RotateHandleZ))
       {
         emit propRotated(prop,0,0,(double) dragY/5.0);
       }
@@ -382,15 +380,19 @@ void AnimationView::mouseMoveEvent(QMouseEvent* event)
     }
     else
     {
-      if(modifier & SHIFT)
-        camera()->pan(dragX/2,dragY/2,0);
-      else if(modifier & ALT)
+      if (modifier & static_cast<int>(ModifierKeys::Shift))
       {
-        camera()->pan(0,0,dragY);
-        camera()->rotate(0,dragX);
+        camera()->pan(dragX / 2, dragY / 2, 0);
+      }
+      else if (modifier & static_cast<int>(ModifierKeys::Alt))
+      {
+        camera()->pan(0, 0, dragY);
+        camera()->rotate(0, dragX);
       }
       else
-        camera()->rotate(dragY,dragX);
+      {
+        camera()->rotate(dragY, dragX);
+      }
 
       repaint();
     }
@@ -439,10 +441,10 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
       emit backgroundClicked();
     }
     // body part clicked
-    else if(selected<OBJECT_START)
+    else if (selected < static_cast<int>(OpenGlIds::ObjectStart))
     {
       partSelected=selected;
-      m_scene->selectAnimation(selected/ANIMATION_INCREMENT);
+      m_scene->selectAnimation(selected / static_cast<int>(OpenGlIds::AnimationIncrement));
       propManager()->selectProp(0);
       propDragging=0;
 
@@ -455,18 +457,18 @@ void AnimationView::mousePressEvent(QMouseEvent* event)
                        m_scene->getAnimation()->getRotationLimits(part),
                        QVector3D(m_scene->getAnimation()->getPosition())
                       );
-      emit partClicked(partSelected % ANIMATION_INCREMENT);
+      emit partClicked(partSelected % static_cast<int>(OpenGlIds::AnimationIncrement));
     }
     // drag handle clicked
-    else if(selected==DRAG_HANDLE_X ||
-            selected==DRAG_HANDLE_Y ||
-            selected==DRAG_HANDLE_Z ||
-            selected==SCALE_HANDLE_X ||
-            selected==SCALE_HANDLE_Y ||
-            selected==SCALE_HANDLE_Z ||
-            selected==ROTATE_HANDLE_X ||
-            selected==ROTATE_HANDLE_Y ||
-            selected==ROTATE_HANDLE_Z)
+    else if (selected == static_cast<int>(OpenGlIds::DragHandleX) ||
+             selected == static_cast<int>(OpenGlIds::DragHandleY) ||
+             selected == static_cast<int>(OpenGlIds::DragHandleZ) ||
+             selected == static_cast<int>(OpenGlIds::ScaleHandleX) ||
+             selected == static_cast<int>(OpenGlIds::ScaleHandleY) ||
+             selected == static_cast<int>(OpenGlIds::ScaleHandleZ) ||
+             selected == static_cast<int>(OpenGlIds::RotateHandleX) ||
+             selected == static_cast<int>(OpenGlIds::RotateHandleY) ||
+             selected == static_cast<int>(OpenGlIds::RotateHandleZ))
     {
       propDragging=selected;
       changeX = changeY = changeZ = 0;
@@ -500,22 +502,29 @@ void AnimationView::mouseDoubleClickEvent(QMouseEvent* event)
   int selected=pickPart(event->x(),event->y());
 
   // no double clicks for props or drag handles
-  if(selected>=OBJECT_START) return;
+  if (selected >= static_cast<int>(OpenGlIds::ObjectStart))
+  {
+    return;
+  }
 
   // FIXME: With multiple avatars, double-clicking
   //  other avatars may require a different
   //  animation than what getAnimation() returns
   if (m_scene->getAnimation()->getNode(selected) == 0) return;
 
-  if(modifier & SHIFT)
+  if (modifier & static_cast<int>(ModifierKeys::Shift))
   {
-    mirrorSelected=getSelectedPart()->getMirrorIndex()+(selected/ANIMATION_INCREMENT)*ANIMATION_INCREMENT;
-    if(mirrorSelected)
+    mirrorSelected=getSelectedPart()->getMirrorIndex() + (selected / static_cast<int>(OpenGlIds::AnimationIncrement)) * static_cast<int>(OpenGlIds::AnimationIncrement);
+    if (mirrorSelected)
+    {
       m_scene->getAnimation()->setMirrored(true);
+    }
   }
-  else if(selected && selected < OBJECT_START)
+  else if (selected && selected < static_cast<int>(OpenGlIds::ObjectStart))
+  {
     m_scene->getAnimation()->setIK(m_scene->getAnimation()->getNode(selected),
                      !m_scene->getAnimation()->getIK(m_scene->getAnimation()->getNode(selected)));
+  }
   repaint();
 }
 
@@ -532,25 +541,25 @@ void AnimationView::keyPressEvent(QKeyEvent* event)
   switch(event->key())
   {
     case Qt::Key_PageUp:
-      camera()->pan(0,0,-5);
+      camera()->pan(0, 0, -5);
       repaint();
       break;
     case Qt::Key_PageDown:
-        camera()->pan(0,0,5);
-        repaint();
-        break;
+      camera()->pan(0, 0, 5);
+      repaint();
+      break;
     case Qt::Key_Shift:
-      modifier|=SHIFT;
+      modifier |= static_cast<int>(ModifierKeys::Shift);
       xSelect = true;
       repaint();
       break;
     case Qt::Key_Alt:
-      modifier|=ALT;
+      modifier |= static_cast<int>(ModifierKeys::Alt);
       ySelect = true;
       repaint();
       break;
     case Qt::Key_Control:
-      modifier|=CTRL;
+      modifier |= static_cast<int>(ModifierKeys::Ctrl);
       zSelect = true;
       repaint();
       break;
@@ -593,17 +602,17 @@ void AnimationView::keyReleaseEvent(QKeyEvent* event)
   switch(event->key())
   {
     case Qt::Key_Shift:
-      modifier&=!SHIFT;
+      modifier &= !static_cast<int>(ModifierKeys::Shift);
       xSelect = false;
       repaint();
       break;
     case Qt::Key_Alt:
-      modifier&=!ALT;
+      modifier &= !static_cast<int>(ModifierKeys::Alt);
       ySelect = false;
       repaint();
       break;
     case Qt::Key_Control:
-      modifier&=!CTRL;
+      modifier &= !static_cast<int>(ModifierKeys::Ctrl);
       zSelect = false;
       repaint();
       break;
@@ -635,13 +644,13 @@ void AnimationView::drawFigure(Animation* anim,unsigned int index)
     // visual compensation
     glTranslatef(0, 2, 0);
 
-    selectName = index*ANIMATION_INCREMENT;
+    selectName = index * static_cast<int>(OpenGlIds::AnimationIncrement);
     glEnable(GL_DEPTH_TEST);
     drawPart(anim,index,anim->getFrame(),anim->getMotion(),joints[figType],MODE_PARTS);
-    selectName = index*ANIMATION_INCREMENT;
+    selectName = index * static_cast<int>(OpenGlIds::AnimationIncrement);
     glEnable(GL_COLOR_MATERIAL);
     drawPart(anim,index,anim->getFrame(),anim->getMotion(),joints[figType],MODE_ROT_AXES);
-    selectName = index*ANIMATION_INCREMENT;
+    selectName = index * static_cast<int>(OpenGlIds::AnimationIncrement);
     glDisable(GL_DEPTH_TEST);
     drawPart(anim,index,anim->getFrame(),anim->getMotion(),joints[figType],MODE_SKELETON);
 
@@ -790,21 +799,21 @@ void AnimationView::drawDragHandles(const Prop* prop) const
 
   switch(partHighlighted)
   {
-    case SCALE_HANDLE_X:
-    case ROTATE_HANDLE_X:
-    case DRAG_HANDLE_X:
+    case static_cast<int>(OpenGlIds::ScaleHandleX):
+    case static_cast<int>(OpenGlIds::RotateHandleX):
+    case static_cast<int>(OpenGlIds::DragHandleX):
       xRGB=xRGB.lighter(120);
       xLineWidth=3;
       break;
-    case SCALE_HANDLE_Y:
-    case ROTATE_HANDLE_Y:
-    case DRAG_HANDLE_Y:
+    case static_cast<int>(OpenGlIds::ScaleHandleY):
+    case static_cast<int>(OpenGlIds::RotateHandleY):
+    case static_cast<int>(OpenGlIds::DragHandleY):
       yRGB=yRGB.lighter(120);
       yLineWidth=3;
       break;
-    case SCALE_HANDLE_Z:
-    case ROTATE_HANDLE_Z:
-    case DRAG_HANDLE_Z:
+    case static_cast<int>(OpenGlIds::ScaleHandleZ):
+    case static_cast<int>(OpenGlIds::RotateHandleZ):
+    case static_cast<int>(OpenGlIds::DragHandleZ):
       zRGB=zRGB.lighter(120);
       zLineWidth=3;
       break;
@@ -817,7 +826,7 @@ void AnimationView::drawDragHandles(const Prop* prop) const
   // set matrix origin to our object's center
   glTranslatef(x,y,z);
 
-  if(modifier & SHIFT)
+  if (modifier & static_cast<int>(ModifierKeys::Shift))
   {
     // now draw the scale cubes with proper depth sorting
     glEnable(GL_DEPTH_TEST);
@@ -826,47 +835,47 @@ void AnimationView::drawDragHandles(const Prop* prop) const
     glRotatef(prop->yRotation(),0,1,0);
     glRotatef(prop->zRotation(),0,0,1);
 
-    glLoadName(SCALE_HANDLE_X);
+    glLoadName(static_cast<int>(OpenGlIds::ScaleHandleX));
     glColor4f(xRGB.redF(),xRGB.greenF(),xRGB.blueF(),1);
     glTranslatef(-xs,0,0);
     m_cubeModel->draw();
     glTranslatef(xs*2,0,0);
     m_cubeModel->draw();
 
-    glLoadName(SCALE_HANDLE_Y);
+    glLoadName(static_cast<int>(OpenGlIds::ScaleHandleY));
     glColor4f(yRGB.redF(),yRGB.greenF(),yRGB.blueF(),1);
     glTranslatef(-xs,-ys,0);
     m_cubeModel->draw();
     glTranslatef(0,ys*2,0);
     m_cubeModel->draw();
 
-    glLoadName(SCALE_HANDLE_Z);
+    glLoadName(static_cast<int>(OpenGlIds::ScaleHandleZ));
     glColor4f(zRGB.redF(),zRGB.greenF(),zRGB.blueF(),1);
     glTranslatef(0,-ys,-zs);
     m_cubeModel->draw();
     glTranslatef(0,0,zs*2);
     m_cubeModel->draw();
   }
-  else if(modifier & CTRL)
+  else if (modifier & static_cast<int>(ModifierKeys::Ctrl))
   {
     // now draw the rotate spheres with proper depth sorting
     glEnable(GL_DEPTH_TEST);
 
-    glLoadName(ROTATE_HANDLE_X);
+    glLoadName(static_cast<int>(OpenGlIds::RotateHandleX));
     glColor4f(xRGB.redF(),xRGB.greenF(),xRGB.blueF(),1);
     glTranslatef(-xs-5,0,0);
     m_sphereModel->draw();
     glTranslatef(2*(xs+5),0,0);
     m_sphereModel->draw();
 
-    glLoadName(ROTATE_HANDLE_Y);
+    glLoadName(static_cast<int>(OpenGlIds::RotateHandleY));
     glColor4f(yRGB.redF(),yRGB.greenF(),yRGB.blueF(),1);
     glTranslatef(-xs-5,-ys-5,0);
     m_sphereModel->draw();
     glTranslatef(0,2*(ys+5),0);
     m_sphereModel->draw();
 
-    glLoadName(ROTATE_HANDLE_Z);
+    glLoadName(static_cast<int>(OpenGlIds::RotateHandleZ));
     glColor4f(zRGB.redF(),zRGB.greenF(),zRGB.blueF(),1);
     glTranslatef(0,-ys-5,-zs-5);
     m_sphereModel->draw();
@@ -902,7 +911,7 @@ void AnimationView::drawDragHandles(const Prop* prop) const
     // now draw the drag handle arrows with proper depth sorting
     glEnable(GL_DEPTH_TEST);
 
-    glLoadName(DRAG_HANDLE_X);
+    glLoadName(static_cast<int>(OpenGlIds::DragHandleX));
     glColor4f(xRGB.redF(),xRGB.greenF(),xRGB.blueF(),1);
     glTranslatef(-xs-5,0,0);
     glRotatef(270,0,1,0);
@@ -913,7 +922,7 @@ void AnimationView::drawDragHandles(const Prop* prop) const
     m_coneModel->draw();
     glRotatef(270,0,1,0);
 
-    glLoadName(DRAG_HANDLE_Y);
+    glLoadName(static_cast<int>(OpenGlIds::DragHandleY));
     glColor4f(yRGB.redF(),yRGB.greenF(),yRGB.blueF(),1);
     glTranslatef(-xs-5,-ys-5,0);
     glRotatef(90,1,0,0);
@@ -924,7 +933,7 @@ void AnimationView::drawDragHandles(const Prop* prop) const
     m_coneModel->draw();
     glRotatef(90,1,0,0);
 
-    glLoadName(DRAG_HANDLE_Z);
+    glLoadName(static_cast<int>(OpenGlIds::DragHandleZ));
     glColor4f(zRGB.redF(),zRGB.greenF(),zRGB.blueF(),1);
     glTranslatef(0,-ys-5,-zs-5);
     glRotatef(180,1,0,0);
@@ -984,12 +993,12 @@ Camera* AnimationView::camera() const
 
 BVHNode* AnimationView::getSelectedPart()
 {
-  return m_scene->getAnimation()->getNode(partSelected % ANIMATION_INCREMENT);
+  return m_scene->getAnimation()->getNode(partSelected % static_cast<int>(OpenGlIds::AnimationIncrement));
 }
 
 unsigned int AnimationView::getSelectedPartIndex()
 {
-  return partSelected % ANIMATION_INCREMENT;
+  return partSelected % static_cast<int>(OpenGlIds::AnimationIncrement);
 }
 
 void AnimationView::setModels(QSharedPointer<Mesh> cubeMesh, QSharedPointer<Mesh> sphereMesh, QSharedPointer<Mesh> coneMesh)
@@ -1007,7 +1016,7 @@ void AnimationView::setModels(QSharedPointer<Mesh> cubeMesh, QSharedPointer<Mesh
 const QString AnimationView::getPartName(int index)
 {
   // get part name from animation, with respect to multiple animations in view
-  return getAnimation()->getPartName(index % ANIMATION_INCREMENT);
+  return getAnimation()->getPartName(index % static_cast<int>(OpenGlIds::AnimationIncrement));
 }
 */
 
@@ -1053,7 +1062,7 @@ void AnimationView::selectPart(BVHNode* node)
   // get the part index to be selected, including the proper animation increment
   // FIXME: when we are adding support for removing animations we need to remember
   //        the increment for each animation so they don't get confused
-  partSelected=m_scene->getAnimation()->getPartIndex(node)+ANIMATION_INCREMENT*animationIndex;
+  partSelected = m_scene->getAnimation()->getPartIndex(node) + static_cast<int>(OpenGlIds::AnimationIncrement) * animationIndex;
   emit partClicked(node,
                    QVector3D(m_scene->getAnimation()->getRotation(node)),
                    m_scene->getAnimation()->getRotationLimits(node),

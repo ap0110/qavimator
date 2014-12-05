@@ -49,7 +49,6 @@ class FileManager : public QObject
       QAVM
     };
 
-    QDir getDataDirectoryByOperatingSystem() const;
     const FileType determineFileType(QFile& openedFile) const;
 
     QSharedPointer<NewAnimation> readBvh(QFile& openedFile);

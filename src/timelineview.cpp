@@ -23,9 +23,11 @@
 #include <QScrollBar>
 #include <QPainter>
 
-#include "timelineview.h"
-#include "timeline.h"
 #include "animation.h"
+#include "constants.h"
+#include "timeline.h"
+
+#include "timelineview.h"
 
 TimelineView::TimelineView(QWidget* parent,Qt::WindowFlags f) : QFrame(parent,f)
 {
@@ -98,7 +100,7 @@ TimelineTracks::~TimelineTracks()
 
 QSize TimelineTracks::sizeHint() const
 {
-  return QSize(LEFT_STRUT,(NUM_PARTS-1)*LINE_HEIGHT+2);
+  return QSize(Constants::leftStrut(), (Constants::numParts() - 1) * Constants::lineHeight() + 2);
 }
 
 void TimelineTracks::paintEvent(QPaintEvent*)
@@ -106,7 +108,10 @@ void TimelineTracks::paintEvent(QPaintEvent*)
   resize(sizeHint());
   if(!animation) return;
 
-  for(int part=0;part<NUM_PARTS;part++) drawTrack(part);
+  for (int part = 0; part < Constants::numParts(); part++)
+  {
+    drawTrack(part);
+  }
 }
 
 void TimelineTracks::drawTrack(int track)
@@ -119,22 +124,22 @@ void TimelineTracks::drawTrack(int track)
     QPainter p(this);
     QPalette::ColorRole textColor=QPalette::Foreground;
 
-    int y=track*LINE_HEIGHT+2;
+    int y = track * Constants::lineHeight() + 2;
 
     if(track==selectedTrack)
     {
-      p.fillRect(0,y,width(),LINE_HEIGHT,palette().color(QPalette::Active,QPalette::Highlight));
+      p.fillRect(0, y, width(), Constants::lineHeight(), palette().color(QPalette::Active, QPalette::Highlight));
 #ifdef Q_OS_WIN32
       // on windows systems use contrast color to track highlight color
       textColor=QPalette::HighlightedText;
 #endif
     }
     else
-      p.eraseRect(0,y,width(),LINE_HEIGHT);
+      p.eraseRect(0, y, width(), Constants::lineHeight());
 
     // draw track name
     p.setPen(palette().color(QPalette::Active,textColor));
-    p.drawText(0,y+KEY_HEIGHT,trackName);
+    p.drawText(0, y + Constants::keyHeight(), trackName);
   }
 }
 

@@ -38,26 +38,6 @@
 #include "prop.h"
 #include "bvh.h"
 
-#define MALE_BVH   "data/SLMale.bvh"
-#define FEMALE_BVH "data/SLFemale.bvh"
-
-// defines where we start counting opengl ids for parts with multiple animations
-// first animation counts 0-ANIMATION_INCREMENT-1, next ANIMATION_INCREMENT++
-#define ANIMATION_INCREMENT 100
-
-#define OBJECT_START      8000
-
-#define DRAG_HANDLE_START OBJECT_START+1000
-#define DRAG_HANDLE_X     DRAG_HANDLE_START
-#define DRAG_HANDLE_Y     DRAG_HANDLE_START+1
-#define DRAG_HANDLE_Z     DRAG_HANDLE_START+2
-#define SCALE_HANDLE_X    DRAG_HANDLE_START+3
-#define SCALE_HANDLE_Y    DRAG_HANDLE_START+4
-#define SCALE_HANDLE_Z    DRAG_HANDLE_START+5
-#define ROTATE_HANDLE_X   DRAG_HANDLE_START+6
-#define ROTATE_HANDLE_Y   DRAG_HANDLE_START+7
-#define ROTATE_HANDLE_Z   DRAG_HANDLE_START+8
-
 class QMouseEvent;
 class Animation;
 class PropManager;
@@ -72,7 +52,7 @@ class AnimationView : public QGLWidget
     ~AnimationView();
 
     // TODO Temporary method while logic is moving around
-    void setScene(Scene* scene);
+    Scene* initializeScene(QObject* parent);
 
     // exports the BVH class handler (ugly, need to find a better way)
     BVH* getBVH() const;
@@ -172,6 +152,32 @@ class AnimationView : public QGLWidget
     void drawCircle(int axis, float radius, int width);
 
   private:
+    enum class OpenGlIds
+    {
+      // defines where we start counting opengl ids for parts with multiple animations
+      // first animation counts 0-ANIMATION_INCREMENT-1, next ANIMATION_INCREMENT++
+      AnimationIncrement = 100,
+
+      ObjectStart = 8000,
+      DragHandlStart = 9000,
+      DragHandleX = 9000,
+      DragHandleY = 9001,
+      DragHandleZ = 9002,
+      ScaleHandleX = 9003,
+      ScaleHandleY = 9004,
+      ScaleHandleZ = 9005,
+      RotateHandleX = 9006,
+      RotateHandleY = 9007,
+      RotateHandleZ = 9008
+    };
+
+    enum class ModifierKeys
+    {
+      Shift = 1,
+      Ctrl = 2,
+      Alt = 4
+    };
+
     // TODO Temporary methods while logic is moved around
     PropManager* propManager() const;
     Camera* camera() const;

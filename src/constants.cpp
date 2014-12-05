@@ -18,6 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef Q_OS_MAC
+#  include <QApplication>
+#endif
+
 #include <QString>
 #include <QStringList>
 
@@ -57,8 +61,15 @@
   const QString Constants::m_applicationName = QString("QAvimator-Development");
 #endif
 
-const QString Constants::m_organizationName = "QAvimator Team";
-const QString Constants::m_organizationDomain = "qavimator.org";
+#ifdef QAVIMATOR_DATAPATH
+  const QString Constants::m_qavimatorDataPath = QString(QAVIMATOR_DATAPATH);
+#else
+#  ifdef Q_OS_MAC
+    const QString Constants::m_qavimatorDataPath = QString(QApplication::applicationDirPath() + "/../Resources");
+#  else
+    const QString Constants::m_qavimatorDataPath = "./data";
+#  endif
+#endif
 
 
 const QString Constants::buildDateTime()
@@ -97,17 +108,87 @@ const QString Constants::updateChannel()
   }
 }
 
+const QString Constants::applicationName()
+{
+  return m_applicationName;
+}
+
 const QString Constants::organizationName()
 {
-  return m_organizationName;
+  return QString("QAvimator Team");
 }
 
 const QString Constants::organizationDomain()
 {
-  return m_organizationDomain;
+  return QString("qavimator.org");
 }
 
-const QString Constants::applicationName()
+const QString Constants::qavimatorDataPath()
 {
-  return m_applicationName;
+  return m_qavimatorDataPath;
+}
+
+const QString Constants::defaultPosePath()
+{
+  return m_qavimatorDataPath + "/TPose.avm";
+}
+
+const QString Constants::limitsFilePath()
+{
+  return m_qavimatorDataPath + "/SL.lim";
+}
+
+const QString Constants::maleBvhPath()
+{
+  return m_qavimatorDataPath + "/SLMale.bvh";
+}
+
+const QString Constants::femaleBvhPath()
+{
+  return m_qavimatorDataPath + "/SLFemale.bvh";
+}
+
+const QString Constants::cubeMeshFilePath()
+{
+  return m_qavimatorDataPath + "/cube.obj";
+}
+
+const QString Constants::sphereMeshFilePath()
+{
+  return m_qavimatorDataPath + "/sphere.obj";
+}
+
+const QString Constants::coneMeshFilePath()
+{
+  return m_qavimatorDataPath + "/cone.obj";
+}
+
+const QString Constants::torusMeshFilePath()
+{
+  return m_qavimatorDataPath + "/torus.obj";
+}
+
+const int Constants::keyWidth()
+{
+  return 10;
+}
+
+const int Constants::keyHeight()
+{
+  return 10;
+}
+
+const int Constants::lineHeight()
+{
+  return 11;
+}
+
+const int Constants::leftStrut()
+{
+  return 55;
+}
+
+const int Constants::numParts()
+{
+  return 25;
 }

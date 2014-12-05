@@ -22,10 +22,10 @@
 
 #include "propmanager.h"
 
-PropManager::PropManager(QObject* parent)
-  : QObject(parent)
+PropManager::PropManager(int nextPropId, QObject* parent)
+  : QObject(parent),
+    m_nextPropId(nextPropId)
 {
-  nextPropId = OBJECT_START;
 }
 
 PropManager::~PropManager()
@@ -90,9 +90,9 @@ Prop* PropManager::addProp(Prop::PropType type,
     name=baseName+" "+QString::number(objectNum++);
   } while(getPropByName(name));
 
-  Prop* newProp=new Prop(nextPropId,type,name,mesh);
+  Prop* newProp = new Prop(m_nextPropId, type, name, mesh);
 
-  nextPropId++;
+  m_nextPropId++;
 
   newProp->attach(attach);
 

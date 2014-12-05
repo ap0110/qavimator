@@ -24,13 +24,13 @@
 
 #include "scene.h"
 
-Scene::Scene(QObject* parent)
+Scene::Scene(int nextPropId, QObject* parent)
   : QObject(parent),
     m_animationManager(this),
-    m_floor(this)
+    m_floor(this),
+    m_propManager(new PropManager(nextPropId, this)),
+    m_camera(new Camera(this))
 {
-  m_camera = new Camera(this);
-  m_propManager = new PropManager(this);
 }
 
 Scene::~Scene()

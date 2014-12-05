@@ -42,9 +42,26 @@ class Constants
     static const QString versionNumberString();
     static const QString buildNumber();
     static const QString updateChannel();
+    static const QString applicationName();
     static const QString organizationName();
     static const QString organizationDomain();
-    static const QString applicationName();
+
+    static const QString qavimatorDataPath();
+    static const QString defaultPosePath();
+    static const QString limitsFilePath();
+    static const QString maleBvhPath();
+    static const QString femaleBvhPath();
+    static const QString cubeMeshFilePath();
+    static const QString sphereMeshFilePath();
+    static const QString coneMeshFilePath();
+    static const QString torusMeshFilePath();
+
+    static const int keyWidth();
+    static const int keyHeight();
+    static const int lineHeight();
+    static const int leftStrut();
+    // FIXME: find out at runtime
+    static const int numParts();
 
   private:
     enum class UpdateChannel
@@ -58,9 +75,8 @@ class Constants
     static const VersionNumber m_versionNumber;
     static const QString m_buildNumber;
     static const UpdateChannel m_updateChannel;
-    static const QString m_organizationName;
-    static const QString m_organizationDomain;
     static const QString m_applicationName;
+    static const QString m_qavimatorDataPath;
 };
 
 #endif

@@ -39,18 +39,18 @@
 #include "ui_qavimatorwindow.h"
 #include "whatsnewdialog.h"
 
-#define ANIM_FILTER "Animation Files (*.avm *.bvh)"
-#define PROP_FILTER "Props (*.prp)"
-#define PRECISION   100
-
 QAvimatorWindow::QAvimatorWindow() :
   QMainWindow(nullptr),
   ui(new Ui::QAvimatorWindow),
   updateChecker(nullptr, this),
-  cubeMesh(new Mesh(CUBE_MESH, Mesh::Shape::CUBE)),
-  sphereMesh(new Mesh(SPHERE_MESH, Mesh::Shape::SPHERE)),
-  coneMesh(new Mesh(CONE_MESH, Mesh::Shape::CONE)),
-  torusMesh(new Mesh(TORUS_MESH, Mesh::Shape::TORUS))
+  cubeMesh(new Mesh(Constants::cubeMeshFilePath(), Mesh::Shape::CUBE)),
+  sphereMesh(new Mesh(Constants::sphereMeshFilePath(), Mesh::Shape::SPHERE)),
+  coneMesh(new Mesh(Constants::coneMeshFilePath(), Mesh::Shape::CONE)),
+  torusMesh(new Mesh(Constants::torusMeshFilePath(), Mesh::Shape::TORUS)),
+  m_animFilter("Animation Files (*.avm *.bvh)"),
+  m_propFilter("Props (*.prp)"),
+  m_untitledName("Untitled.avm"),
+  m_precision(100)
 {
   nodeMapping <<  0
               <<  1 <<  2 <<  3 <<  4 << 5
@@ -71,8 +71,7 @@ QAvimatorWindow::QAvimatorWindow() :
   frameDataValid=false;
   currentPart=0;
   longestRunningTime=0.0;
-  scene = new Scene(this);
-  ui->animationView->setScene(scene);
+  scene = ui->animationView->initializeScene(this);
   ui->animationView->setModels(cubeMesh, sphereMesh, coneMesh);
 
   // prepare play button icons
@@ -151,12 +150,12 @@ QAvimatorWindow::QAvimatorWindow() :
   connect(timeline,SIGNAL(positionCenter(int)),ui->timelineView,SLOT(scrollTo(int)));
   connect(timeline,SIGNAL(trackClicked(int)),ui->animationView,SLOT(selectPart(int)));
 
-  ui->xRotationSlider->setPageStep(10*PRECISION);
-  ui->yRotationSlider->setPageStep(10*PRECISION);
-  ui->zRotationSlider->setPageStep(10*PRECISION);
-  ui->xPositionSlider->setPageStep(10*PRECISION);
-  ui->yPositionSlider->setPageStep(10*PRECISION);
-  ui->zPositionSlider->setPageStep(10*PRECISION);
+  ui->xRotationSlider->setPageStep(10 * m_precision);
+  ui->yRotationSlider->setPageStep(10 * m_precision);
+  ui->zRotationSlider->setPageStep(10 * m_precision);
+  ui->xPositionSlider->setPageStep(10 * m_precision);
+  ui->yPositionSlider->setPageStep(10 * m_precision);
+  ui->zPositionSlider->setPageStep(10 * m_precision);
 
   ui->currentFrameSlider->setPageStep(1);
 
@@ -225,15 +224,15 @@ void QAvimatorWindow::partClicked(BVHNode* node, QVector3D rotation, RotationLim
     // maybe this shouldn't be like this to allow for multi rotation spins
     if(currentPart->type==BVH_ROOT)
     {
-      ui->xRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
-      ui->yRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
-      ui->zRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
+      ui->xRotationSlider->setRange(-359 * m_precision, 359 * m_precision);
+      ui->yRotationSlider->setRange(-359 * m_precision, 359 * m_precision);
+      ui->zRotationSlider->setRange(-359 * m_precision, 359 * m_precision);
     }
     else
     {
-      ui->xRotationSlider->setRange((int)(limits.minimum.x()*PRECISION),(int)(limits.maximum.x()*PRECISION));
-      ui->yRotationSlider->setRange((int)(limits.minimum.y()*PRECISION),(int)(limits.maximum.y()*PRECISION));
-      ui->zRotationSlider->setRange((int)(limits.minimum.z()*PRECISION),(int)(limits.maximum.z()*PRECISION));
+      ui->xRotationSlider->setRange((int)(limits.minimum.x() * m_precision), (int)(limits.maximum.x() * m_precision));
+      ui->yRotationSlider->setRange((int)(limits.minimum.y() * m_precision), (int)(limits.maximum.y() * m_precision));
+      ui->zRotationSlider->setRange((int)(limits.minimum.z() * m_precision), (int)(limits.maximum.z() * m_precision));
     }
 
     // re-enable signals
@@ -418,13 +417,13 @@ void QAvimatorWindow::rotationValue()
   double y=ui->yRotationEdit->text().toDouble();
   double z=ui->zRotationEdit->text().toDouble();
 
-  double min_x=ui->xRotationSlider->minimum()/PRECISION;
-  double min_y=ui->yRotationSlider->minimum()/PRECISION;
-  double min_z=ui->zRotationSlider->minimum()/PRECISION;
+  double min_x = ui->xRotationSlider->minimum() / m_precision;
+  double min_y = ui->yRotationSlider->minimum() / m_precision;
+  double min_z = ui->zRotationSlider->minimum() / m_precision;
 
-  double max_x=ui->xRotationSlider->maximum()/PRECISION;
-  double max_y=ui->yRotationSlider->maximum()/PRECISION;
-  double max_z=ui->zRotationSlider->maximum()/PRECISION;
+  double max_x = ui->xRotationSlider->maximum() / m_precision;
+  double max_y = ui->yRotationSlider->maximum() / m_precision;
+  double max_z = ui->zRotationSlider->maximum() / m_precision;
 
   if(x<min_x) x=min_x;
   if(y<min_y) y=min_y;
@@ -487,13 +486,13 @@ void QAvimatorWindow::positionValue()
   double y=ui->yPositionEdit->text().toDouble();
   double z=ui->zPositionEdit->text().toDouble();
 
-  double min_x=ui->xPositionSlider->minimum()/PRECISION;
-  double min_y=ui->yPositionSlider->minimum()/PRECISION;
-  double min_z=ui->zPositionSlider->minimum()/PRECISION;
+  double min_x = ui->xPositionSlider->minimum() / m_precision;
+  double min_y = ui->yPositionSlider->minimum() / m_precision;
+  double min_z = ui->zPositionSlider->minimum() / m_precision;
 
-  double max_x=ui->xPositionSlider->maximum()/PRECISION;
-  double max_y=ui->yPositionSlider->maximum()/PRECISION;
-  double max_z=ui->zPositionSlider->maximum()/PRECISION;
+  double max_x = ui->xPositionSlider->maximum() / m_precision;
+  double max_y = ui->yPositionSlider->maximum() / m_precision;
+  double max_z = ui->zPositionSlider->maximum() / m_precision;
 
   if(x<min_x) x=min_x;
   if(y<min_y) y=min_y;
@@ -540,15 +539,15 @@ void QAvimatorWindow::updateInputs()
 
       if(currentPart->type==BVH_ROOT)
       {
-        ui->xRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
-        ui->yRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
-        ui->zRotationSlider->setRange(-359*PRECISION, 359*PRECISION);
+        ui->xRotationSlider->setRange(-359 * m_precision, 359 * m_precision);
+        ui->yRotationSlider->setRange(-359 * m_precision, 359 * m_precision);
+        ui->zRotationSlider->setRange(-359 * m_precision, 359 * m_precision);
       }
       else
       {
-        ui->xRotationSlider->setRange((int)(xMin*PRECISION), (int)(xMax*PRECISION));
-        ui->yRotationSlider->setRange((int)(yMin*PRECISION), (int)(yMax*PRECISION));
-        ui->zRotationSlider->setRange((int)(zMin*PRECISION), (int)(zMax*PRECISION));
+        ui->xRotationSlider->setRange((int)(xMin * m_precision), (int)(xMax * m_precision));
+        ui->yRotationSlider->setRange((int)(yMin * m_precision), (int)(yMax * m_precision));
+        ui->zRotationSlider->setRange((int)(zMin * m_precision), (int)(zMax * m_precision));
       }
 
       setX(x);
@@ -815,7 +814,7 @@ void QAvimatorWindow::fileNew()
   animationIds.append(anim);
   calculateLongestRunningTime();
   // add new animation to combo box
-  addToOpenFiles(UNTITLED_NAME);
+  addToOpenFiles(m_untitledName);
 
   if(UserSettings::protectFirstFrame())
   {
@@ -859,9 +858,9 @@ QString QAvimatorWindow::selectFileToOpen(const QString& caption)
 {
    //// For some unknown reason passing "this" locks up the OSX qavimator window. Possibly a QT4 bug, needs investigation
 #ifdef __APPLE__
-   QString file=QFileDialog::getOpenFileName(NULL,caption,UserSettings::lastPath(),ANIM_FILTER);
+   QString file = QFileDialog::getOpenFileName(NULL, caption, UserSettings::lastPath(), m_animFilter);
 #else
-   QString file=QFileDialog::getOpenFileName(this,caption,UserSettings::lastPath(),ANIM_FILTER);
+   QString file = QFileDialog::getOpenFileName(this, caption, UserSettings::lastPath(), m_animFilter);
 #endif
   if(!file.isEmpty())
   {
@@ -982,10 +981,14 @@ void QAvimatorWindow::fileAdd(const QString& name)
 // Menu Action: File / Save
 void QAvimatorWindow::fileSave()
 {
-  if(currentFile==UNTITLED_NAME)
+  if (currentFile == m_untitledName)
+  {
     fileSaveAs();
+  }
   else
+  {
     scene->getAnimation()->saveBVH(currentFile);
+  }
 }
 
 // Menu Action: File / Save As...
@@ -993,9 +996,9 @@ void QAvimatorWindow::fileSaveAs()
 {
    //// For some unknown reason passing "this" locks up the OSX qavimator window. Possibly a QT4 bug, needs investigation
 #ifdef __APPLE__
-   QString file=QFileDialog::getSaveFileName(NULL,tr("Save Animation File"),currentFile,ANIM_FILTER,0,QFileDialog:: DontConfirmOverwrite);
+   QString file = QFileDialog::getSaveFileName(NULL, tr("Save Animation File"), currentFile, m_animFilter, 0, QFileDialog:: DontConfirmOverwrite);
 #else
-   QString file=QFileDialog::getSaveFileName(this,tr("Save Animation File"),currentFile,ANIM_FILTER,0,QFileDialog:: DontConfirmOverwrite);
+   QString file = QFileDialog::getSaveFileName(this, tr("Save Animation File"), currentFile, m_animFilter, 0, QFileDialog:: DontConfirmOverwrite);
 #endif
 
   if(!file.isEmpty())
@@ -1026,7 +1029,7 @@ void QAvimatorWindow::fileExportForSecondLife()
 {
   // FIXME: think of a sensible thing to do when the animation has not been saved
   //        as .avm yet
-  if(currentFile!=UNTITLED_NAME)
+  if (currentFile != m_untitledName)
   {
     QFileInfo fileInfo(currentFile);
     QString exportName=fileInfo.path()+"/"+fileInfo.completeBaseName()+".bvh";
@@ -1042,9 +1045,9 @@ void QAvimatorWindow::fileLoadProps()
 {
    //// For some unknown reason passing "this" locks up the OSX qavimator window. Possibly a QT4 bug, needs investigation
 #ifdef __APPLE__
-   QString fileName=QFileDialog::getOpenFileName(NULL,QString(),UserSettings::lastPath(),PROP_FILTER);
+   QString fileName = QFileDialog::getOpenFileName(nullptr, QString(), UserSettings::lastPath(), m_propFilter);
 #else
-   QString fileName=QFileDialog::getOpenFileName(this,QString(),UserSettings::lastPath(),PROP_FILTER);
+   QString fileName = QFileDialog::getOpenFileName(this, QString(), UserSettings::lastPath(), m_propFilter);
 #endif
 
   if(!fileName.isEmpty())
@@ -1128,9 +1131,9 @@ void QAvimatorWindow::fileSaveProps()
 {
    //// For some unknown reason passing "this" locks up the OSX qavimator window. Possibly a QT4 bug, needs investigation
 #ifdef __APPLE__
-   QString fileName=QFileDialog::getSaveFileName(NULL,tr("Save Props"),currentFile,PROP_FILTER);
+   QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save Props"), currentFile, m_propFilter);
 #else
-   QString fileName=QFileDialog::getSaveFileName(this,tr("Save Props"),currentFile,PROP_FILTER);
+   QString fileName = QFileDialog::getSaveFileName(this, tr("Save Props"), currentFile, m_propFilter);
 #endif
 
   if(!fileName.isEmpty())
@@ -1344,17 +1347,17 @@ void QAvimatorWindow::setZ(float z)
 
 float QAvimatorWindow::getX()
 {
-  return ui->xRotationSlider->value()/PRECISION;
+  return ui->xRotationSlider->value() / m_precision;
 }
 
 float QAvimatorWindow::getY()
 {
-  return ui->yRotationSlider->value()/PRECISION;
+  return ui->yRotationSlider->value() / m_precision;
 }
 
 float QAvimatorWindow::getZ()
 {
-  return ui->zRotationSlider->value()/PRECISION;
+  return ui->zRotationSlider->value() / m_precision;
 }
 
 void QAvimatorWindow::setXPos(float x)
@@ -1374,17 +1377,17 @@ void QAvimatorWindow::setZPos(float z)
 
 float QAvimatorWindow::getXPos()
 {
-  return ui->xPositionSlider->value()/PRECISION;
+  return ui->xPositionSlider->value() / m_precision;
 }
 
 float QAvimatorWindow::getYPos()
 {
-  return ui->yPositionSlider->value()/PRECISION;
+  return ui->yPositionSlider->value() / m_precision;
 }
 
 float QAvimatorWindow::getZPos()
 {
-  return ui->zPositionSlider->value()/PRECISION;
+  return ui->zPositionSlider->value() / m_precision;
 }
 
 // helper function to prevent feedback between the two widgets
@@ -1392,7 +1395,7 @@ void QAvimatorWindow::setSliderValue(QSlider* slider,QLineEdit* edit,float value
 {
   slider->blockSignals(true);
   edit->blockSignals(true);
-  slider->setValue((int)(value*PRECISION));
+  slider->setValue((int)(value * m_precision));
   edit->setText(QString::number(value));
   edit->blockSignals(false);
   slider->blockSignals(false);
@@ -1455,7 +1458,7 @@ bool QAvimatorWindow::clearOpenFiles()
   openFiles.clear();
   ui->selectAnimationCombo->clear();
   animationIds.clear();
-  setCurrentFile(UNTITLED_NAME);
+  setCurrentFile(m_untitledName);
   longestRunningTime=0.0;
 
   return true;
@@ -1686,7 +1689,7 @@ void QAvimatorWindow::selectAnimation(Animation* animation)
   updateInputs();
 
   // enable export to second life if current file name is not the default untitled name
-  ui->fileExportForSecondLifeAction->setEnabled(!(currentFile==UNTITLED_NAME));
+  ui->fileExportForSecondLifeAction->setEnabled(currentFile != m_untitledName);
 }
 
 // set loop in point (user view, so always +1)
