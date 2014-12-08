@@ -72,7 +72,7 @@ QAvimatorWindow::QAvimatorWindow() :
   currentPart=0;
   longestRunningTime=0.0;
   scene = ui->animationView->initializeScene(this);
-  ui->animationView->setModels(cubeMesh, sphereMesh, coneMesh);
+  ui->animationView->setMeshModels(cubeMesh, sphereMesh, coneMesh);
 
   // prepare play button icons
   stopIcon=QIcon(":/icons/icons/stop.png");
@@ -93,6 +93,8 @@ QAvimatorWindow::QAvimatorWindow() :
   ui->optionsProtectFirstFrameAction->setChecked(UserSettings::protectFirstFrame());
 
   if(!UserSettings::showTimelinePanel()) ui->timelineView->hide();
+
+  //ui->propNameCombo->setModel(scene->propManager()->addressOfPropModel());
 
   connect(scene, SIGNAL(repaint()), ui->animationView, SLOT(repaint()));
   connect(scene, SIGNAL(animationSelected(Animation*)), this, SLOT(selectAnimation(Animation*)));

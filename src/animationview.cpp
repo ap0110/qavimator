@@ -40,9 +40,9 @@
 
 AnimationView::AnimationView(QWidget* parent, const char* /* name */, Animation* anim)
  : QGLWidget(parent),
-   m_cubeModel(nullptr),
-   m_sphereModel(nullptr),
-   m_coneModel(nullptr)
+   m_cubeMeshModel(nullptr),
+   m_sphereMeshModel(nullptr),
+   m_coneMeshModel(nullptr)
 {
   figureFiles << Constants::maleBvhPath() << Constants::femaleBvhPath();
 
@@ -698,7 +698,7 @@ void AnimationView::drawPart(Animation* anim,unsigned int currentAnimationIndex,
         else
           glColor4f(0,1,0,1);
 
-        m_sphereModel->draw();
+        m_sphereMeshModel->draw();
       }
     }
 
@@ -838,23 +838,23 @@ void AnimationView::drawDragHandles(const Prop* prop) const
     glLoadName(static_cast<int>(OpenGlIds::ScaleHandleX));
     glColor4f(xRGB.redF(),xRGB.greenF(),xRGB.blueF(),1);
     glTranslatef(-xs,0,0);
-    m_cubeModel->draw();
+    m_cubeMeshModel->draw();
     glTranslatef(xs*2,0,0);
-    m_cubeModel->draw();
+    m_cubeMeshModel->draw();
 
     glLoadName(static_cast<int>(OpenGlIds::ScaleHandleY));
     glColor4f(yRGB.redF(),yRGB.greenF(),yRGB.blueF(),1);
     glTranslatef(-xs,-ys,0);
-    m_cubeModel->draw();
+    m_cubeMeshModel->draw();
     glTranslatef(0,ys*2,0);
-    m_cubeModel->draw();
+    m_cubeMeshModel->draw();
 
     glLoadName(static_cast<int>(OpenGlIds::ScaleHandleZ));
     glColor4f(zRGB.redF(),zRGB.greenF(),zRGB.blueF(),1);
     glTranslatef(0,-ys,-zs);
-    m_cubeModel->draw();
+    m_cubeMeshModel->draw();
     glTranslatef(0,0,zs*2);
-    m_cubeModel->draw();
+    m_cubeMeshModel->draw();
   }
   else if (modifier & static_cast<int>(ModifierKeys::Ctrl))
   {
@@ -864,23 +864,23 @@ void AnimationView::drawDragHandles(const Prop* prop) const
     glLoadName(static_cast<int>(OpenGlIds::RotateHandleX));
     glColor4f(xRGB.redF(),xRGB.greenF(),xRGB.blueF(),1);
     glTranslatef(-xs-5,0,0);
-    m_sphereModel->draw();
+    m_sphereMeshModel->draw();
     glTranslatef(2*(xs+5),0,0);
-    m_sphereModel->draw();
+    m_sphereMeshModel->draw();
 
     glLoadName(static_cast<int>(OpenGlIds::RotateHandleY));
     glColor4f(yRGB.redF(),yRGB.greenF(),yRGB.blueF(),1);
     glTranslatef(-xs-5,-ys-5,0);
-    m_sphereModel->draw();
+    m_sphereMeshModel->draw();
     glTranslatef(0,2*(ys+5),0);
-    m_sphereModel->draw();
+    m_sphereMeshModel->draw();
 
     glLoadName(static_cast<int>(OpenGlIds::RotateHandleZ));
     glColor4f(zRGB.redF(),zRGB.greenF(),zRGB.blueF(),1);
     glTranslatef(0,-ys-5,-zs-5);
-    m_sphereModel->draw();
+    m_sphereMeshModel->draw();
     glTranslatef(0,0,2*(zs+5));
-    m_sphereModel->draw();
+    m_sphereMeshModel->draw();
   }
   else
   {
@@ -915,32 +915,32 @@ void AnimationView::drawDragHandles(const Prop* prop) const
     glColor4f(xRGB.redF(),xRGB.greenF(),xRGB.blueF(),1);
     glTranslatef(-xs-5,0,0);
     glRotatef(270,0,1,0);
-    m_coneModel->draw();
+    m_coneMeshModel->draw();
     glRotatef(90,0,1,0);
     glTranslatef(2*(xs+5),0,0);
     glRotatef(90,0,1,0);
-    m_coneModel->draw();
+    m_coneMeshModel->draw();
     glRotatef(270,0,1,0);
 
     glLoadName(static_cast<int>(OpenGlIds::DragHandleY));
     glColor4f(yRGB.redF(),yRGB.greenF(),yRGB.blueF(),1);
     glTranslatef(-xs-5,-ys-5,0);
     glRotatef(90,1,0,0);
-    m_coneModel->draw();
+    m_coneMeshModel->draw();
     glRotatef(270,1,0,0);
     glTranslatef(0,2*(ys+5),0);
     glRotatef(270,1,0,0);
-    m_coneModel->draw();
+    m_coneMeshModel->draw();
     glRotatef(90,1,0,0);
 
     glLoadName(static_cast<int>(OpenGlIds::DragHandleZ));
     glColor4f(zRGB.redF(),zRGB.greenF(),zRGB.blueF(),1);
     glTranslatef(0,-ys-5,-zs-5);
     glRotatef(180,1,0,0);
-    m_coneModel->draw();
+    m_coneMeshModel->draw();
     glRotatef(180,1,0,0);
     glTranslatef(0,0,2*(zs+5));
-    m_coneModel->draw();
+    m_coneMeshModel->draw();
   }
   // restore drawing matrix
   glPopMatrix();
@@ -1001,16 +1001,16 @@ unsigned int AnimationView::getSelectedPartIndex()
   return partSelected % static_cast<int>(OpenGlIds::AnimationIncrement);
 }
 
-void AnimationView::setModels(QSharedPointer<Mesh> cubeMesh, QSharedPointer<Mesh> sphereMesh, QSharedPointer<Mesh> coneMesh)
+void AnimationView::setMeshModels(QSharedPointer<Mesh> cubeMesh, QSharedPointer<Mesh> sphereMesh, QSharedPointer<Mesh> coneMesh)
 {
-  m_cubeModel.reset(new Model(cubeMesh));
-  m_sphereModel.reset(new Model(sphereMesh));
-  m_coneModel.reset(new Model(coneMesh));
+  m_cubeMeshModel.reset(new MeshModel(cubeMesh));
+  m_sphereMeshModel.reset(new MeshModel(sphereMesh));
+  m_coneMeshModel.reset(new MeshModel(coneMesh));
 
   // Scale cube to an edge length of 2 instead of 1
-  m_cubeModel->scale(2.0f, 2.0f, 2.0f);
+  m_cubeMeshModel->scale(2.0f, 2.0f, 2.0f);
   // Scale cone to a height of 3 instead of 2
-  m_coneModel->scale(1.0f, 1.0f, 1.5f);
+  m_coneMeshModel->scale(1.0f, 1.0f, 1.5f);
 }
 /*
 const QString AnimationView::getPartName(int index)

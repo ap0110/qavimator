@@ -27,7 +27,7 @@
 
 #include <QStandardItem>
 
-#include "model.h"
+#include "meshmodel.h"
 
 class Prop : public QStandardItem
 {
@@ -91,7 +91,7 @@ class Prop : public QStandardItem
 
     unsigned int m_attachmentPoint;
 
-    Model m_model;
+    MeshModel m_meshModel;
 };
 
 #endif

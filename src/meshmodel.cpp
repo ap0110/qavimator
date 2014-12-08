@@ -24,23 +24,23 @@
 #include <GL/glu.h>
 #endif
 
-#include "model.h"
+#include "meshmodel.h"
 
-Model::Model(QSharedPointer<Mesh> mesh) :
+MeshModel::MeshModel(QSharedPointer<Mesh> mesh) :
   QObject(nullptr),
   m_mesh(mesh),
   m_modelView(1.0f, 1.0f, 1.0f)
 {
 }
 
-void Model::scale(float x, float y, float z)
+void MeshModel::scale(float x, float y, float z)
 {
   m_modelView.setX(x);
   m_modelView.setY(y);
   m_modelView.setZ(z);
 }
 
-void Model::draw() const
+void MeshModel::draw() const
 {
   glPushMatrix();
 

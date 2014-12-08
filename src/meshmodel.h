@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef MESHMODEL_H
+#define MESHMODEL_H
 
 #include <QMatrix4x4>
 #include <QObject>
@@ -27,12 +27,12 @@
 
 #include "mesh.h"
 
-class Model : public QObject
+class MeshModel : public QObject
 {
   Q_OBJECT
 
   public:
-    explicit Model(QSharedPointer<Mesh> mesh);
+    explicit MeshModel(QSharedPointer<Mesh> mesh);
 
     void scale(float x, float y, float z);
 

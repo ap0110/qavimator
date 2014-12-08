@@ -63,8 +63,8 @@ class AnimationView : public QGLWidget
     unsigned int getSelectedPartIndex();
     // const QString getPartName(int index);
 
-    // TODO Temporary method to set models for removing GLUT
-    void setModels(QSharedPointer<Mesh> cubeMesh, QSharedPointer<Mesh> sphereMesh, QSharedPointer<Mesh> coneMesh);
+    // TODO Temporary method to set mesh models for removing GLUT
+    void setMeshModels(QSharedPointer<Mesh> cubeMesh, QSharedPointer<Mesh> sphereMesh, QSharedPointer<Mesh> coneMesh);
 
   signals:
     void partClicked(BVHNode* node, QVector3D rotation, RotationLimits rotLimit, QVector3D position);
@@ -185,10 +185,10 @@ class AnimationView : public QGLWidget
     // TODO Temporary pointer to scene while logic is being moved around
     Scene* m_scene;
 
-    // TODO Temporary models to remove GLUT
-    QScopedPointer<Model> m_cubeModel;
-    QScopedPointer<Model> m_sphereModel;
-    QScopedPointer<Model> m_coneModel;
+    // TODO Temporary mesh models to remove GLUT
+    QScopedPointer<MeshModel> m_cubeMeshModel;
+    QScopedPointer<MeshModel> m_sphereMeshModel;
+    QScopedPointer<MeshModel> m_coneMeshModel;
 };
 
 #endif

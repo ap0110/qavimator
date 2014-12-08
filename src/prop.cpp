@@ -32,7 +32,7 @@
 #include "prop.h"
 
 Prop::Prop(unsigned int propId, PropType propType, const QString& newName, QSharedPointer<Mesh> mesh) :
-  m_model(mesh)
+  m_meshModel(mesh)
 {
   m_id = propId;
   setPropType(propType);
@@ -179,23 +179,23 @@ void Prop::draw(State state) const
   if(m_propType == Box)
   {
     glScalef(m_scale->x(), m_scale->y(), m_scale->z());
-    m_model.draw();
+    m_meshModel.draw();
   }
   else if(m_propType == Sphere)
   {
     glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
-    m_model.draw();
+    m_meshModel.draw();
   }
   else if(m_propType == Cone)
   {
     glTranslatef(0,0,-5);
     glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
-    m_model.draw();
+    m_meshModel.draw();
   }
   else if(m_propType == Torus)
   {
     glScalef(m_scale->x() / 4, m_scale->y() / 4, m_scale->z() / 2);
-    m_model.draw();
+    m_meshModel.draw();
   }
 
   glPopMatrix();

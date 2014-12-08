@@ -50,10 +50,12 @@ class PropManager : public QObject
 
     void selectProp(unsigned int id = 0);
 
+    QAbstractItemModel* addressOfPropModel();
+
   private:
     unsigned int m_nextPropId;
 
-    QList<Prop*> propList;
+    QStandardItemModel propModel;
 
     unsigned int propSelected;
 };

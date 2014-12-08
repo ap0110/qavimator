@@ -39,10 +39,14 @@ unsigned int PropManager::getSelectedPropId()
 
 Prop* PropManager::getPropByName(const QString &lookName)
 {
-  for(unsigned int index=0;index< (unsigned int) propList.count();index++)
+  for(unsigned int index = 0; index < (unsigned int) propModel.rowCount(); index++)
   {
-    Prop* prop=propList.at(index);
-    if(prop->name()==lookName) return prop;
+    Prop* prop = static_cast<Prop*>(propModel.item(index));
+    if (prop != nullptr
+        && prop->name() == lookName)
+    {
+      return prop;
+    }
   }
 
   return 0;
@@ -50,11 +54,14 @@ Prop* PropManager::getPropByName(const QString &lookName)
 
 Prop* PropManager::getPropById(unsigned int id)
 {
-  for(unsigned int index=0;index< (unsigned int) propList.count();index++)
+  for(unsigned int index = 0; index < (unsigned int) propModel.rowCount(); index++)
   {
-    Prop* prop=propList.at(index);
-    if(prop->id() == id)
+    Prop* prop = static_cast<Prop*>(propModel.item(index));
+    if (prop != nullptr
+        && prop->id() == id)
+    {
       return prop;
+    }
   }
 
   return 0;
@@ -62,12 +69,12 @@ Prop* PropManager::getPropById(unsigned int id)
 
 Prop* PropManager::at(int i) const
 {
-  return propList.at(i);
+  return static_cast<Prop*>(propModel.item(i));
 }
 
 int PropManager::count() const
 {
-  return propList.count();
+  return propModel.rowCount();
 }
 
 Prop* PropManager::addProp(Prop::PropType type,
@@ -100,28 +107,28 @@ Prop* PropManager::addProp(Prop::PropType type,
   newProp->setRotation(xr,yr,zr);
   newProp->setScale(xs,ys,zs);
 
-  propList.append(newProp);
+  propModel.appendRow(newProp);
 
   return newProp;
 }
 
-void PropManager::deleteProp(Prop *prop)
+void PropManager::deleteProp(Prop* prop)
 {
-  propList.removeAll(prop);
-  delete prop;
+  auto modelIndex = propModel.indexFromItem(prop);
+  propModel.removeRow(modelIndex.row());
 }
 
 void PropManager::clearProps()
 {
-  while(propList.count())
-  {
-    Prop* prop=propList.at(0);
-    propList.removeAll(prop);
-    delete prop;
-  }
+  propModel.clear();
 }
 
 void PropManager::selectProp(unsigned int id)
 {
   propSelected = id;
+}
+
+QAbstractItemModel* PropManager::addressOfPropModel()
+{
+  return &propModel;
 }

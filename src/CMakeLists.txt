@@ -16,7 +16,7 @@ SET (QAVI_SRC aboutdialog.cpp
               joint.cpp
               main.cpp
               mesh.cpp
-              model.cpp
+              meshmodel.cpp
               newanimation.cpp
               prop.cpp
               propmanager.cpp
