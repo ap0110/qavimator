@@ -1071,13 +1071,11 @@ void AnimationView::selectPart(BVHNode* node)
   repaint();
 }
 
-void AnimationView::selectProp(const QString& propName)
+void AnimationView::selectProp()
 {
   // make sure no part is selected anymore
   partSelected=0;
   mirrorSelected=0;
-  Prop* prop=m_scene->getPropByName(propName);
-  if(prop) propManager()->selectProp(prop->id());
   repaint();
 }
 

@@ -31,18 +31,17 @@
 
 #include "prop.h"
 
-Prop::Prop(unsigned int propId, PropType propType, const QString& newName, QSharedPointer<Mesh> mesh) :
-  m_meshModel(mesh)
+Prop::Prop(unsigned int propId, PropType propType, const QString& newName, QSharedPointer<Mesh> mesh)
+  : m_rotation(),
+    m_position(),
+    m_scale(),
+    m_meshModel(mesh)
 {
   m_id = propId;
   setPropType(propType);
 
   m_name = newName;
   setText(m_name);
-
-  m_position.reset(new QVector3D());
-  m_scale.reset(new QVector3D());
-  m_rotation.reset(new QVector3D());
 
   m_attachmentPoint = 0;
 }
@@ -81,70 +80,85 @@ unsigned int Prop::isAttached() const
   return m_attachmentPoint;
 }
 
-float Prop::xPosition() const
+const QVector3D& Prop::rotation() const
 {
-  return m_position->x();
-}
-
-float Prop::yPosition() const
-{
-  return m_position->y();
-}
-
-float Prop::zPosition() const
-{
-  return m_position->z();
-}
-
-float Prop::xScale() const
-{
-  return m_scale->x();
-}
-
-float Prop::yScale() const
-{
-  return m_scale->y();
-}
-
-float Prop::zScale() const
-{
-  return m_scale->z();
+  return m_rotation;
 }
 
 float Prop::xRotation() const
 {
-  return m_rotation->x();
+  return m_rotation.x();
 }
 
 float Prop::yRotation() const
 {
-  return m_rotation->y();
+  return m_rotation.y();
 }
 
 float Prop::zRotation() const
 {
-  return m_rotation->z();
+  return m_rotation.z();
+}
+
+const QVector3D& Prop::position() const
+{
+  return m_position;
+}
+
+float Prop::xPosition() const
+{
+  return m_position.x();
+}
+
+float Prop::yPosition() const
+{
+  return m_position.y();
+}
+
+float Prop::zPosition() const
+{
+  return m_position.z();
+}
+
+const QVector3D& Prop::scale() const
+{
+  return m_scale;
+}
+
+float Prop::xScale() const
+{
+  return m_scale.x();
+}
+
+float Prop::yScale() const
+{
+  return m_scale.y();
+}
+
+float Prop::zScale() const
+{
+  return m_scale.z();
 }
 
 void Prop::setPosition(double xp,double yp,double zp)
 {
-  m_position->setX(xp);
-  m_position->setY(yp);
-  m_position->setZ(zp);
+  m_position.setX(xp);
+  m_position.setY(yp);
+  m_position.setZ(zp);
 }
 
 void Prop::setScale(double scx,double scy,double scz)
 {
-  m_scale->setX(scx);
-  m_scale->setY(scy);
-  m_scale->setZ(scz);
+  m_scale.setX(scx);
+  m_scale.setY(scy);
+  m_scale.setZ(scz);
 }
 
 void Prop::setRotation(double rx,double ry,double rz)
 {
-  m_rotation->setX(rx);
-  m_rotation->setY(ry);
-  m_rotation->setZ(rz);
+  m_rotation.setX(rx);
+  m_rotation.setY(ry);
+  m_rotation.setZ(rz);
 }
 
 void Prop::draw(State state) const
@@ -159,11 +173,11 @@ void Prop::draw(State state) const
 
   glPushMatrix();
 
-  glTranslatef(m_position->x(), m_position->y(), m_position->z());
+  glTranslatef(m_position.x(), m_position.y(), m_position.z());
 
-  glRotatef(m_rotation->x(), 1, 0, 0);
-  glRotatef(m_rotation->y(), 0, 1, 0);
-  glRotatef(m_rotation->z(), 0, 0, 1);
+  glRotatef(m_rotation.x(), 1, 0, 0);
+  glRotatef(m_rotation.y(), 0, 1, 0);
+  glRotatef(m_rotation.z(), 0, 0, 1);
 
   // load prop's id, so we can pick it later
   glLoadName(m_id);
@@ -178,23 +192,23 @@ void Prop::draw(State state) const
   // each prop type has its own base sizes and positions
   if(m_propType == Box)
   {
-    glScalef(m_scale->x(), m_scale->y(), m_scale->z());
+    glScalef(m_scale.x(), m_scale.y(), m_scale.z());
     m_meshModel.draw();
   }
   else if(m_propType == Sphere)
   {
-    glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
+    glScalef(m_scale.x() / 2, m_scale.y() / 2, m_scale.z() / 2);
     m_meshModel.draw();
   }
   else if(m_propType == Cone)
   {
     glTranslatef(0,0,-5);
-    glScalef(m_scale->x() / 2, m_scale->y() / 2, m_scale->z() / 2);
+    glScalef(m_scale.x() / 2, m_scale.y() / 2, m_scale.z() / 2);
     m_meshModel.draw();
   }
   else if(m_propType == Torus)
   {
-    glScalef(m_scale->x() / 4, m_scale->y() / 4, m_scale->z() / 2);
+    glScalef(m_scale.x() / 4, m_scale.y() / 4, m_scale.z() / 2);
     m_meshModel.draw();
   }
 

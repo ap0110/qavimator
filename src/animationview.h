@@ -58,7 +58,7 @@ class AnimationView : public QGLWidget
     BVH* getBVH() const;
 
     void selectPart(BVHNode* node);
-    void selectProp(const QString& prop);
+    void selectProp();
     BVHNode* getSelectedPart();
     unsigned int getSelectedPartIndex();
     // const QString getPartName(int index);

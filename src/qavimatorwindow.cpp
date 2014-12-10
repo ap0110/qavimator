@@ -28,6 +28,7 @@
 #include "animationview.h"
 #include "constants.h"
 #include "prop.h"
+#include "qavimator.h"
 #include "scene.h"
 #include "timeline.h"
 #include "timelineview.h"
@@ -42,6 +43,7 @@
 QAvimatorWindow::QAvimatorWindow() :
   QMainWindow(nullptr),
   ui(new Ui::QAvimatorWindow),
+  m_qavimator(new QAvimator(this)),
   updateChecker(nullptr, this),
   cubeMesh(new Mesh(Constants::cubeMeshFilePath(), Mesh::Shape::CUBE)),
   sphereMesh(new Mesh(Constants::sphereMeshFilePath(), Mesh::Shape::SPHERE)),
@@ -72,6 +74,7 @@ QAvimatorWindow::QAvimatorWindow() :
   currentPart=0;
   longestRunningTime=0.0;
   scene = ui->animationView->initializeScene(this);
+  m_qavimator->setScene(scene);
   ui->animationView->setMeshModels(cubeMesh, sphereMesh, coneMesh);
 
   // prepare play button icons
@@ -129,15 +132,12 @@ QAvimatorWindow::QAvimatorWindow() :
   connect(ui->animationView,SIGNAL(backgroundClicked()),this,SLOT(backgroundClicked()));
   connect(ui->animationView,SIGNAL(animationSelected(Animation*)),this,SLOT(selectAnimation(Animation*)));
 
-  connect(this,SIGNAL(enablePosition(bool)),ui->positionGroupBox,SLOT(setEnabled(bool)));
-  connect(this,SIGNAL(enableRotation(bool)),ui->rotationGroupBox,SLOT(setEnabled(bool)));
-
-  connect(this,SIGNAL(enableProps(bool)),ui->propPositionGroup,SLOT(setEnabled(bool)));
-  connect(this,SIGNAL(enableProps(bool)),ui->propScaleGroup,SLOT(setEnabled(bool)));
-  connect(this,SIGNAL(enableProps(bool)),ui->propRotationGroup,SLOT(setEnabled(bool)));
-
-  connect(this,SIGNAL(enableProps(bool)),ui->attachToLabel,SLOT(setEnabled(bool)));
-  connect(this,SIGNAL(enableProps(bool)),ui->attachToComboBox,SLOT(setEnabled(bool)));
+  connect(this, static_cast<void (QAvimatorWindow::*)(int)>(&QAvimatorWindow::selectProp), m_qavimator.data(), &QAvimator::selectProp);
+  connect(m_qavimator.data(), &QAvimator::enablePropsUi, this, &QAvimatorWindow::enableProps);
+  connect(m_qavimator.data(), &QAvimator::selectPropUi, this, &QAvimatorWindow::onSelectProp);
+  connect(m_qavimator.data(), &QAvimator::enableAvatarRotationUi, this, &QAvimatorWindow::enableAvatarRotation);
+  connect(m_qavimator.data(), &QAvimator::enableAvatarPositionUi, this, &QAvimatorWindow::enableAvatarPosition);
+  connect(m_qavimator.data(), &QAvimator::updatePropSpinsUi, this, &QAvimatorWindow::updatePropSpins);
 
   connect(this,SIGNAL(enableEaseInOut(bool)),ui->easeInOutGroup,SLOT(setEnabled(bool)));
 
@@ -201,7 +201,7 @@ void QAvimatorWindow::afterShow()
 void QAvimatorWindow::partClicked(BVHNode* node, QVector3D rotation, RotationLimits limits, QVector3D position)
 {
   ui->avatarPropsTab->setCurrentIndex(0);
-  emit enableProps(false);
+  enableProps(false);
 
   if(!node)
   {
@@ -246,11 +246,10 @@ void QAvimatorWindow::partClicked(BVHNode* node, QVector3D rotation, RotationLim
     setY(rotation.y());
     setZ(rotation.z());
 
-//    emit enablePosition(!protect);
     if(node->type==BVH_POS)
-      emit enableRotation(false);
+      enableAvatarRotation(false);
     else
-      emit enableRotation(!protect);
+      enableAvatarRotation(!protect);
 
     setXPos(position.x());
     setYPos(position.y());
@@ -318,7 +317,7 @@ void QAvimatorWindow::propClicked(Prop* prop)
     if(ui->propNameCombo->itemText(index)==prop->name()) ui->propNameCombo->setCurrentIndex(index);
 
   // update prop value spinboxes
-  selectProp(prop->name());
+  selectProp();
 }
 
 // slot gets called by AnimationView::mouseMoveEvent()
@@ -328,7 +327,7 @@ void QAvimatorWindow::propDragged(Prop* prop,double x,double y,double z)
   double newY = prop->yPosition() + y;
   double newZ = prop->zPosition() + z;
   prop->setPosition(newX, newY, newZ);
-  updatePropSpins(prop);
+  updatePropSpins(prop->position(), prop->rotation(), prop->scale());
 }
 
 // slot gets called by AnimationView::mouseMoveEvent()
@@ -338,7 +337,7 @@ void QAvimatorWindow::propScaled(Prop* prop,double x,double y,double z)
   double newY = prop->yScale() + y;
   double newZ = prop->zScale() + z;
   prop->setScale(newX, newY, newZ);
-  updatePropSpins(prop);
+  updatePropSpins(prop->position(), prop->rotation(), prop->scale());
 }
 
 // slot gets called by AnimationView::mouseMoveEvent()
@@ -348,7 +347,7 @@ void QAvimatorWindow::propRotated(Prop* prop,double x,double y,double z)
   double newY = prop->yRotation() + y;
   double newZ = prop->zRotation() + z;
   prop->setRotation(newX, newY, newZ);
-  updatePropSpins(prop);
+  updatePropSpins(prop->position(), prop->rotation(), prop->scale());
 }
 
 // slot gets called by AnimationView::mouseButtonClicked()
@@ -356,8 +355,8 @@ void QAvimatorWindow::backgroundClicked()
 {
   currentPart=0;
 
-  emit enableRotation(false);
-  emit enableProps(false);
+  enableAvatarRotation(false);
+  enableProps(false);
   emit enableEaseInOut(false);
   ui->editPartCombo->setCurrentIndex(0);
   updateKeyBtn();
@@ -374,7 +373,7 @@ void QAvimatorWindow::partChoice()
   ui->timelineView->selectTrack(nodeNumber);
 
   ui->animationView->setFocus();
-  emit enableProps(false);
+  enableProps(false);
 }
 
 // gets called whenever a body part rotation slider is moved
@@ -558,10 +557,10 @@ void QAvimatorWindow::updateInputs()
     }
     else
     {
-      emit enableRotation(false);
+      enableAvatarRotation(false);
     }
 
-    emit enablePosition(!protect);
+    enableAvatarPosition(!protect);
     QVector3D position = anim->getPosition();
 
     setXPos(position.x());
@@ -594,9 +593,9 @@ void QAvimatorWindow::updateInputs()
     ui->editPasteAction->setEnabled(false);
 
   if(ui->propNameCombo->count())
-    emit enableProps(true);
+    enableProps(true);
   else
-    emit enableProps(false);
+    enableProps(false);
 
   // reactivate redraw
   setUpdatesEnabled(true);
@@ -638,7 +637,7 @@ void QAvimatorWindow::enableInputs(bool state)
 
   // do not enable rotation if we have no part selected
   if(currentPart == NULL) state=false;
-  emit enableRotation(state);
+  enableAvatarRotation(state);
 }
 
 void QAvimatorWindow::frameTimeout()
@@ -849,9 +848,9 @@ void QAvimatorWindow::fileNew()
   updateInputs();
   updateFps();
 
-  emit enableRotation(false);
-  emit enablePosition(true);
-  emit enableProps(false);
+  enableAvatarRotation(false);
+  enableAvatarPosition(true);
+  enableProps(false);
 
   anim->setDirty(false);
 }
@@ -1120,7 +1119,7 @@ void QAvimatorWindow::fileLoadProps()
           {
             ui->propNameCombo->addItem(prop->name());
             ui->propNameCombo->setCurrentIndex(ui->propNameCombo->count()-1);
-            selectProp(prop->name());
+            selectProp();
           }
         } // while
       }
@@ -1392,6 +1391,80 @@ float QAvimatorWindow::getZPos()
   return ui->zPositionSlider->value() / m_precision;
 }
 
+void QAvimatorWindow::enableProps(bool state)
+{
+  ui->propPositionGroup->setEnabled(state);
+  ui->propScaleGroup->setEnabled(state);
+  ui->propRotationGroup->setEnabled(state);
+  ui->attachToLabel->setEnabled(state);
+  ui->attachToComboBox->setEnabled(state);
+}
+
+void QAvimatorWindow::enableAvatarRotation(bool state)
+{
+  ui->rotationGroupBox->setEnabled(state);
+}
+
+void QAvimatorWindow::enableAvatarPosition(bool state)
+{
+  ui->positionGroupBox->setEnabled(state);
+}
+
+void QAvimatorWindow::updatePropSpins(const QVector3D& position, const QVector3D& rotation, const QVector3D& scale)
+{
+  ui->propXPosSpin->blockSignals(true);
+  ui->propYPosSpin->blockSignals(true);
+  ui->propZPosSpin->blockSignals(true);
+
+  ui->propXPosSpin->setValue(static_cast<int>(position.x()));
+  ui->propYPosSpin->setValue(static_cast<int>(position.y()));
+  ui->propZPosSpin->setValue(static_cast<int>(position.z()));
+
+  ui->propXPosSpin->blockSignals(false);
+  ui->propYPosSpin->blockSignals(false);
+  ui->propZPosSpin->blockSignals(false);
+
+  ui->propXRotSpin->blockSignals(true);
+  ui->propYRotSpin->blockSignals(true);
+  ui->propZRotSpin->blockSignals(true);
+
+  ui->propXRotSpin->setValue((360 + static_cast<int>(rotation.x())) % 360);
+  ui->propYRotSpin->setValue((360 + static_cast<int>(rotation.y())) % 360);
+  ui->propZRotSpin->setValue((360 + static_cast<int>(rotation.z())) % 360);
+
+  ui->propXRotSpin->blockSignals(false);
+  ui->propYRotSpin->blockSignals(false);
+  ui->propZRotSpin->blockSignals(false);
+
+  ui->propXScaleSpin->blockSignals(true);
+  ui->propYScaleSpin->blockSignals(true);
+  ui->propZScaleSpin->blockSignals(true);
+
+  ui->propXScaleSpin->setValue(static_cast<int>(scale.x()));
+  ui->propYScaleSpin->setValue(static_cast<int>(scale.y()));
+  ui->propZScaleSpin->setValue(static_cast<int>(scale.z()));
+
+  ui->propXScaleSpin->blockSignals(false);
+  ui->propYScaleSpin->blockSignals(false);
+  ui->propZScaleSpin->blockSignals(false);
+}
+
+void QAvimatorWindow::onSelectProp(bool isSelected, int attachmentPoint)
+{
+  ui->propNameCombo->setEnabled(isSelected);
+  ui->deletePropButton->setEnabled(isSelected);
+  if (isSelected)
+  {
+    ui->attachToComboBox->setCurrentIndex(attachmentPoint);
+  }
+  ui->animationView->selectProp();
+}
+
+void QAvimatorWindow::selectProp()
+{
+  emit selectProp(ui->propNameCombo->currentIndex());
+}
+
 // helper function to prevent feedback between the two widgets
 void QAvimatorWindow::setSliderValue(QSlider* slider,QLineEdit* edit,float value)
 {
@@ -1506,31 +1579,8 @@ void QAvimatorWindow::newProp(Prop::PropType type, QSharedPointer<Mesh> mesh)
   {
     ui->propNameCombo->addItem(prop->name());
     ui->propNameCombo->setCurrentIndex(ui->propNameCombo->count()-1);
-    selectProp(prop->name());
+    selectProp();
     ui->attachToComboBox->setCurrentIndex(0);
-  }
-}
-
-void QAvimatorWindow::selectProp(const QString& propName)
-{
-  const Prop* prop=scene->getPropByName(propName);
-  if(prop)
-  {
-    emit enableProps(true);
-    emit enableRotation(false);
-    emit enablePosition(false);
-    ui->propNameCombo->setEnabled(true);
-    ui->deletePropButton->setEnabled(true);
-
-    updatePropSpins(prop);
-    ui->animationView->selectProp(prop->name());
-    ui->attachToComboBox->setCurrentIndex(prop->isAttached());
-  }
-  else
-  {
-    emit enableProps(false);
-    ui->propNameCombo->setEnabled(false);
-    ui->deletePropButton->setEnabled(false);
   }
 }
 
@@ -1541,47 +1591,8 @@ void QAvimatorWindow::attachProp(int attachmentPoint)
   QString propName=ui->propNameCombo->currentText();
   Prop* prop=scene->getPropByName(propName);
   prop->attach(attachmentPoint);
-  updatePropSpins(prop);
+  updatePropSpins(prop->position(), prop->rotation(), prop->scale());
   ui->animationView->repaint();
-}
-
-void QAvimatorWindow::updatePropSpins(const Prop* prop)
-{
-  ui->propXPosSpin->blockSignals(true);
-  ui->propYPosSpin->blockSignals(true);
-  ui->propZPosSpin->blockSignals(true);
-
-  ui->propXPosSpin->setValue((int)(prop->xPosition()));
-  ui->propYPosSpin->setValue((int)(prop->yPosition()));
-  ui->propZPosSpin->setValue((int)(prop->zPosition()));
-
-  ui->propXPosSpin->blockSignals(false);
-  ui->propYPosSpin->blockSignals(false);
-  ui->propZPosSpin->blockSignals(false);
-
-  ui->propXRotSpin->blockSignals(true);
-  ui->propYRotSpin->blockSignals(true);
-  ui->propZRotSpin->blockSignals(true);
-
-  ui->propXRotSpin->setValue((int)(360+prop->xRotation()) % 360);
-  ui->propYRotSpin->setValue((int)(360+prop->yRotation()) % 360);
-  ui->propZRotSpin->setValue((int)(360+prop->zRotation()) % 360);
-
-  ui->propXRotSpin->blockSignals(false);
-  ui->propYRotSpin->blockSignals(false);
-  ui->propZRotSpin->blockSignals(false);
-
-  ui->propXScaleSpin->blockSignals(true);
-  ui->propYScaleSpin->blockSignals(true);
-  ui->propZScaleSpin->blockSignals(true);
-
-  ui->propXScaleSpin->setValue((int)(prop->xScale()));
-  ui->propYScaleSpin->setValue((int)(prop->yScale()));
-  ui->propZScaleSpin->setValue((int)(prop->zScale()));
-
-  ui->propXScaleSpin->blockSignals(false);
-  ui->propYScaleSpin->blockSignals(false);
-  ui->propZScaleSpin->blockSignals(false);
 }
 
 // gets called whenever one of the prop position values gets changed
@@ -1631,7 +1642,7 @@ void QAvimatorWindow::deleteProp()
       if(ui->propNameCombo->itemText(index)==propName)
     {
       ui->propNameCombo->removeItem(index);
-      selectProp(ui->propNameCombo->currentText());
+      selectProp();
     }
   }
 }
@@ -1640,7 +1651,7 @@ void QAvimatorWindow::clearProps()
 {
   scene->clearProps();
   ui->propNameCombo->clear();
-  selectProp(QString::null);
+  selectProp();
 }
 
 // gets called by selecting an animation from the animation combo box
@@ -2015,9 +2026,9 @@ void QAvimatorWindow::on_newTorusPropButton_clicked()
   newProp(Prop::Torus, torusMesh);
 }
 
-void QAvimatorWindow::on_propNameCombo_activated(const QString& name)
+void QAvimatorWindow::on_propNameCombo_activated(int index)
 {
-  selectProp(name);
+  selectProp();
 }
 
 void QAvimatorWindow::on_deletePropButton_clicked()

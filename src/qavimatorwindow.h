@@ -39,6 +39,7 @@ class QSlider;
 
 class Animation;
 class BVHNode;
+class QAvimator;
 struct RotationLimits;
 class Scene;
 class Timeline;
@@ -58,12 +59,10 @@ class QAvimatorWindow : public QMainWindow
     void queueAfterShow();
 
   signals:
-    void enableRotation(bool state);
-    void enablePosition(bool state);
-    void enableProps(bool state);
     void enableEaseInOut(bool state);
     void resetCamera();
     void protectFrame(bool state);
+    void selectProp(int index);
 
   protected slots:
     void afterShow();
@@ -143,7 +142,7 @@ class QAvimatorWindow : public QMainWindow
     void on_newSpherePropButton_clicked();
     void on_newConePropButton_clicked();
     void on_newTorusPropButton_clicked();
-    void on_propNameCombo_activated(const QString& name);
+    void on_propNameCombo_activated(int index);
     void on_deletePropButton_clicked();
     void on_attachToComboBox_activated(int attachmentPoint);
     void on_propXPosSpin_valueChanged(int);
@@ -212,7 +211,6 @@ class QAvimatorWindow : public QMainWindow
     void easeOutChanged(int change);
 
     void newProp(Prop::PropType, QSharedPointer<Mesh> mesh);
-    void selectProp(const QString& name);
     void deleteProp();
     void attachProp(int attachmentPoint);
     void propPositionChanged();
@@ -242,7 +240,6 @@ class QAvimatorWindow : public QMainWindow
     void updateFps();
     void updateKeyBtn();
     void updateInputs();
-    void updatePropSpins(const Prop* prop);
 
     // calculates the longest running time of all loaded animations, returns it
     // and stores it in longestRunningTime member variable
@@ -291,8 +288,22 @@ class QAvimatorWindow : public QMainWindow
     // holds the longest running time of all currently opened animations
     double longestRunningTime;
 
+  private slots:
+    void enableProps(bool state);
+    void enableAvatarRotation(bool state);
+    void enableAvatarPosition(bool state);
+    void updatePropSpins(const QVector3D& position, const QVector3D& rotation, const QVector3D& scale);
+    void onSelectProp(bool isSelected, int attachmentPoint);
+
+
   private:
+    void selectProp();
+
     QScopedPointer<Ui::QAvimatorWindow> ui;
+
+    // TODO Temporary pointer while logic is moved around.
+    //  Eventually, QAvimator should own QAvimatorWindow
+    QScopedPointer<QAvimator> m_qavimator;
 
     Scene* scene;
 

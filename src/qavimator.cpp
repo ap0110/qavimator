@@ -18,9 +18,34 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "propmanager.h"
+#include "scene.h"
+
 #include "qavimator.h"
 
 QAvimator::QAvimator(QObject* parent) :
   QObject(parent)
 {
+}
+
+void QAvimator::setScene(Scene* scene)
+{
+  m_scene = scene;
+}
+
+void QAvimator::selectProp(int index)
+{
+  const Prop* prop = static_cast<Prop*>(m_scene->propManager()->at(index));
+  bool isSelected = (prop != nullptr);
+  int attachmentPoint = isSelected ? prop->isAttached() : 0;
+
+  if (prop != nullptr)
+  {
+    m_scene->propManager()->selectProp(prop->id());
+    emit enableAvatarRotationUi(false);
+    emit enableAvatarPositionUi(false);
+    emit updatePropSpinsUi(prop->position(), prop->rotation(), prop->scale());
+  }
+  emit enablePropsUi(isSelected);
+  emit selectPropUi(isSelected, attachmentPoint);
 }

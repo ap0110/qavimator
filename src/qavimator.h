@@ -23,6 +23,8 @@
 
 #include <QObject>
 
+class Scene;
+
 class QAvimator : public QObject
 {
     Q_OBJECT
@@ -30,6 +32,21 @@ class QAvimator : public QObject
   public:
     explicit QAvimator(QObject* parent = nullptr);
 
+    // TODO Temporary method while logic is moved around
+    void setScene(Scene* scene);
+
+  public slots:
+    void selectProp(int index);
+
+  signals:
+    void enablePropsUi(bool state);
+    void enableAvatarRotationUi(bool state);
+    void enableAvatarPositionUi(bool state);
+    void updatePropSpinsUi(const QVector3D& position, const QVector3D& rotation, const QVector3D& scale);
+    void selectPropUi(bool isSelected, int attachmentPoint);
+
+  private:
+    Scene* m_scene;
 };
 
 #endif

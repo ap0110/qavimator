@@ -59,17 +59,20 @@ class Prop : public QStandardItem
     const QString& name() const;
     unsigned int isAttached() const;
 
+    const QVector3D& rotation() const;
+    float xRotation() const;
+    float yRotation() const;
+    float zRotation() const;
+
+    const QVector3D& position() const;
     float xPosition() const;
     float yPosition() const;
     float zPosition() const;
 
+    const QVector3D& scale() const;
     float xScale() const;
     float yScale() const;
     float zScale() const;
-
-    float xRotation() const;
-    float yRotation() const;
-    float zRotation() const;
 
     void setPosition(double xp,double yp,double zp);
     void setScale(double scx,double scy,double scz);
@@ -85,9 +88,9 @@ class Prop : public QStandardItem
 
     QString m_name;
 
-    QScopedPointer<QVector3D> m_position;
-    QScopedPointer<QVector3D> m_scale;
-    QScopedPointer<QVector3D> m_rotation;
+    QVector3D m_rotation;
+    QVector3D m_position;
+    QVector3D m_scale;
 
     unsigned int m_attachmentPoint;
 
