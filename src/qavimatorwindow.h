@@ -62,7 +62,14 @@ class QAvimatorWindow : public QMainWindow
     void enableEaseInOut(bool state);
     void resetCamera();
     void protectFrame(bool state);
+    void newProp(Prop::PropType, QSharedPointer<Mesh> mesh);
     void selectProp(int index);
+    void attachProp(int attachmentPoint);
+    void propPositionChanged(double xPosition, double yPosition, double zPosition);
+    void propScaleChanged(double xScale, double yScale, double zScale);
+    void propRotationChanged(double xRotation, double yRotation, double zRotation);
+    void deleteProp();
+    void clearProps();
 
   protected slots:
     void afterShow();
@@ -82,7 +89,6 @@ class QAvimatorWindow : public QMainWindow
     void setCurrentFrame(int frame);
 
     void selectAnimation(Animation* animation);
-    void clearProps();
 
     // autoconnection from designer UI
 
@@ -210,13 +216,6 @@ class QAvimatorWindow : public QMainWindow
     void easeInChanged(int change);
     void easeOutChanged(int change);
 
-    void newProp(Prop::PropType, QSharedPointer<Mesh> mesh);
-    void deleteProp();
-    void attachProp(int attachmentPoint);
-    void propPositionChanged();
-    void propScaleChanged();
-    void propRotationChanged();
-
     void frameSlider(int position);
     void nextPlaystate();
     void setLoopInPoint(int inFrame);
@@ -293,7 +292,10 @@ class QAvimatorWindow : public QMainWindow
     void enableAvatarRotation(bool state);
     void enableAvatarPosition(bool state);
     void updatePropSpins(const QVector3D& position, const QVector3D& rotation, const QVector3D& scale);
+    void onNewProp(const QString& propName);
     void onSelectProp(bool isSelected, int attachmentPoint);
+    void onDeleteProp(const QString propName);
+    void onClearProps();
 
 
   private:

@@ -77,11 +77,11 @@ int PropManager::count() const
   return propModel.rowCount();
 }
 
-Prop* PropManager::addProp(Prop::PropType type,
-                    double x, double y, double z,
-                    double xs, double ys, double zs,
-                    double xr, double yr, double zr,
-                    int attach, QSharedPointer<Mesh> mesh)
+Prop* PropManager::addProp(Prop::PropType type, QSharedPointer<Mesh> mesh,
+                           int attach,
+                           double xPosition, double yPosition, double zPosition,
+                           double xScale, double yScale, double zScale,
+                           double xRotation, double yRotation, double zRotation)
 {
   QString name;
   QString baseName;
@@ -103,9 +103,9 @@ Prop* PropManager::addProp(Prop::PropType type,
 
   newProp->attach(attach);
 
-  newProp->setPosition(x,y,z);
-  newProp->setRotation(xr,yr,zr);
-  newProp->setScale(xs,ys,zs);
+  newProp->setPosition(xPosition, yPosition, zPosition);
+  newProp->setRotation(xRotation, yRotation, zRotation);
+  newProp->setScale(xScale, yScale, zScale);
 
   propModel.appendRow(newProp);
 

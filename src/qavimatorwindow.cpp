@@ -99,6 +99,7 @@ QAvimatorWindow::QAvimatorWindow() :
 
   //ui->propNameCombo->setModel(scene->propManager()->addressOfPropModel());
 
+  connect(m_qavimator.data(), &QAvimator::repaint, ui->animationView, static_cast<void (AnimationView::*)()>(&AnimationView::repaint));
   connect(scene, SIGNAL(repaint()), ui->animationView, SLOT(repaint()));
   connect(scene, SIGNAL(animationSelected(Animation*)), this, SLOT(selectAnimation(Animation*)));
   connect(this, SIGNAL(protectFrame(bool)), scene, SLOT(protectFrame(bool)));
@@ -132,9 +133,19 @@ QAvimatorWindow::QAvimatorWindow() :
   connect(ui->animationView,SIGNAL(backgroundClicked()),this,SLOT(backgroundClicked()));
   connect(ui->animationView,SIGNAL(animationSelected(Animation*)),this,SLOT(selectAnimation(Animation*)));
 
+  connect(this, &QAvimatorWindow::newProp, m_qavimator.data(), &QAvimator::newProp);
   connect(this, static_cast<void (QAvimatorWindow::*)(int)>(&QAvimatorWindow::selectProp), m_qavimator.data(), &QAvimator::selectProp);
-  connect(m_qavimator.data(), &QAvimator::enablePropsUi, this, &QAvimatorWindow::enableProps);
+  connect(this, &QAvimatorWindow::attachProp, m_qavimator.data(), &QAvimator::attachProp);
+  connect(this, &QAvimatorWindow::propPositionChanged, m_qavimator.data(), &QAvimator::propPositionChanged);
+  connect(this, &QAvimatorWindow::propScaleChanged, m_qavimator.data(), &QAvimator::propScaleChanged);
+  connect(this, &QAvimatorWindow::propRotationChanged, m_qavimator.data(), &QAvimator::propRotationChanged);
+  connect(this, &QAvimatorWindow::deleteProp, m_qavimator.data(), &QAvimator::deleteProp);
+  connect(this, &QAvimatorWindow::clearProps, m_qavimator.data(), &QAvimator::clearProps);
+  connect(m_qavimator.data(), &QAvimator::newPropUi, this, &QAvimatorWindow::onNewProp);
   connect(m_qavimator.data(), &QAvimator::selectPropUi, this, &QAvimatorWindow::onSelectProp);
+  connect(m_qavimator.data(), &QAvimator::deletePropUi, this, &QAvimatorWindow::onDeleteProp);
+  connect(m_qavimator.data(), &QAvimator::clearPropsUi, this, &QAvimatorWindow::onClearProps);
+  connect(m_qavimator.data(), &QAvimator::enablePropsUi, this, &QAvimatorWindow::enableProps);
   connect(m_qavimator.data(), &QAvimator::enableAvatarRotationUi, this, &QAvimatorWindow::enableAvatarRotation);
   connect(m_qavimator.data(), &QAvimator::enableAvatarPositionUi, this, &QAvimatorWindow::enableAvatarPosition);
   connect(m_qavimator.data(), &QAvimator::updatePropSpinsUi, this, &QAvimatorWindow::updatePropSpins);
@@ -801,7 +812,7 @@ void QAvimatorWindow::easeOutChanged(int change)
 void QAvimatorWindow::fileNew()
 {
   if(!clearOpenFiles()) return;
-  clearProps();
+  emit clearProps();
 
   Animation* anim=new Animation(ui->animationView->getBVH());
 
@@ -894,7 +905,7 @@ void QAvimatorWindow::fileOpen(const QString& name)
   if(!file.isEmpty())
   {
     if(!clearOpenFiles()) return;
-    clearProps();
+    emit clearProps();
     fileAdd(file);
   }
 
@@ -1057,7 +1068,7 @@ void QAvimatorWindow::fileLoadProps()
 
     if(fileInfo.exists())
     {
-      clearProps();
+      emit clearProps();
       QFile file(fileName);
       if(file.open(QIODevice::ReadOnly))
       {
@@ -1083,6 +1094,18 @@ void QAvimatorWindow::fileLoadProps()
             while(props.count()<11) props.append("0");
           }
 
+          auto propType = static_cast<Prop::PropType>(props[0].toInt());
+          auto xPosition = props[1].toDouble();
+          auto yPosition = props[2].toDouble();
+          auto zPosition = props[3].toDouble();
+          auto xScale = props[4].toDouble();
+          auto yScale = props[5].toDouble();
+          auto zScale = props[6].toDouble();
+          auto xRotation = props[7].toDouble();
+          auto yRotation = props[8].toDouble();
+          auto zRotation = props[9].toDouble();
+          auto isAttached = props[10].toInt();
+
           // TODO Temporary hack for adding mesh as part of removing GLUT
           QSharedPointer<Mesh> mesh;
 
@@ -1102,19 +1125,11 @@ void QAvimatorWindow::fileLoadProps()
               break;
           }
 
-          const Prop* prop=scene->addProp((Prop::PropType) props[0].toInt(),
-                                            props[1].toDouble(),
-                                            props[2].toDouble(),
-                                            props[3].toDouble(),
-                                            props[4].toDouble(),
-                                            props[5].toDouble(),
-                                            props[6].toDouble(),
-                                            props[7].toDouble(),
-                                            props[8].toDouble(),
-                                            props[9].toDouble(),
-                                            props[10].toInt(),
-                                            mesh
-          );
+          const Prop* prop = scene->addProp(propType, mesh,
+                                            isAttached,
+                                            xPosition, yPosition, zPosition,
+                                            xScale, yScale, zScale,
+                                            xRotation, yRotation, zRotation);
           if(prop)
           {
             ui->propNameCombo->addItem(prop->name());
@@ -1449,6 +1464,14 @@ void QAvimatorWindow::updatePropSpins(const QVector3D& position, const QVector3D
   ui->propZScaleSpin->blockSignals(false);
 }
 
+void QAvimatorWindow::onNewProp(const QString& propName)
+{
+  ui->propNameCombo->addItem(propName);
+  ui->propNameCombo->setCurrentIndex(ui->propNameCombo->count() - 1);
+  selectProp();
+  ui->attachToComboBox->setCurrentIndex(0);
+}
+
 void QAvimatorWindow::onSelectProp(bool isSelected, int attachmentPoint)
 {
   ui->propNameCombo->setEnabled(isSelected);
@@ -1458,6 +1481,23 @@ void QAvimatorWindow::onSelectProp(bool isSelected, int attachmentPoint)
     ui->attachToComboBox->setCurrentIndex(attachmentPoint);
   }
   ui->animationView->selectProp();
+}
+
+void QAvimatorWindow::onDeleteProp(const QString propName)
+{
+  for (int index = 0; index < ui->propNameCombo->count(); index++)
+  {
+    if (ui->propNameCombo->itemText(index) == propName)
+    {
+      ui->propNameCombo->removeItem(index);
+      selectProp();
+    }
+  }
+}
+
+void QAvimatorWindow::onClearProps()
+{
+  ui->propNameCombo->clear();
 }
 
 void QAvimatorWindow::selectProp()
@@ -1568,90 +1608,6 @@ void QAvimatorWindow::setCurrentFrame(int frame)
     updateInputs();
     updateKeyBtn();
   }
-}
-
-// this slot gets called when someone clicks one of the "New Prop" buttons
-void QAvimatorWindow::newProp(Prop::PropType type, QSharedPointer<Mesh> mesh)
-{
-  const Prop* prop=scene->addProp(type,10,40,10, 10,10,10, 0,0,0, 0, mesh);
-
-  if(prop)
-  {
-    ui->propNameCombo->addItem(prop->name());
-    ui->propNameCombo->setCurrentIndex(ui->propNameCombo->count()-1);
-    selectProp();
-    ui->attachToComboBox->setCurrentIndex(0);
-  }
-}
-
-void QAvimatorWindow::attachProp(int attachmentPoint)
-{
-  // FIXME: find better solution for filtering endpoint for joints
-  if(ui->attachToComboBox->currentText()=="-") attachmentPoint=0;
-  QString propName=ui->propNameCombo->currentText();
-  Prop* prop=scene->getPropByName(propName);
-  prop->attach(attachmentPoint);
-  updatePropSpins(prop->position(), prop->rotation(), prop->scale());
-  ui->animationView->repaint();
-}
-
-// gets called whenever one of the prop position values gets changed
-void QAvimatorWindow::propPositionChanged()
-{
-  QString propName=ui->propNameCombo->currentText();
-  Prop* prop=scene->getPropByName(propName);
-  if(prop)
-  {
-    prop->setPosition(ui->propXPosSpin->value(),ui->propYPosSpin->value(),ui->propZPosSpin->value());
-    ui->animationView->repaint();
-  }
-}
-
-// gets called whenever one of the prop scale values gets changed
-void QAvimatorWindow::propScaleChanged()
-{
-  QString propName=ui->propNameCombo->currentText();
-  Prop* prop=scene->getPropByName(propName);
-  if(prop)
-  {
-    prop->setScale(ui->propXScaleSpin->value(),ui->propYScaleSpin->value(),ui->propZScaleSpin->value());
-    ui->animationView->repaint();
-  }
-}
-
-// gets called whenever one of the prop rotation values gets changed
-void QAvimatorWindow::propRotationChanged()
-{
-  QString propName=ui->propNameCombo->currentText();
-  Prop* prop=scene->getPropByName(propName);
-  if(prop)
-  {
-    prop->setRotation(ui->propXRotSpin->value(),ui->propYRotSpin->value(),ui->propZRotSpin->value());
-    ui->animationView->repaint();
-  }
-}
-
-void QAvimatorWindow::deleteProp()
-{
-  QString propName=ui->propNameCombo->currentText();
-  Prop* prop=scene->getPropByName(propName);
-  if(prop)
-  {
-    scene->deleteProp(prop);
-    for(int index=0;index<ui->propNameCombo->count();index++)
-      if(ui->propNameCombo->itemText(index)==propName)
-    {
-      ui->propNameCombo->removeItem(index);
-      selectProp();
-    }
-  }
-}
-
-void QAvimatorWindow::clearProps()
-{
-  scene->clearProps();
-  ui->propNameCombo->clear();
-  selectProp();
 }
 
 // gets called by selecting an animation from the animation combo box
@@ -2008,22 +1964,22 @@ void QAvimatorWindow::on_easeOutCheck_stateChanged(int newState)
 
 void QAvimatorWindow::on_newBoxPropButton_clicked()
 {
-  newProp(Prop::Box, cubeMesh);
+  emit newProp(Prop::Box, cubeMesh);
 }
 
 void QAvimatorWindow::on_newSpherePropButton_clicked()
 {
-  newProp(Prop::Sphere, sphereMesh);
+  emit newProp(Prop::Sphere, sphereMesh);
 }
 
 void QAvimatorWindow::on_newConePropButton_clicked()
 {
-  newProp(Prop::Cone, coneMesh);
+  emit newProp(Prop::Cone, coneMesh);
 }
 
 void QAvimatorWindow::on_newTorusPropButton_clicked()
 {
-  newProp(Prop::Torus, torusMesh);
+  emit newProp(Prop::Torus, torusMesh);
 }
 
 void QAvimatorWindow::on_propNameCombo_activated(int index)
@@ -2033,57 +1989,62 @@ void QAvimatorWindow::on_propNameCombo_activated(int index)
 
 void QAvimatorWindow::on_deletePropButton_clicked()
 {
-  deleteProp();
+  emit deleteProp();
 }
 
 void QAvimatorWindow::on_attachToComboBox_activated(int attachmentPoint)
 {
-  attachProp(attachmentPoint);
+  // FIXME: find better solution for filtering endpoint for joints
+  if (ui->attachToComboBox->currentText() == "-")
+  {
+    attachmentPoint = 0;
+  }
+  emit attachProp(attachmentPoint);
 }
 
 void QAvimatorWindow::on_propXPosSpin_valueChanged(int)
 {
-  propPositionChanged();
+  emit propPositionChanged(ui->propXPosSpin->value(), ui->propYPosSpin->value(), ui->propZPosSpin->value());
 }
 
 void QAvimatorWindow::on_propYPosSpin_valueChanged(int)
 {
-  propPositionChanged();
+  emit propPositionChanged(ui->propXPosSpin->value(), ui->propYPosSpin->value(), ui->propZPosSpin->value());
 }
 
 void QAvimatorWindow::on_propZPosSpin_valueChanged(int)
 {
-  propPositionChanged();
+  emit propPositionChanged(ui->propXPosSpin->value(), ui->propYPosSpin->value(), ui->propZPosSpin->value());
 }
 
 void QAvimatorWindow::on_propXScaleSpin_valueChanged(int)
 {
-  propScaleChanged();
+  emit propScaleChanged(ui->propXScaleSpin->value(), ui->propYScaleSpin->value(), ui->propZScaleSpin->value());
 }
 
 void QAvimatorWindow::on_propYScaleSpin_valueChanged(int)
 {
-  propScaleChanged();
+  emit propScaleChanged(ui->propXScaleSpin->value(), ui->propYScaleSpin->value(), ui->propZScaleSpin->value());
 }
 
 void QAvimatorWindow::on_propZScaleSpin_valueChanged(int)
 {
-  propScaleChanged();
+  emit propScaleChanged(ui->propXScaleSpin->value(), ui->propYScaleSpin->value(), ui->propZScaleSpin->value());
 }
 
 void QAvimatorWindow::on_propXRotSpin_valueChanged(int)
 {
-  propRotationChanged();
+  emit propRotationChanged(ui->propXRotSpin->value(), ui->propYRotSpin->value(), ui->propZRotSpin->value());
 }
 
 void QAvimatorWindow::on_propYRotSpin_valueChanged(int)
 {
-  propRotationChanged();
+  emit propRotationChanged(ui->propXRotSpin->value(), ui->propYRotSpin->value(), ui->propZRotSpin->value());
 }
 
 void QAvimatorWindow::on_propZRotSpin_valueChanged(int)
 {
-  propRotationChanged();
+  emit propRotationChanged(ui->propXRotSpin->value(), ui->propYRotSpin->value(), ui->propZRotSpin->value());
 }
 
 void QAvimatorWindow::on_currentFrameSlider_valueChanged(int newValue)

@@ -127,9 +127,17 @@ PropManager* Scene::propManager()
   return m_propManager;
 }
 
-const Prop* Scene::addProp(Prop::PropType type, double x, double y, double z, double xs, double ys, double zs, double xr, double yr, double zr, int attach, QSharedPointer<Mesh> mesh)
+const Prop* Scene::addProp(Prop::PropType type, QSharedPointer<Mesh> mesh,
+                           int attach,
+                           double xPosition, double yPosition, double zPosition,
+                           double xScale, double yScale, double zScale,
+                           double xRotation, double yRotation, double zRotation)
 {
-  Prop* newProp = m_propManager->addProp(type, x, y, z, xs, ys, zs, xr, yr, zr, attach, mesh);
+  Prop* newProp = m_propManager->addProp(type, mesh,
+                                         attach,
+                                         xPosition, yPosition, zPosition,
+                                         xScale, yScale, zScale,
+                                         xRotation, yRotation, zRotation);
   emit repaint();
 
   return newProp;

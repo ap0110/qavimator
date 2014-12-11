@@ -40,11 +40,11 @@ class PropManager : public QObject
     Prop* at(int i) const;
     int count() const;
 
-    Prop* addProp(Prop::PropType type,
-                        double x, double y, double z,
-                        double xs, double ys, double zs,
-                        double xr, double yr, double zr,
-                        int attach, QSharedPointer<Mesh> mesh);
+    Prop* addProp(Prop::PropType type, QSharedPointer<Mesh> mesh,
+                  int attach,
+                  double xPosition, double yPosition, double zPosition,
+                  double xScale, double yScale, double zScale,
+                  double xRotation, double yRotation, double zRotation);
     void deleteProp(Prop* prop);
     void clearProps();
 

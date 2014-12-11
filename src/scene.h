@@ -71,11 +71,11 @@ class Scene : public QObject
     Camera* camera();
     PropManager* propManager();
 
-    const Prop* addProp(Prop::PropType type,
-                        double x, double y, double z,
-                        double xs, double ys, double zs,
-                        double xr, double yr, double zr,
-                        int attach, QSharedPointer<Mesh> mesh);
+    const Prop* addProp(Prop::PropType type, QSharedPointer<Mesh> mesh,
+                        int attach = 0,
+                        double xPosition = 10, double yPosition = 40, double zPosition = 10,
+                        double xScale = 10, double yScale = 10, double zScale = 10,
+                        double xRotation = 0, double yRotation = 0, double zRotation = 0);
     Prop* getPropByName(const QString& lookName);
     Prop* getPropById(unsigned int id);
     void deleteProp(Prop* prop);
