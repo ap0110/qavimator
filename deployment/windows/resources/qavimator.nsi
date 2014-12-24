@@ -105,6 +105,25 @@
 	!insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
+;Functions
+
+Function findQavimatorProcesses
+
+	StrCpy $0 "qavimator.exe"
+	KillProc::FindProcesses
+	StrCmp $1 "-1" 0 endOfFindFunction
+		;If something went wrong, warn the user about running QAvimator instances
+		; and continue installing
+		MessageBox MB_OK|MB_ICONINFORMATION \
+		"Be sure to close any open instances of QAvimator before installing a new one."
+		
+		StrCpy $0 "0"
+		
+	endOfFindFunction:
+	
+FunctionEnd
+
+;--------------------------------
 ;Function run on initialization of installer
 
 Var OldInstallationDir
@@ -112,6 +131,22 @@ Var OldStartMenuFolder
 Var OldVersion
 
 Function .onInit
+
+	checkRunningQavimator:
+
+	Call findQavimatorProcesses
+	StrCmp $0 "0" checkExistingInstallation 0
+		MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+		"QAvimator seems to be open. \
+		$\nPlease close any running instances of QAvimator before continuing." \
+		/SD IDABORT \
+		IDRETRY checkRunningQavimator \
+		IDIGNORE checkExistingInstallation
+
+		;IDABORT
+		Abort
+
+	checkExistingInstallation:
 
 	;If the user did not uninstall the previous version, then
 	; ask before running its uninstaller
@@ -196,10 +231,10 @@ Section "Install"
 	File "${PROJECT_ROOT_DIR}\_install\data\torus.obj"
 	File "${PROJECT_ROOT_DIR}\_install\data\TPose.avm"
 	File "${PROJECT_ROOT_DIR}\_install\data\TPose.bvh"
-	
+
 	!ifdef QT_DIR
 		SetOutPath "$INSTDIR"
-	
+
 		File "${QT_DIR}\bin\icudt52.dll"
 		File "${QT_DIR}\bin\icuin52.dll"
 		File "${QT_DIR}\bin\icuuc52.dll"
@@ -212,9 +247,9 @@ Section "Install"
 		File "${QT_DIR}\bin\Qt5OpenGL.dll"
 		File "${QT_DIR}\bin\Qt5Widgets.dll"
 		File "${RESOURCE_DIR}\qt.conf"
-		
+
 		SetOutPath "$INSTDIR\plugins\platforms"
-		
+
 		File "${QT_DIR}\plugins\platforms\qwindows.dll"
 	!endif
 
@@ -263,7 +298,6 @@ Section "Install"
 		CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\uninstall.exe"
 	!insertmacro MUI_STARTMENU_WRITE_END
 
-
 	WriteUninstaller "$INSTDIR\uninstall.exe"
 
 SectionEnd
@@ -271,7 +305,11 @@ SectionEnd
 ;--------------------------------
 ;Uninstaller section
 
+Var isFileRemaining
+
 Section "Uninstall"
+
+	StrCpy $isFileRemaining "0"
 
 	Delete "$INSTDIR\data\cone.obj"
 	Delete "$INSTDIR\data\cube.obj"
@@ -286,12 +324,12 @@ Section "Uninstall"
 	Delete "$INSTDIR\data\TPose.avm"
 	Delete "$INSTDIR\data\TPose.bvh"
 	RMDir "$INSTDIR\data"
-	
+
 	!ifdef QT_DIR
 		Delete "$INSTDIR\plugins\platforms\qwindows.dll"
 		RMDir "$INSTDIR\plugins\platforms"
 		RMDir "$INSTDIR\plugins"
-	
+
 		Delete "$INSTDIR\icudt52.dll"
 		Delete "$INSTDIR\icuin52.dll"
 		Delete "$INSTDIR\icuuc52.dll"
@@ -305,11 +343,15 @@ Section "Uninstall"
 		Delete "$INSTDIR\Qt5Widgets.dll"
 		Delete "$INSTDIR\qt.conf"
 	!endif
-	
+
 	Delete "$INSTDIR\NEWS"
 	Delete "$INSTDIR\qavimator.exe"
 	Delete "$INSTDIR\uninstall.exe"
+
+	ClearErrors
 	RMDir "$INSTDIR"
+	IfErrors 0 +2
+		StrCpy $isFileRemaining "1"
 
 	!insertmacro MUI_STARTMENU_GETFOLDER "${APPLICATION_NAME}" $StartMenuFolder
 
@@ -319,5 +361,9 @@ Section "Uninstall"
 
 	DeleteRegKey ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}"
 	DeleteRegKey ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}"
+
+	StrCmp $isFileRemaining "1" 0 +2
+		MessageBox MB_OK|MB_ICONEXCLAMATION \
+		"Some files could not be removed; they can be deleted manually."
 
 SectionEnd
