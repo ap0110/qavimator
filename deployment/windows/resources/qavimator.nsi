@@ -115,7 +115,7 @@ Function findQavimatorProcesses
 		;If something went wrong, warn the user about running QAvimator instances
 		; and continue installing
 		MessageBox MB_OK|MB_ICONINFORMATION \
-		"Be sure to close any open instances of QAvimator before installing a new one."
+		"Please close any running instances of QAvimator before continuing."
 		
 		StrCpy $0 "0"
 		
@@ -137,8 +137,7 @@ Function .onInit
 	Call findQavimatorProcesses
 	StrCmp $0 "0" checkExistingInstallation 0
 		MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
-		"QAvimator seems to be open. \
-		$\nPlease close any running instances of QAvimator before continuing." \
+		"Please close running instances of QAvimator before continuing." \
 		/SD IDABORT \
 		IDRETRY checkRunningQavimator \
 		IDIGNORE checkExistingInstallation
