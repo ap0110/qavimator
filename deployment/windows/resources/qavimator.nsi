@@ -123,6 +123,22 @@ Function findQavimatorProcesses
 	
 FunctionEnd
 
+Function un.findQavimatorProcesses
+
+	StrCpy $0 "qavimator.exe"
+	KillProc::FindProcesses
+	StrCmp $1 "-1" 0 endOfFindFunction
+		;If something went wrong, warn the user about running QAvimator instances
+		; and continue installing
+		MessageBox MB_OK|MB_ICONINFORMATION \
+		"Please close any running instances of QAvimator before continuing."
+		
+		StrCpy $0 "0"
+		
+	endOfFindFunction:
+	
+FunctionEnd
+
 ;--------------------------------
 ;Function run on initialization of installer
 
@@ -136,8 +152,12 @@ Function .onInit
 
 	Call findQavimatorProcesses
 	StrCmp $0 "0" checkExistingInstallation 0
-		MessageBox MB_ABORTRETRYIGNORE|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
-		"Please close running instances of QAvimator before continuing." \
+		MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP|MB_DEFBUTTON2 \
+		"Error: QAvimator is open. \
+		$\n$\nPlease close running instances of QAvimator before continuing. \
+		$\n$\nClick Abort to stop the installation, \
+		$\nRetry to check again, or \
+		$\nIgnore to continue the installation." \
 		/SD IDABORT \
 		IDRETRY checkRunningQavimator \
 		IDIGNORE checkExistingInstallation
@@ -166,9 +186,11 @@ Function .onInit
 	ReadRegStr $OldStartMenuFolder ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" "Start Menu Folder"
 	ReadRegStr $OldVersion ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" "Version"
 
-	;Run the installer and wait for it to return
+	;Copy uninstaller into temp so it can delete itself from the installation directory
+	CopyFiles /SILENT /FILESONLY "$OldInstallationDir\uninstall.exe" "$TEMP"
+	;Run the uninstaller and wait for it to return
 	ClearErrors
-	ExecWait '"$OldInstallationDir\uninstall.exe" _?=$OldInstallationDir'
+	ExecWait '"$TEMP\uninstall.exe" _?=$OldInstallationDir'
 
 	IfErrors abortInstallation
 
@@ -176,10 +198,6 @@ Function .onInit
 	ReadRegStr $R0 ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" ""
 	;If registry value still exists, then abort, otherwise remove uninstaller
 	StrCmp "$R0" "" 0 abortInstallation
-
-	;Remove the uninstaller
-	Delete "$OldInstallationDir\uninstall.exe"
-	RMDir "$OldInstallationDir"
 
 	;If "Start Menu Folder" was in registry...
 	StrCmp "$OldStartMenuFolder" "" continueInstallation 0
@@ -307,6 +325,25 @@ SectionEnd
 Var isFileRemaining
 
 Section "Uninstall"
+
+	checkRunningQavimator:
+
+	Call un.findQavimatorProcesses
+	StrCmp $0 "0" continueUninstallation 0
+		MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP|MB_DEFBUTTON2 \
+		"Error: QAvimator is open. \
+		$\n$\nPlease close running instances of QAvimator before continuing. \
+		$\n$\nClick Abort to stop the uninstallation, \
+		$\nRetry to check again, or \
+		$\nIgnore to continue the uninstallation." \
+		/SD IDABORT \
+		IDRETRY checkRunningQavimator \
+		IDIGNORE continueUninstallation
+
+		;IDABORT
+		Abort
+
+	continueUninstallation:
 
 	StrCpy $isFileRemaining "0"
 
