@@ -1622,6 +1622,8 @@ void QAvimatorWindow::animationChanged(int which)
   Animation* anim=animationIds.at(which);
   // select animation (will also update combo box, but better than duplicate code)
   selectAnimation(anim);
+  ui->animationView->selectPart(0);
+  currentPart = nullptr;
 }
 
 // gets called from AnimationView::animationSelected()

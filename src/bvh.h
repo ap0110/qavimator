@@ -108,8 +108,8 @@ class BVH
     void avmReadKeyFrame(BVHNode* root);
     void avmReadKeyFrameProperties(BVHNode* root);
 
-    void avmWriteKeyFrame(BVHNode* root,QTextStream& out);
-    void avmWriteKeyFrameProperties(BVHNode* root,QTextStream& out);
+    void avmWriteKeyFrame(BVHNode* root, QTextStream& out, int numberOfFrames);
+    void avmWriteKeyFrameProperties(BVHNode* root, QTextStream& out, int numberOfFrames);
 
     // removes all unknown nodes from the animation
     void removeNoSLNodes(BVHNode* root);

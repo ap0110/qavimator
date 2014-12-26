@@ -657,40 +657,62 @@ void BVH::bvhWrite(Animation* anim, const QString& file)
   f.close();
 }
 
-void BVH::avmWriteKeyFrame(BVHNode* root,QTextStream& out)
+void BVH::avmWriteKeyFrame(BVHNode* root, QTextStream& out, int numberOfFrames)
 {
   const QList<int> keys=root->keyframeList();
+
+  int actualKeyCount = keys.count();
+  // Write only keys for which frame data has been written
+  for (int i = 1; i < keys.count(); i++)
+  {
+    if (keys[i] >= numberOfFrames)
+    {
+      actualKeyCount = i;
+      break;
+    }
+  }
+
   // no key frames (usually at joint ends), just write a 0\n line
-  if(keys.count()==0)
+  if (actualKeyCount == 0)
     out << "0" << endl;
 
   // write line of key files
   else
   {
     // write number of key files
-    out << keys.count()-1 << " ";
+    out << actualKeyCount - 1 << " ";
 
     // skip frame 0 (always key frame) while saving and write all keys in a row
-    for(unsigned int i=1;i< (unsigned int) keys.count();i++)
+    for (unsigned int i = 1; i < (unsigned int) actualKeyCount; i++)
       out << keys[i] << " ";
 
     out << endl;
   }
 
   for(int i=0;i<root->numChildren();i++)
-    avmWriteKeyFrame(root->child(i),out);
+    avmWriteKeyFrame(root->child(i), out, numberOfFrames);
 }
 
 // writes ease in / out data
-void BVH::avmWriteKeyFrameProperties(BVHNode* root,QTextStream& out)
+void BVH::avmWriteKeyFrameProperties(BVHNode* root, QTextStream& out, int numberOfFrames)
 {
   const QList<int> keys=root->keyframeList();
 
-  // NOTE: remember, ease in/out data always takes first frame into account
-  out << keys.count() << " ";
+  int actualKeyCount = keys.count();
+  // Write only keys for which frame data has been written
+  for (int i = 1; i < keys.count(); i++)
+  {
+    if (keys[i] >= numberOfFrames)
+    {
+      actualKeyCount = i;
+      break;
+    }
+  }
 
   // NOTE: remember, ease in/out data always takes first frame into account
-  for(unsigned int i=0;i< (unsigned int) keys.count();i++)
+  out << actualKeyCount << " ";
+
+  for (unsigned int i = 0; i < (unsigned int) actualKeyCount; i++)
   {
     int type=0;
 
@@ -702,7 +724,7 @@ void BVH::avmWriteKeyFrameProperties(BVHNode* root,QTextStream& out)
   out << endl;
 
   for(int i=0;i<root->numChildren();i++)
-    avmWriteKeyFrameProperties(root->child(i),out);
+    avmWriteKeyFrameProperties(root->child(i), out, numberOfFrames);
 }
 
 void BVH::avmWrite(Animation* anim,const QString& file)
@@ -730,10 +752,10 @@ void BVH::avmWrite(Animation* anim,const QString& file)
     out << endl;
   }
 
-  avmWriteKeyFrame(root,out);
+  avmWriteKeyFrame(root, out, anim->getNumberOfFrames());
   out << "Properties" << endl;
 
-  avmWriteKeyFrameProperties(root,out);
+  avmWriteKeyFrameProperties(root, out, anim->getNumberOfFrames());
 
   // write remaining properties
   out << "Scale: " << anim->getAvatarScale() << endl;
@@ -744,10 +766,10 @@ void BVH::avmWrite(Animation* anim,const QString& file)
   // HACK: add-on for position key support - this needs to be revised badly
   // HACK: we need a new file format that makes it easier to add new features
   out << "Positions: ";
-  avmWriteKeyFrame(positionNode,out);
+  avmWriteKeyFrame(positionNode, out, anim->getNumberOfFrames());
 
   out << "PositionsEase: ";
-  avmWriteKeyFrameProperties(positionNode,out);
+  avmWriteKeyFrameProperties(positionNode, out, anim->getNumberOfFrames());
 
   f.close();
 }
