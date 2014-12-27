@@ -152,18 +152,12 @@ Function .onInit
 
 	Call findQavimatorProcesses
 	StrCmp $0 "0" checkExistingInstallation 0
-		MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP|MB_DEFBUTTON2 \
-		"Error: QAvimator is open. \
-		$\n$\nPlease close running instances of QAvimator before continuing. \
-		$\n$\nClick Abort to stop the installation, \
-		$\nRetry to check again, or \
-		$\nIgnore to continue the installation." \
-		/SD IDABORT \
+		MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+		"An instance of QAvimator is currently running. \
+		Please close QAvimator and try again." \
+		/SD IDCANCEL \
 		IDRETRY checkRunningQavimator \
-		IDIGNORE checkExistingInstallation
-
-		;IDABORT
-		Abort
+		IDCANCEL abortInstallation
 
 	checkExistingInstallation:
 
@@ -177,8 +171,8 @@ Function .onInit
 		$\nThis version must be removed before installation can continue. \
 		$\n$\nRemove current installation of QAvimator?" \
 		/SD IDCANCEL \
-		IDOK runUninstaller
-		Abort
+		IDOK runUninstaller \
+		IDCANCEL abortInstallation
 
 	runUninstaller:
 
@@ -330,17 +324,13 @@ Section "Uninstall"
 
 	Call un.findQavimatorProcesses
 	StrCmp $0 "0" continueUninstallation 0
-		MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP|MB_DEFBUTTON2 \
-		"Error: QAvimator is open. \
-		$\n$\nPlease close running instances of QAvimator before continuing. \
-		$\n$\nClick Abort to stop the uninstallation, \
-		$\nRetry to check again, or \
-		$\nIgnore to continue the uninstallation." \
-		/SD IDABORT \
-		IDRETRY checkRunningQavimator \
-		IDIGNORE continueUninstallation
+		MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+		"An instance of QAvimator is currently running. \
+		Please close QAvimator and try again." \
+		/SD IDCANCEL \
+		IDRETRY checkRunningQavimator
 
-		;IDABORT
+		;IDCANCEL
 		Abort
 
 	continueUninstallation:
@@ -399,7 +389,7 @@ Section "Uninstall"
 	DeleteRegKey ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}"
 
 	StrCmp $isFileRemaining "1" 0 +2
-		MessageBox MB_OK|MB_ICONEXCLAMATION \
+		MessageBox MB_OK|MB_ICONINFORMATION \
 		"Some files could not be removed; they can be deleted manually."
 
 SectionEnd
