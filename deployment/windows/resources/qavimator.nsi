@@ -166,10 +166,11 @@ Function .onInit
 	ReadRegStr $OldInstallationDir ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" ""
 	StrCmp "$OldInstallationDir" "" continueInstallation
 
+	ReadRegStr $OldVersion ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" "Version"
+
 	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
-		"A version of QAvimator is already installed! \
-		$\nThis version must be removed before installation can continue. \
-		$\n$\nRemove current installation of QAvimator?" \
+		"QAvimator $OldVersion is already installed and must be removed to continue. \
+		$\n$\nUninstall QAvimator $OldVersion now?" \
 		/SD IDCANCEL \
 		IDOK runUninstaller \
 		IDCANCEL abortInstallation
@@ -178,7 +179,6 @@ Function .onInit
 
 	;Get the "Start Menu Folder" name in case of version 20100106
 	ReadRegStr $OldStartMenuFolder ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" "Start Menu Folder"
-	ReadRegStr $OldVersion ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" "Version"
 
 	;Copy uninstaller into temp so it can delete itself from the installation directory
 	CopyFiles /SILENT /FILESONLY "$OldInstallationDir\uninstall.exe" "$TEMP"
@@ -316,8 +316,6 @@ SectionEnd
 ;--------------------------------
 ;Uninstaller section
 
-Var isFileRemaining
-
 Section "Uninstall"
 
 	checkRunningQavimator:
@@ -334,8 +332,6 @@ Section "Uninstall"
 		Abort
 
 	continueUninstallation:
-
-	StrCpy $isFileRemaining "0"
 
 	Delete "$INSTDIR\data\cone.obj"
 	Delete "$INSTDIR\data\cube.obj"
@@ -373,11 +369,7 @@ Section "Uninstall"
 	Delete "$INSTDIR\NEWS"
 	Delete "$INSTDIR\qavimator.exe"
 	Delete "$INSTDIR\uninstall.exe"
-
-	ClearErrors
 	RMDir "$INSTDIR"
-	IfErrors 0 +2
-		StrCpy $isFileRemaining "1"
 
 	!insertmacro MUI_STARTMENU_GETFOLDER "${APPLICATION_NAME}" $StartMenuFolder
 
@@ -387,9 +379,5 @@ Section "Uninstall"
 
 	DeleteRegKey ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}"
 	DeleteRegKey ${REGISTRY_ROOT_KEY} "${REGISTRY_UNINSTALL_KEY}"
-
-	StrCmp $isFileRemaining "1" 0 +2
-		MessageBox MB_OK|MB_ICONINFORMATION \
-		"Some files could not be removed; they can be deleted manually."
 
 SectionEnd
