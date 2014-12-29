@@ -129,7 +129,7 @@ Function un.findQavimatorProcesses
 	KillProc::FindProcesses
 	StrCmp $1 "-1" 0 endOfFindFunction
 		;If something went wrong, warn the user about running QAvimator instances
-		; and continue installing
+		; and continue uninstalling
 		MessageBox MB_OK|MB_ICONINFORMATION \
 		"Please close any running instances of QAvimator before continuing."
 		
