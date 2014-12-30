@@ -105,6 +105,41 @@
 	!insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
+;Functions
+
+Function findQavimatorProcesses
+
+	StrCpy $0 "qavimator.exe"
+	KillProc::FindProcesses
+	StrCmp $1 "-1" 0 endOfFindFunction
+		;If something went wrong, warn the user about running QAvimator instances
+		; and continue installing
+		MessageBox MB_OK|MB_ICONINFORMATION \
+		"Please close any running instances of QAvimator before continuing."
+		
+		StrCpy $0 "0"
+		
+	endOfFindFunction:
+	
+FunctionEnd
+
+Function un.findQavimatorProcesses
+
+	StrCpy $0 "qavimator.exe"
+	KillProc::FindProcesses
+	StrCmp $1 "-1" 0 endOfFindFunction
+		;If something went wrong, warn the user about running QAvimator instances
+		; and continue uninstalling
+		MessageBox MB_OK|MB_ICONINFORMATION \
+		"Please close any running instances of QAvimator before continuing."
+		
+		StrCpy $0 "0"
+		
+	endOfFindFunction:
+	
+FunctionEnd
+
+;--------------------------------
 ;Function run on initialization of installer
 
 Var OldInstallationDir
@@ -113,28 +148,43 @@ Var OldVersion
 
 Function .onInit
 
+	checkRunningQavimator:
+
+	Call findQavimatorProcesses
+	StrCmp $0 "0" checkExistingInstallation 0
+		MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+		"An instance of QAvimator is currently running. \
+		Please close QAvimator and try again." \
+		/SD IDCANCEL \
+		IDRETRY checkRunningQavimator \
+		IDCANCEL abortInstallation
+
+	checkExistingInstallation:
+
 	;If the user did not uninstall the previous version, then
 	; ask before running its uninstaller
 	ReadRegStr $OldInstallationDir ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" ""
 	StrCmp "$OldInstallationDir" "" continueInstallation
 
+	ReadRegStr $OldVersion ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" "Version"
+
 	MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
-		"A version of QAvimator is already installed! \
-		$\nThis version must be removed before installation can continue. \
-		$\n$\nRemove current installation of QAvimator?" \
+		"QAvimator $OldVersion is already installed and must be removed to continue. \
+		$\n$\nUninstall QAvimator $OldVersion now?" \
 		/SD IDCANCEL \
-		IDOK runUninstaller
-		Abort
+		IDOK runUninstaller \
+		IDCANCEL abortInstallation
 
 	runUninstaller:
 
 	;Get the "Start Menu Folder" name in case of version 20100106
 	ReadRegStr $OldStartMenuFolder ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" "Start Menu Folder"
-	ReadRegStr $OldVersion ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" "Version"
 
-	;Run the installer and wait for it to return
+	;Copy uninstaller into temp so it can delete itself from the installation directory
+	CopyFiles /SILENT /FILESONLY "$OldInstallationDir\uninstall.exe" "$TEMP"
+	;Run the uninstaller and wait for it to return
 	ClearErrors
-	ExecWait '"$OldInstallationDir\uninstall.exe" _?=$OldInstallationDir'
+	ExecWait '"$TEMP\uninstall.exe" _?=$OldInstallationDir'
 
 	IfErrors abortInstallation
 
@@ -142,10 +192,6 @@ Function .onInit
 	ReadRegStr $R0 ${REGISTRY_ROOT_KEY} "${REGISTRY_INSTALL_KEY}" ""
 	;If registry value still exists, then abort, otherwise remove uninstaller
 	StrCmp "$R0" "" 0 abortInstallation
-
-	;Remove the uninstaller
-	Delete "$OldInstallationDir\uninstall.exe"
-	RMDir "$OldInstallationDir"
 
 	;If "Start Menu Folder" was in registry...
 	StrCmp "$OldStartMenuFolder" "" continueInstallation 0
@@ -196,10 +242,10 @@ Section "Install"
 	File "${PROJECT_ROOT_DIR}\_install\data\torus.obj"
 	File "${PROJECT_ROOT_DIR}\_install\data\TPose.avm"
 	File "${PROJECT_ROOT_DIR}\_install\data\TPose.bvh"
-	
+
 	!ifdef QT_DIR
 		SetOutPath "$INSTDIR"
-	
+
 		File "${QT_DIR}\bin\icudt52.dll"
 		File "${QT_DIR}\bin\icuin52.dll"
 		File "${QT_DIR}\bin\icuuc52.dll"
@@ -212,9 +258,9 @@ Section "Install"
 		File "${QT_DIR}\bin\Qt5OpenGL.dll"
 		File "${QT_DIR}\bin\Qt5Widgets.dll"
 		File "${RESOURCE_DIR}\qt.conf"
-		
+
 		SetOutPath "$INSTDIR\plugins\platforms"
-		
+
 		File "${QT_DIR}\plugins\platforms\qwindows.dll"
 	!endif
 
@@ -263,7 +309,6 @@ Section "Install"
 		CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\uninstall.exe"
 	!insertmacro MUI_STARTMENU_WRITE_END
 
-
 	WriteUninstaller "$INSTDIR\uninstall.exe"
 
 SectionEnd
@@ -272,6 +317,21 @@ SectionEnd
 ;Uninstaller section
 
 Section "Uninstall"
+
+	checkRunningQavimator:
+
+	Call un.findQavimatorProcesses
+	StrCmp $0 "0" continueUninstallation 0
+		MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON2 \
+		"An instance of QAvimator is currently running. \
+		Please close QAvimator and try again." \
+		/SD IDCANCEL \
+		IDRETRY checkRunningQavimator
+
+		;IDCANCEL
+		Abort
+
+	continueUninstallation:
 
 	Delete "$INSTDIR\data\cone.obj"
 	Delete "$INSTDIR\data\cube.obj"
@@ -286,12 +346,12 @@ Section "Uninstall"
 	Delete "$INSTDIR\data\TPose.avm"
 	Delete "$INSTDIR\data\TPose.bvh"
 	RMDir "$INSTDIR\data"
-	
+
 	!ifdef QT_DIR
 		Delete "$INSTDIR\plugins\platforms\qwindows.dll"
 		RMDir "$INSTDIR\plugins\platforms"
 		RMDir "$INSTDIR\plugins"
-	
+
 		Delete "$INSTDIR\icudt52.dll"
 		Delete "$INSTDIR\icuin52.dll"
 		Delete "$INSTDIR\icuuc52.dll"
@@ -305,7 +365,7 @@ Section "Uninstall"
 		Delete "$INSTDIR\Qt5Widgets.dll"
 		Delete "$INSTDIR\qt.conf"
 	!endif
-	
+
 	Delete "$INSTDIR\NEWS"
 	Delete "$INSTDIR\qavimator.exe"
 	Delete "$INSTDIR\uninstall.exe"
