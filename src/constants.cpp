@@ -64,11 +64,7 @@
 #ifdef QAVIMATOR_DATAPATH
   const QString Constants::m_qavimatorDataPath = QString(QAVIMATOR_DATAPATH);
 #else
-#  ifdef __APPLE__
-    const QString Constants::m_qavimatorDataPath = QString(QApplication::applicationDirPath() + "/../Resources");
-#  else
-    const QString Constants::m_qavimatorDataPath = "./data";
-#  endif
+  const QString Constants::m_qavimatorDataPath = QString();
 #endif
 
 
@@ -125,47 +121,58 @@ const QString Constants::organizationDomain()
 
 const QString Constants::qavimatorDataPath()
 {
-  return m_qavimatorDataPath;
+  if (!m_qavimatorDataPath.isNull())
+  {
+    return m_qavimatorDataPath;
+  }
+  else
+  {
+#  ifdef __APPLE__
+    return QString(QApplication::applicationDirPath() + "/../Resources");
+#  else
+    return QString("./data");
+#  endif
+  }
 }
 
 const QString Constants::defaultPosePath()
 {
-  return m_qavimatorDataPath + "/TPose.avm";
+  return qavimatorDataPath() + "/TPose.avm";
 }
 
 const QString Constants::limitsFilePath()
 {
-  return m_qavimatorDataPath + "/SL.lim";
+  return qavimatorDataPath() + "/SL.lim";
 }
 
 const QString Constants::maleBvhPath()
 {
-  return m_qavimatorDataPath + "/SLMale.bvh";
+  return qavimatorDataPath() + "/SLMale.bvh";
 }
 
 const QString Constants::femaleBvhPath()
 {
-  return m_qavimatorDataPath + "/SLFemale.bvh";
+  return qavimatorDataPath() + "/SLFemale.bvh";
 }
 
 const QString Constants::cubeMeshFilePath()
 {
-  return m_qavimatorDataPath + "/cube.obj";
+  return qavimatorDataPath() + "/cube.obj";
 }
 
 const QString Constants::sphereMeshFilePath()
 {
-  return m_qavimatorDataPath + "/sphere.obj";
+  return qavimatorDataPath() + "/sphere.obj";
 }
 
 const QString Constants::coneMeshFilePath()
 {
-  return m_qavimatorDataPath + "/cone.obj";
+  return qavimatorDataPath() + "/cone.obj";
 }
 
 const QString Constants::torusMeshFilePath()
 {
-  return m_qavimatorDataPath + "/torus.obj";
+  return qavimatorDataPath() + "/torus.obj";
 }
 
 const int Constants::keyWidth()
