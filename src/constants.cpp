@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifdef Q_OS_MAC
+#ifdef __APPLE__
 #  include <QApplication>
 #endif
 
@@ -64,7 +64,7 @@
 #ifdef QAVIMATOR_DATAPATH
   const QString Constants::m_qavimatorDataPath = QString(QAVIMATOR_DATAPATH);
 #else
-#  ifdef Q_OS_MAC
+#  ifdef __APPLE__
     const QString Constants::m_qavimatorDataPath = QString(QApplication::applicationDirPath() + "/../Resources");
 #  else
     const QString Constants::m_qavimatorDataPath = "./data";
