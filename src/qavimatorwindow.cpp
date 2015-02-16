@@ -1112,16 +1112,16 @@ void QAvimatorWindow::fileLoadProps()
           switch (props[0].toInt())
           {
             case Prop::PropType::Box:
-              mesh.swap(cubeMesh);
+              mesh = cubeMesh;
               break;
             case Prop::PropType::Sphere:
-              mesh.swap(sphereMesh);
+              mesh = sphereMesh;
               break;
             case Prop::PropType::Cone:
-              mesh.swap(coneMesh);
+              mesh = coneMesh;
               break;
             case Prop::PropType::Torus:
-              mesh.swap(torusMesh);
+              mesh = torusMesh;
               break;
           }
 
