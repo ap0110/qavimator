@@ -1,12 +1,18 @@
-Version 0.1.1
-----------------
+Version 0.1.1.450
+---------------------
 
-  - BUG: Fixed avatar positioning
+  - BUG: Fixed crash when loading props
+
+
+Version 0.1.1
+---------------------
+
+  - BUG: Fixed avatar position interpolation
   - BUG: Fixed avatar rotation/position ignoring changes if return key was not pressed after typing a new value
 
 
 Version 0.1.0
-----------------
+---------------------
 
   - First release
   - FEATURE: Added program update notifications
